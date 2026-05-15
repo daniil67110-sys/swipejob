@@ -1,0 +1,31 @@
+# SwipeJob — Lefthook Git hooks configuration
+# Source: architecture.md ligne 683
+#
+# Note: extend PATH with $HOME/.local/bin so hooks find pnpm when installed
+# via npm --prefix ~/.local (cf. README "Installation"). Corepack/Homebrew
+# installs are also picked up via the default PATH.
+
+pre-commit:
+  parallel: true
+  env:
+    PATH: "$HOME/.local/bin:$PATH"
+  commands:
+    # Note: ESLint lives per-workspace (apps/* and packages/*) — running it on
+    # raw staged-file paths from the root fails because eslint isn't installed
+    # at the root. We rely on Turborepo's cache to keep the full-repo lint fast.
+    lint:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: pnpm lint
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: pnpm typecheck
+    format-check:
+      glob: "*.{ts,tsx,js,json,md,css}"
+      run: pnpm exec prettier --check {staged_files}
+
+commit-msg:
+  env:
+    PATH: "$HOME/.local/bin:$PATH"
+  commands:
+    commitlint:
+      run: pnpm exec commitlint --edit {1}

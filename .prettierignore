@@ -1,0 +1,11 @@
+.next/
+dist/
+node_modules/
+_bmad-output/
+_bmad/
+.claude/
+coverage/
+.turbo/
+*.lock
+pnpm-lock.yaml
+meta.json

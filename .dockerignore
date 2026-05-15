@@ -1,0 +1,14 @@
+node_modules
+.env*
+!.env.example
+_bmad-output/
+_bmad/
+.git/
+.turbo
+dist
+.next
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/

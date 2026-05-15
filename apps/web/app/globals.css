@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+/* SwipeJob — Design System Global CSS */
+/* Fonts chargées via next/font dans app/layout.tsx */
+
+/* Variables CSS custom (spécifiques à l'app — les tokens couleurs sont dans le preset Tailwind) */
+:root {
+  /* Transitions globales */
+  --transition-default: 150ms ease;
+  --transition-slow: 300ms ease;
+
+  /* SwipeCard animations */
+  --swipe-rotation-max: 15deg;
+  --swipe-threshold: 100px;
+}
+
+/* Dark mode support (via next-themes) */
+.dark {
+  color-scheme: dark;
+}
+
+/* Reset & base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100dvh;
+}
