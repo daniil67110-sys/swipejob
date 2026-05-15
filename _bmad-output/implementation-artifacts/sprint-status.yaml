@@ -1,0 +1,157 @@
+# generated: 2026-05-15
+# last_updated: 2026-05-15
+# project: mon-test-bmad
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-05-15
+last_updated: 2026-05-15
+project: mon-test-bmad
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # =========================================================================
+  # EPIC 1: Foundation & Authenticated Onboarding
+  # =========================================================================
+  epic-1: backlog
+  1-1-bootstrap-monorepo-turborepo-et-infrastructure-de-base: backlog
+  1-2-setup-observability-et-pipeline-ci-cd: backlog
+  1-3-inscription-utilisateur-via-oauth-google: backlog
+  1-4-inscription-utilisateur-via-email-et-mot-de-passe: backlog
+  1-5-verification-d-age-et-consentement-parental-pour-mineurs: backlog
+  1-6-upload-de-cv-au-format-pdf-avec-stockage-securise: backlog
+  1-7-parsing-ia-du-cv-avec-correction-manuelle: backlog
+  1-8-configuration-des-preferences-de-recherche: backlog
+  1-9-referentiel-des-ecoles-et-niveau-d-etudes: backlog
+  1-10-modification-et-suppression-de-profil: backlog
+  epic-1-retrospective: optional
+
+  # =========================================================================
+  # EPIC 2: Offer Discovery & AI Matching
+  # =========================================================================
+  epic-2: backlog
+  2-1-bootstrap-du-worker-bullmq-et-schemas-d-offres: backlog
+  2-2-integration-de-l-api-france-travail: backlog
+  2-3-integration-d-au-moins-une-source-secondaire-d-offres: backlog
+  2-4-normalisation-des-offres-en-format-unifie: backlog
+  2-5-detection-et-fusion-des-doublons-inter-sources: backlog
+  2-6-desactivation-automatique-des-offres-expirees-ou-pourvues: backlog
+  2-7-maintenir-un-catalogue-de-5000-offres-actives: backlog
+  2-8-calcul-des-embeddings-et-score-de-matching-ia-explicable: backlog
+  2-9-exclusion-stricte-des-criteres-proteges-du-matching: backlog
+  2-10-generation-du-deck-quotidien-personnalise: backlog
+  2-11-affichage-de-l-explication-textuelle-du-score-par-offre: backlog
+  2-12-detection-de-penurie-et-suggestion-d-elargissement: backlog
+  2-13-journal-auditable-des-calculs-de-matching-ia-act: backlog
+  2-14-performance-du-calcul-de-deck-post-upload-cv: backlog
+  epic-2-retrospective: optional
+
+  # =========================================================================
+  # EPIC 3: Swipe & AI Application
+  # =========================================================================
+  epic-3: backlog
+  3-1-composant-swipecard-avec-animations-framer-motion: backlog
+  3-2-composant-swipedeck-avec-stack-3d-et-prechargement: backlog
+  3-3-consultation-du-detail-d-une-offre-depuis-la-carte: backlog
+  3-4-gestes-swipe-et-equivalents-clavier-bouton: backlog
+  3-5-generation-automatique-d-une-lettre-de-motivation-ia: backlog
+  3-6-envoi-automatique-de-la-candidature-par-email: backlog
+  3-7-mode-preview-de-la-lettre-avant-envoi: backlog
+  3-8-undo-d-une-candidature-dans-les-30-secondes: backlog
+  3-9-quota-quotidien-de-swipes-droits-configurable: backlog
+  3-10-anti-doublon-de-candidature-a-la-meme-offre: backlog
+  epic-3-retrospective: optional
+
+  # =========================================================================
+  # EPIC 4: Application Lifecycle & Coaching
+  # =========================================================================
+  epic-4: backlog
+  4-1-dashboard-des-candidatures-envoyees-avec-statuts: backlog
+  4-2-modification-manuelle-du-statut-d-une-candidature: backlog
+  4-3-reporter-une-signature-avec-celebration: backlog
+  4-4-notifications-push-web-quotidiennes-configurables: backlog
+  4-5-email-recapitulatif-hebdomadaire-d-activite: backlog
+  4-6-preferences-des-canaux-de-communication: backlog
+  4-7-mini-coach-ia-pre-entretien-interviewprepcard: backlog
+  epic-4-retrospective: optional
+
+  # =========================================================================
+  # EPIC 5: Engagement, Streaks & Social
+  # =========================================================================
+  epic-5: backlog
+  5-1-composant-dailystreak-avec-heatmap-historique: backlog
+  5-2-systeme-de-badges-et-deblocage-aux-jalons: backlog
+  5-3-lien-de-parrainage-unique-avec-tracking-et-recompense: backlog
+  5-4-partage-d-une-offre-avec-lien-anonymise: backlog
+  5-5-ecran-wrappedshare-a-la-signature: backlog
+  epic-5-retrospective: optional
+
+  # =========================================================================
+  # EPIC 6: Privacy, RGPD Self-Service & Compliance
+  # =========================================================================
+  epic-6: backlog
+  6-1-pages-cgu-politique-de-confidentialite-et-cookies: backlog
+  6-2-gestion-granulaire-des-consentements-par-finalite: backlog
+  6-3-export-des-donnees-personnelles-json-et-pdf: backlog
+  6-4-demande-de-suppression-complete-du-compte: backlog
+  6-5-audit-logs-append-only-des-acces-et-modifications-pii: backlog
+  6-6-anonymisation-automatique-des-cv-24-mois-d-inactivite: backlog
+  6-7-conformite-loi-toubon-et-infrastructure-i18n: backlog
+  6-8-declaration-d-accessibilite-publique-et-signalement: backlog
+  epic-6-retrospective: optional
+
+  # =========================================================================
+  # EPIC 7: Public Marketing & SEO Discovery
+  # =========================================================================
+  epic-7: backlog
+  7-1-landing-publique-optimisee-seo-et-core-web-vitals: backlog
+  7-2-pages-seo-dynamiques-par-metier-ville-ecole: backlog
+  7-3-page-publique-d-offre-anonymisee: backlog
+  7-4-sitemap-xml-et-robots-txt-dynamiques: backlog
+  7-5-metadonnees-schema-org-jobposting-completes: backlog
+  7-6-bibliotheque-de-blog-editorial: backlog
+  epic-7-retrospective: optional
+
+  # =========================================================================
+  # EPIC 8: Admin Back-Office & Compliance Operations
+  # =========================================================================
+  epic-8: backlog
+  8-1-authentification-admin-sur-back-office-distinct: backlog
+  8-2-moderation-des-offres-ingerees: backlog
+  8-3-gestion-des-utilisateurs-et-etats: backlog
+  8-4-traitement-des-demandes-rgpd: backlog
+  8-5-dashboard-des-metriques-produit-kpis: backlog
+  8-6-dashboard-audit-ia-et-kill-switch-matching: backlog
+  epic-8-retrospective: optional
