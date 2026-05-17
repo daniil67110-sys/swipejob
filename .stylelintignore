@@ -1,0 +1,11 @@
+node_modules
+.next
+.turbo
+dist
+build
+_bmad
+_bmad-output
+.claude
+coverage
+playwright-report
+test-results

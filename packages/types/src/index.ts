@@ -5,6 +5,8 @@
 
 export * from './action-result.js';
 export * from './errors.js';
+export * from './pii.js';
+export * from './jobs/audit-export.js';
 
 // Stubs — seront implémentés au fur et à mesure des stories
 // export * from './user.js';

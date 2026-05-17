@@ -1,40 +1,25 @@
 import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
-  // TypeScript strict mode en build
   typescript: {
     ignoreBuildErrors: false,
   },
 
-  // ESLint en build
   eslint: {
     ignoreDuringBuilds: false,
   },
 
-  // Expérimental — React 19 strict mode
   reactStrictMode: true,
 
-  // Headers de sécurité (sera enrichi en Story 1.2 avec CSP)
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          // X-XSS-Protection retiré: déprécié, ignoré par les navigateurs modernes,
-          // peut introduire des vulnérabilités avec des proxies legacy.
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
-          },
-          // HSTS: activé uniquement en production (pas en preview/dev pour éviter les boucles)
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           ...(process.env['NODE_ENV'] === 'production'
             ? [
                 {
@@ -49,4 +34,22 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const sentryAuthAvailable = Boolean(
+  process.env['SENTRY_AUTH_TOKEN'] && process.env['SENTRY_ORG'] && process.env['SENTRY_PROJECT'],
+);
+
+export default sentryAuthAvailable
+  ? withSentryConfig(nextConfig, {
+      org: process.env['SENTRY_ORG'],
+      project: process.env['SENTRY_PROJECT'],
+      authToken: process.env['SENTRY_AUTH_TOKEN'],
+      silent: !process.env['CI'],
+      widenClientFileUpload: true,
+      sourcemaps: {
+        disable: false,
+        deleteSourcemapsAfterUpload: true,
+      },
+      disableLogger: true,
+      automaticVercelMonitors: false,
+    })
+  : nextConfig;

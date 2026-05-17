@@ -1,16 +1,23 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-/**
- * Middleware Next.js — V1 passthrough
- * Sera enrichi en Story 1.3 (Auth.js v5 session guard)
- */
-export function middleware(_request: NextRequest) {
-  // V1: passthrough — l'authentification sera gérée par Auth.js (Story 1.3)
-  return NextResponse.next();
+const TRACE_ID_HEADER = 'x-trace-id';
+
+export function middleware(request: NextRequest) {
+  const traceId = request.headers.get(TRACE_ID_HEADER) ?? crypto.randomUUID();
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(TRACE_ID_HEADER, traceId);
+
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  response.headers.set(TRACE_ID_HEADER, traceId);
+  return response;
 }
 
 export const config = {
-  // Matcher: toutes les routes sauf les assets statiques
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|manifest.webmanifest|public/).*)'],
+  matcher: [
+    '/((?!api/health|api/sentry-test|_next/static|_next/image|favicon.ico|manifest.webmanifest|sitemap.xml|robots.txt|public/).*)',
+  ],
 };

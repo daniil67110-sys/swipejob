@@ -13,7 +13,9 @@ function buildHealthResponse() {
     {
       status: 'ok',
       service: 'web',
-      version: process.env['npm_package_version'] ?? '0.1.0',
+      version: process.env['NEXT_PUBLIC_APP_VERSION'] ?? 'dev',
+      commit: process.env['VERCEL_GIT_COMMIT_SHA'] ?? 'local',
+      env: process.env['VERCEL_ENV'] ?? process.env['NODE_ENV'] ?? 'development',
       timestamp: new Date().toISOString(),
     },
     {

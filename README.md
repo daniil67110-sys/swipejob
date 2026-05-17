@@ -94,6 +94,10 @@ pnpm format:check     # Prettier --check (utilisé par CI)
 
 # Tests
 pnpm test             # Vitest sur tout le monorepo
+pnpm --filter @swipejob/web test:e2e  # Playwright + axe-core (e2e)
+
+# CSS lint (Tailwind 4)
+pnpm lint:css         # Stylelint sur apps/web/app/**/*.css
 
 # Build production
 pnpm build            # Build Next.js + worker TypeScript
@@ -130,11 +134,40 @@ Types valides : `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `ci`
 
 ---
 
+## Observability (Story 1.2)
+
+| Service                               | Rôle                                                                         | Activation                                                                        |
+| ------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Sentry**                            | Erreurs web + worker, source maps, release tracking, distributed tracing     | `SENTRY_DSN` set                                                                  |
+| **Posthog Cloud EU**                  | Analytics produit (anonymisé, RGPD-compliant, host `eu.i.posthog.com` forcé) | `NEXT_PUBLIC_POSTHOG_KEY` set                                                     |
+| **Axiom**                             | Logs structurés Pino JSON (3 datasets : web, worker, audit 13 mois)          | `AXIOM_TOKEN` set (prod uniquement)                                               |
+| **Vercel Analytics + Speed Insights** | Core Web Vitals real-user, cookie-less                                       | activé via composants `<Analytics />` + `<SpeedInsights />` (auto sur Vercel Pro) |
+
+Tout le code observability skip silencieusement si les env vars sont absentes — boot OK sans aucune credential.
+
+Runbooks détaillés :
+
+- [`docs/runbooks/observability.md`](docs/runbooks/observability.md) — dashboards, validation manuelle, conformité RGPD, incident playbook.
+- [`docs/runbooks/vercel-setup.md`](docs/runbooks/vercel-setup.md) — procédure import projet + env vars.
+- [`docs/runbooks/branch-protection.md`](docs/runbooks/branch-protection.md) — required status checks `main`.
+- [`docs/runbooks/audit-export.md`](docs/runbooks/audit-export.md) — export mensuel logs RGPD vers R2 (13 mois).
+
+---
+
+## CI/CD (Story 1.2)
+
+- `.github/workflows/ci.yml` : `install` → (`lint`, `typecheck`, `test`, `build`) en parallèle.
+- `.github/workflows/e2e.yml` : Playwright (chromium + webkit) + axe-core (NFR-A8 bloquant `serious`/`critical`).
+- Preview deployments Vercel par PR (cf. runbook).
+
+---
+
 ## Références
 
 - [Architecture complète](_bmad-output/planning-artifacts/architecture.md)
 - [PRD SwipeJob](_bmad-output/planning-artifacts/prd.md)
 - [UX Design Specification](_bmad-output/planning-artifacts/ux-design-specification.md)
 - [Épics & Stories](_bmad-output/planning-artifacts/epics.md)
+- [Runbooks opérationnels](docs/runbooks/)
 
-> **Note :** La documentation est dans `_bmad-output/planning-artifacts/` (pas `docs/`).
+> **Note :** La doc fonctionnelle/architecture est dans `_bmad-output/planning-artifacts/`. La doc opérationnelle (runbooks, ADRs, compliance, API) est dans `docs/`.

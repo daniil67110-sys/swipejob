@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Sora } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { PosthogProvider } from '@/components/shared/PosthogProvider';
 import './globals.css';
 
 /**
@@ -40,9 +43,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const posthogKey = process.env['NEXT_PUBLIC_POSTHOG_KEY'];
+  const posthogHost = process.env['NEXT_PUBLIC_POSTHOG_HOST'] ?? 'https://eu.i.posthog.com';
+
   return (
     <html lang="fr" suppressHydrationWarning className={`${inter.variable} ${sora.variable}`}>
-      <body className="font-sans antialiased bg-neutral-50 text-neutral-900">{children}</body>
+      <body className="font-sans antialiased bg-neutral-50 text-neutral-900">
+        <PosthogProvider posthogKey={posthogKey} posthogHost={posthogHost}>
+          {children}
+        </PosthogProvider>
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

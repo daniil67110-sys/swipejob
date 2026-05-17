@@ -1,3 +1,4 @@
+import 'server-only';
 import pino from 'pino';
 import { env, isObservabilityEnabled } from './env.js';
 
@@ -16,32 +17,20 @@ function buildTransport(): pino.LoggerOptions['transport'] | undefined {
     return {
       target: '@axiomhq/pino',
       options: {
-        dataset: env.AXIOM_DATASET_WORKER,
+        dataset: env.AXIOM_DATASET_WEB,
         token: env.AXIOM_TOKEN,
-      },
-    };
-  }
-  if (env.NODE_ENV !== 'production') {
-    return {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'HH:MM:ss',
-        ignore: 'pid,hostname',
       },
     };
   }
   return undefined;
 }
 
-const logger = pino({
-  level: env.LOG_LEVEL,
+export const serverLogger = pino({
+  level: env.NODE_ENV === 'production' ? 'info' : 'debug',
   base: {
-    service: 'worker',
+    service: 'web',
     env: env.NODE_ENV,
   },
   redact: { paths: REDACT_PATHS, censor: '[REDACTED]' },
   transport: buildTransport(),
 });
-
-export default logger;

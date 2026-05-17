@@ -1,49 +1,42 @@
+import { initSentry, captureException, flushSentry } from './lib/sentry.js';
+initSentry();
+
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { z } from 'zod';
 import logger from './lib/logger.js';
+import { env } from './lib/env.js';
+import { startAuditWorker, stopAuditWorker } from './workers/audit.worker.js';
 
 const app = new Hono();
 
-// Health check endpoint
 app.get('/health', (c) => {
   return c.json({
     status: 'ok',
     service: 'worker',
-    version: process.env['npm_package_version'] ?? '0.1.0',
+    version: process.env['APP_VERSION'] ?? 'dev',
+    commit: env.RAILWAY_GIT_COMMIT_SHA ?? 'local',
+    env: env.NODE_ENV,
+    queues: { active: 0, waiting: 0 },
     timestamp: new Date().toISOString(),
   });
 });
 
-// Metrics endpoint placeholder (Story 1.2 — observability)
-// Returns 501 Not Implemented — Prometheus would parse 200 OK text as error
 app.get('/metrics', (c) => c.text('# Not implemented\n', 501));
 
-// Validate WORKER_PORT via Zod — avoids NaN from Number('abc') or Number('')
-const portSchema = z.coerce.number().int().min(1).max(65535).default(4000);
-const portResult = portSchema.safeParse(process.env['WORKER_PORT']);
-const PORT = portResult.success ? portResult.data : 4000;
+const PORT = env.WORKER_PORT;
 
-if (!portResult.success) {
-  logger.warn(
-    { envValue: process.env['WORKER_PORT'] },
-    'Invalid WORKER_PORT — falling back to default port 4000',
-  );
-}
-
-// Start server with EADDRINUSE error handling
 let server: ReturnType<typeof serve> | undefined;
 
 try {
-  server = serve(
-    {
-      fetch: app.fetch,
-      port: PORT,
-    },
-    (info) => {
-      logger.info({ port: info.port }, `SwipeJob Worker démarré sur le port ${info.port}`);
-    },
-  );
+  server = serve({ fetch: app.fetch, port: PORT }, (info) => {
+    logger.info({ port: info.port }, `SwipeJob Worker démarré sur le port ${info.port}`);
+  });
+
+  if (env.WORKER_ROLE !== 'http-only') {
+    void startAuditWorker().catch((err) => {
+      logger.error({ err }, 'Failed to start audit worker — continuing without it.');
+    });
+  }
 } catch (error: unknown) {
   const err = error as NodeJS.ErrnoException;
   if (err.code === 'EADDRINUSE') {
@@ -54,18 +47,19 @@ try {
   } else {
     logger.error({ error: err }, 'Erreur au démarrage du serveur worker');
   }
+  captureException(err);
+  await flushSentry();
   process.exit(1);
 }
 
-// Graceful shutdown handler
 function shutdown(signal: string) {
   logger.info({ signal }, 'Signal reçu — arrêt gracieux du worker en cours...');
+  void stopAuditWorker().catch(() => {});
   if (server) {
     server.close(() => {
       logger.info('Serveur fermé proprement.');
-      process.exit(0);
+      void flushSentry().finally(() => process.exit(0));
     });
-    // Force exit after 10s if server doesn't close cleanly
     setTimeout(() => {
       logger.error('Timeout arrêt gracieux — forçage exit.');
       process.exit(1);
@@ -85,12 +79,14 @@ process.on('SIGINT', () => {
 
 process.on('uncaughtException', (error) => {
   logger.error({ error }, 'uncaughtException — arrêt du worker');
-  process.exit(1);
+  captureException(error);
+  void flushSentry().finally(() => process.exit(1));
 });
 
 process.on('unhandledRejection', (reason) => {
   logger.error({ reason }, 'unhandledRejection — arrêt du worker');
-  process.exit(1);
+  captureException(reason);
+  void flushSentry().finally(() => process.exit(1));
 });
 
 export { app };

@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 /* SwipeJob — Design System Global CSS */
+
 /* Fonts chargées via next/font dans app/layout.tsx */
 
 /* Variables CSS custom (spécifiques à l'app — les tokens couleurs sont dans le preset Tailwind) */
@@ -28,7 +29,7 @@
 
 html {
   font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

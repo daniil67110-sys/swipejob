@@ -6,6 +6,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "lint:css": "stylelint \"apps/web/app/**/*.css\"",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
@@ -13,19 +14,13 @@
     "clean": "turbo run clean && rm -rf node_modules/.cache .turbo",
     "prepare": "lefthook install"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "lefthook",
-      "esbuild",
-      "sharp",
-      "msgpackr-extract"
-    ]
-  },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "lefthook": "^1.11.13",
     "prettier": "^3.5.3",
+    "stylelint": "^17.11.1",
+    "stylelint-config-standard": "^40.0.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },
