@@ -1,5 +1,8 @@
 # generated: 2026-05-15
 # last_updated: 2026-05-17
+# 2026-05-17: insertion hors-séquence story 1-2-5 (TECH-002) avant story 1-3 pour
+# combler le gap planning DB schema (cf. _bmad-output/implementation-artifacts/
+# 1-2-5-setup-neon-drizzle-schemas-initiaux.md header).
 # project: mon-test-bmad
 # project_key: NOKEY
 # tracking_system: file-system
@@ -48,6 +51,7 @@ development_status:
   epic-1: in-progress
   1-1-bootstrap-monorepo-turborepo-et-infrastructure-de-base: done
   1-2-setup-observability-et-pipeline-ci-cd: done
+  1-2-5-setup-neon-drizzle-schemas-initiaux: done
   1-3-inscription-utilisateur-via-oauth-google: backlog
   1-4-inscription-utilisateur-via-email-et-mot-de-passe: backlog
   1-5-verification-d-age-et-consentement-parental-pour-mineurs: backlog

@@ -16,6 +16,7 @@
     "@hono/node-server": "^1.14.2",
     "@sentry/node": "^10.53.1",
     "@sentry/profiling-node": "^10.53.1",
+    "@swipejob/db": "workspace:*",
     "@swipejob/types": "workspace:*",
     "bullmq": "^5.53.3",
     "hono": "^4.7.10",

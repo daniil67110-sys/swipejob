@@ -5,6 +5,7 @@ allowBuilds:
   "@sentry-internal/node-cpu-profiler": true
   "@sentry/cli": true
   core-js: false
+  esbuild: true
   protobufjs: false
 onlyBuiltDependencies:
   - lefthook

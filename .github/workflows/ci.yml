@@ -97,6 +97,29 @@ jobs:
           restore-keys: ${{ runner.os }}-turbo-test-
       - run: pnpm test
 
+  db-check:
+    name: db-check
+    needs: install
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Verify no schema/migration drift
+        working-directory: packages/db
+        run: |
+          pnpm exec drizzle-kit generate --name __drift_check__
+          # Si une nouvelle migration a été créée → schema/migration drift
+          if [ -f "src/migrations/0000___drift_check__.sql" ] || ls src/migrations/*__drift_check__*.sql 2>/dev/null; then
+            echo "Schema drift detected — run 'pnpm db:generate' locally and commit the migration."
+            exit 1
+          fi
+
   build:
     name: build
     needs: install

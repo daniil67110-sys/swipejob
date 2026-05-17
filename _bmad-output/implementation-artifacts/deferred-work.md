@@ -4,8 +4,8 @@ Travaux identifiés mais reportés volontairement. Chaque entrée indique l'orig
 
 ## Deferred from: code review of story 1-1-bootstrap-monorepo-turborepo (2026-05-15)
 
-- ~~**Worker `package.json` manque `@swipejob/db` et `@swipejob/llm`**~~ — **partiellement levé Story 1.2** : `@swipejob/types` migré devDep → dep dans apps/worker car constants `AUDIT_QUEUE_NAME` / Zod schemas importés à runtime (audit-export job). `@swipejob/db` et `@swipejob/llm` toujours absents, à ajouter quand Story 2.x importera.
-- **`apps/web` `package.json` manque `@swipejob/db` et `@swipejob/llm`** [`apps/web/package.json`] — Task 4 ligne 110. **Reprise :** quand la première Server Action importera `@swipejob/db` (probablement Story 1.3 auth).
+- ~~**Worker `package.json` manque `@swipejob/db` et `@swipejob/llm`**~~ — **`@swipejob/db` levé Story 1.2.5** (ajouté en dep worker pour audit-logs runtime), **`@swipejob/types` levé Story 1.2**. `@swipejob/llm` toujours absent, à ajouter quand Story 2.x importera.
+- ~~**`apps/web` `package.json` manque `@swipejob/db` et `@swipejob/llm`**~~ — **`@swipejob/db` levé Story 1.2.5** (re-export via `apps/web/lib/db.ts`). `@swipejob/llm` toujours absent, à ajouter quand Story 2.x importera.
 - **Pas d'enforcement imports relatifs cross-package** [`packages/config/eslint/base.js`] — Dev Notes story 1.1 ligne 205 demande règle `import/no-restricted-imports`. **Reprise :** Story 1.3+ dès qu'il y a des imports cross-package réels.
 - **Health route web `npm_package_version` figé en Docker** [`apps/web/app/api/health/route.ts:11`] — apps/web sur Vercel (pas Docker), moins critique. **Reprise :** à ré-évaluer si déploiement Docker pour `apps/web`.
 - **Dockerfile worker `pnpm --filter ...` fragile** [`apps/worker/Dockerfile:24`] — si worker dépend un jour de `@swipejob/db`, `--filter=...` plantera car deps workspace non copiées. **Reprise :** dès que `apps/worker` importera réellement `@swipejob/db` ou `@swipejob/llm`.

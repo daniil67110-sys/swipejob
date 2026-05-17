@@ -99,6 +99,13 @@ pnpm --filter @swipejob/web test:e2e  # Playwright + axe-core (e2e)
 # CSS lint (Tailwind 4)
 pnpm lint:css         # Stylelint sur apps/web/app/**/*.css
 
+# Database (Drizzle + Neon Postgres)
+pnpm db:generate      # Génère un fichier SQL de migration depuis les schémas
+pnpm db:migrate       # Applique les migrations pending sur la DB
+pnpm db:push          # Push direct (DEV uniquement, jamais en prod)
+pnpm db:studio        # UI web Drizzle Studio (http://localhost:4983)
+pnpm db:seed          # Seed dev : 1 admin + 2 utilisateurs test (refuse en prod)
+
 # Build production
 pnpm build            # Build Next.js + worker TypeScript
 pnpm build --filter=@swipejob/web     # Build seulement le web
@@ -151,6 +158,7 @@ Runbooks détaillés :
 - [`docs/runbooks/vercel-setup.md`](docs/runbooks/vercel-setup.md) — procédure import projet + env vars.
 - [`docs/runbooks/branch-protection.md`](docs/runbooks/branch-protection.md) — required status checks `main`.
 - [`docs/runbooks/audit-export.md`](docs/runbooks/audit-export.md) — export mensuel logs RGPD vers R2 (13 mois).
+- [`docs/runbooks/database.md`](docs/runbooks/database.md) — provisioning Neon, workflows migrations, seed, restauration PITR.
 
 ---
 
