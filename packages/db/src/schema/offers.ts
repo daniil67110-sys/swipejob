@@ -7,6 +7,7 @@ import {
   index,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -15,6 +16,10 @@ import {
 import { createId } from '../lib/id.js';
 import { timestamps } from '../lib/timestamps.js';
 import { offerSources } from './offer-sources.js';
+
+// Story 2.6 : status enum (active=default, expired=expiré, filled=pourvu signalé
+// par la source, archived=PII réduite après 90j).
+export const offerStatus = pgEnum('offer_status', ['active', 'expired', 'filled', 'archived']);
 
 // pgvector custom type. Dimension 1024 = Mistral-Embed default.
 const vector1024 = customType<{ data: number[]; driverData: string }>({
@@ -76,6 +81,8 @@ export const offers = pgTable(
     canonicalId: text('canonical_id'),
     dedupedAt: timestamp('deduped_at', { withTimezone: true, mode: 'date' }),
     expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }),
+    // Story 2.6 : status enum. is_active gardé pour rétrocompat — sync par le job.
+    status: offerStatus('status').notNull().default('active'),
     isActive: boolean('is_active').notNull().default(true),
     ...timestamps,
   },
@@ -97,6 +104,10 @@ export const offers = pgTable(
     index('idx_offers_not_deduped')
       .on(table.id)
       .where(sql`${table.dedupedAt} IS NULL`),
+    // Story 2.6 : index partiel pour matching (filtre status='active' uniquement).
+    index('idx_offers_status_active')
+      .on(table.status)
+      .where(sql`${table.status} = 'active'`),
   ],
 );
 

@@ -19,6 +19,7 @@ export const QUEUE_NAMES = {
   OFFER_INGEST: 'offer-ingest',
   OFFER_NORMALIZE: 'offer-normalize',
   OFFER_DEDUPE: 'offer-dedupe',
+  OFFER_MAINTENANCE: 'offer-maintenance',
   EMBEDDINGS_COMPUTE: 'embeddings-compute',
   MATCH_COMPUTE: 'match-compute',
   CV_PARSE: 'cv-parse',
@@ -55,6 +56,9 @@ export function getOfferNormalizeQueue() {
 }
 export function getOfferDedupeQueue() {
   return getQueue(QUEUE_NAMES.OFFER_DEDUPE);
+}
+export function getOfferMaintenanceQueue() {
+  return getQueue(QUEUE_NAMES.OFFER_MAINTENANCE);
 }
 export function getEmbeddingsComputeQueue() {
   return getQueue(QUEUE_NAMES.EMBEDDINGS_COMPUTE);

@@ -12,6 +12,10 @@ import {
   stopNormalizeOffersWorker,
 } from './workers/normalize-offers.worker.js';
 import { startOfferDedupeWorker, stopOfferDedupeWorker } from './workers/offer-dedupe.worker.js';
+import {
+  startOfferMaintenanceWorker,
+  stopOfferMaintenanceWorker,
+} from './workers/offer-maintenance.worker.js';
 import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker.js';
 import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
 import { startFailedJobsWorker, stopFailedJobsWorker } from './workers/failed-jobs.worker.js';
@@ -70,6 +74,7 @@ try {
       startOfferIngestWorker(),
       startNormalizeOffersWorker(),
       startOfferDedupeWorker(),
+      startOfferMaintenanceWorker(),
       startCvParseWorker(),
       startRgpdDeleteWorker(),
       startFailedJobsWorker(),
@@ -99,6 +104,7 @@ function shutdown(signal: string) {
     stopOfferIngestWorker(),
     stopNormalizeOffersWorker(),
     stopOfferDedupeWorker(),
+    stopOfferMaintenanceWorker(),
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
     stopFailedJobsWorker(),
