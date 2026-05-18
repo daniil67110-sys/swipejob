@@ -166,24 +166,57 @@ export async function requireAuth(nextPath?: string) {
 }
 
 /**
- * Same as requireAuth but ALSO enforces email_verified_at (Story 1.4).
- * Used by /(app) + /(onboarding) layouts. Defense in depth vs middleware
- * (which runs in Edge runtime and can't touch the DB).
+ * Same as requireAuth but ALSO enforces (Stories 1.4 + 1.5) :
+ * - email_verified_at must be set (1.4)
+ * - birthDate must be set (1.5 — sinon /age)
+ * - consentStatus must be GRANTED (1.5 — sinon attente parental / refus)
+ *
+ * Defense in depth vs middleware (Edge can't touch DB). Used by /(app) + /(onboarding) layouts.
+ * Accepts a `skipOnboardingChecks` to allow the /age page itself to render.
  */
-export async function requireVerifiedAuth(nextPath?: string) {
+export async function requireVerifiedAuth(
+  options: { nextPath?: string; skipOnboardingChecks?: boolean } = {},
+) {
+  const { nextPath, skipOnboardingChecks = false } = options;
   const session = await requireAuth(nextPath);
   if (!isDatabaseConfigured) return session;
   const userId = session.user?.id;
   if (!userId) return session;
 
   const rows = await db
-    .select({ emailVerified: schema.users.emailVerified })
+    .select({
+      emailVerified: schema.users.emailVerified,
+      birthDate: schema.users.birthDate,
+      consentStatus: schema.users.consentStatus,
+      deletedAt: schema.users.deletedAt,
+    })
     .from(schema.users)
     .where(eq(schema.users.id, userId))
     .limit(1);
 
-  if (!rows[0]?.emailVerified) {
+  const row = rows[0];
+  if (!row) {
+    redirect('/inscription?error=account_disabled');
+  }
+  // skipOnboardingChecks bypasse aussi deletedAt : autorise /age/refus-mineur et
+  // /age/parental/refuse à s'afficher juste après une action qui set deletedAt
+  // (sinon le router.push redirige immédiatement vers /inscription au layout).
+  // Subséquentes visites depuis (app)/layout sans skip → redirect /inscription OK.
+  if (!skipOnboardingChecks && row.deletedAt) {
+    redirect('/inscription?error=account_disabled');
+  }
+  if (!row.emailVerified) {
     redirect('/inscription/valider-email?from=protected');
+  }
+  if (skipOnboardingChecks) return session;
+  if (!row.birthDate) {
+    redirect('/age');
+  }
+  if (row.consentStatus === 'PENDING_PARENTAL_CONSENT') {
+    redirect('/age/parental/envoye');
+  }
+  if (row.consentStatus === 'REFUSED') {
+    redirect('/age/parental/refuse');
   }
   return session;
 }

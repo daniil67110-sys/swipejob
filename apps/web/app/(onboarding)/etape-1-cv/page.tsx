@@ -1,7 +1,8 @@
-import { requireAuth } from '@/lib/auth';
+import { requireVerifiedAuth } from '@/lib/auth';
 
 export default async function EtapeCvPage() {
-  const session = await requireAuth();
+  // Onboarding layout skip consent checks ; on les exige ici (étape 1 du flow utile).
+  const session = await requireVerifiedAuth({});
   const userName = session.user?.name ?? session.user?.email ?? 'toi';
 
   return (
