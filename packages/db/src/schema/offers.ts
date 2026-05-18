@@ -72,6 +72,9 @@ export const offers = pgTable(
     contactEmail: citext('contact_email'),
     publishedAt: timestamp('published_at', { withTimezone: true, mode: 'date' }),
     normalizedAt: timestamp('normalized_at', { withTimezone: true, mode: 'date' }),
+    // Story 2.5 : self-ref vers la version canonique (null = canonical lui-même).
+    canonicalId: text('canonical_id'),
+    dedupedAt: timestamp('deduped_at', { withTimezone: true, mode: 'date' }),
     expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }),
     isActive: boolean('is_active').notNull().default(true),
     ...timestamps,
@@ -89,6 +92,11 @@ export const offers = pgTable(
     index('idx_offers_not_normalized')
       .on(table.id)
       .where(sql`${table.normalizedAt} IS NULL`),
+    // Story 2.5 : canonical_id lookup pour deck + dedupe batch.
+    index('idx_offers_canonical_id').on(table.canonicalId),
+    index('idx_offers_not_deduped')
+      .on(table.id)
+      .where(sql`${table.dedupedAt} IS NULL`),
   ],
 );
 

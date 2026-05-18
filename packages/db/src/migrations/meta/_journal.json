@@ -71,6 +71,13 @@
       "when": 1779135574130,
       "tag": "0009_normalize_offers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1779136106545,
+      "tag": "0010_offers_canonical",
+      "breakpoints": true
     }
   ]
 }

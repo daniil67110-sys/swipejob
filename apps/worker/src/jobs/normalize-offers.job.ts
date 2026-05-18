@@ -2,6 +2,7 @@ import { eq, isNull, sql } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from '@swipejob/db';
 import { offers, offerSources } from '@swipejob/db/schema';
 import { normalizeOffer } from '../lib/normalize.js';
+import { getOfferDedupeQueue } from '../queues/index.js';
 import logger from '../lib/logger.js';
 
 const BATCH_SIZE = 500;
@@ -104,6 +105,16 @@ export async function processNormalizeOffers(): Promise<NormalizeResult> {
       { normalized, durationMs, qualityDistribution: distRows },
       'Normalize batch complete',
     );
+
+    // Trigger dedupe batch (Story 2.5) — idempotent via deduped_at IS NULL.
+    if (normalized > 0) {
+      const dedupeQueue = getOfferDedupeQueue();
+      if (dedupeQueue) {
+        await dedupeQueue.add('dedupe', {}).catch((err) => {
+          logger.warn({ err }, 'Failed to enqueue dedupe batch post-normalize');
+        });
+      }
+    }
 
     return { ok: true, count: normalized, durationMs };
   } catch (err) {
