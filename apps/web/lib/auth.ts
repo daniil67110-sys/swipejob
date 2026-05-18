@@ -65,7 +65,7 @@ const authConfig: NextAuthConfig = {
     error: '/inscription',
   },
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ account, profile, user }) {
       if (account?.provider !== 'google') {
         logger.warn({ provider: account?.provider }, 'signIn rejected: non-google provider');
         return false;
@@ -73,6 +73,20 @@ const authConfig: NextAuthConfig = {
       if (profile?.email_verified !== true) {
         logger.warn({ provider: account.provider }, 'signIn rejected: google email not verified');
         return false;
+      }
+      // Bloque la reconnexion OAuth d'un user soft-deleted (mineur <13, refus
+      // parental, suppression self-service). Avant ce check, DrizzleAdapter
+      // créait une nouvelle session avant que requireVerifiedAuth puisse agir.
+      if (user.id && isDatabaseConfigured) {
+        const rows = await db
+          .select({ deletedAt: schema.users.deletedAt })
+          .from(schema.users)
+          .where(eq(schema.users.id, user.id))
+          .limit(1);
+        if (rows[0]?.deletedAt) {
+          logger.warn({ userId: user.id }, 'signIn rejected: account soft-deleted');
+          return false;
+        }
       }
       return true;
     },

@@ -61,7 +61,8 @@ export default async function ConfirmerPage(props: { searchParams: Promise<{ tok
     .limit(1);
   const row = rows[0];
   if (!row) return renderOutcome('invalid');
-  if (row.status !== 'PENDING') return renderOutcome('already');
+  // Check expiration AVANT le check de statut (un token expiré qui a déjà été
+  // marqué EXPIRED ailleurs doit afficher 'expired' clair, pas 'already').
   if (row.expiresAt.getTime() < Date.now()) {
     await db
       .update(parentalConsents)
@@ -69,18 +70,24 @@ export default async function ConfirmerPage(props: { searchParams: Promise<{ tok
       .where(eq(parentalConsents.id, row.id));
     return renderOutcome('expired');
   }
+  if (row.status !== 'PENDING') return renderOutcome('already');
 
   try {
-    await db
-      .update(parentalConsents)
-      .set({
-        status: 'GRANTED',
-        respondedAt: new Date(),
-        ipAddress: ip,
-        userAgent: userAgent ?? null,
-      })
-      .where(and(eq(parentalConsents.id, row.id), eq(parentalConsents.status, 'PENDING')));
-    await db.update(users).set({ consentStatus: 'GRANTED' }).where(eq(users.id, row.userId));
+    // Transaction : si crash entre l'update consent et l'update user, le mineur
+    // pourrait rester bloqué consentStatus=PENDING_PARENTAL_CONSENT alors que
+    // le parent a cliqué. Atomicité = idempotence.
+    await db.transaction(async (tx) => {
+      await tx
+        .update(parentalConsents)
+        .set({
+          status: 'GRANTED',
+          respondedAt: new Date(),
+          ipAddress: ip,
+          userAgent: userAgent ?? null,
+        })
+        .where(and(eq(parentalConsents.id, row.id), eq(parentalConsents.status, 'PENDING')));
+      await tx.update(users).set({ consentStatus: 'GRANTED' }).where(eq(users.id, row.userId));
+    });
 
     captureServer('consent.parental_granted', hashUserId(row.userId), {});
     await auditLog({

@@ -33,8 +33,9 @@ export async function loginWithEmailAction(rawInput: {
 }): Promise<ActionResult<{ redirectTo: string }>> {
   const hdrs = await headers();
   const ip = getClientIp(hdrs);
-  const rl = await loginRateLimit.limit(ip);
-  if (!rl.success) {
+  // Rate limit par IP (anti-bot) ET par email (anti-bruteforce distribué via proxies).
+  const rlIp = await loginRateLimit.limit(`ip:${ip}`);
+  if (!rlIp.success) {
     return {
       ok: false,
       error: {
@@ -67,6 +68,21 @@ export async function loginWithEmailAction(rawInput: {
   }
 
   const { email, password } = parsed.data;
+
+  // Rate limit par email (hash) : protège un compte ciblé contre bruteforce
+  // depuis IPs multiples. Hash l'email pour ne pas log PII dans Redis keys.
+  // 5 tentatives/min/email.
+  const emailKey = `email:${email.toLowerCase()}`;
+  const rlEmail = await loginRateLimit.limit(emailKey);
+  if (!rlEmail.success) {
+    return {
+      ok: false,
+      error: {
+        code: 'RATE_LIMITED',
+        message: 'Trop de tentatives sur ce compte. Patiente une minute.',
+      },
+    };
+  }
 
   try {
     const rows = await db

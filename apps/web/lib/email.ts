@@ -126,8 +126,10 @@ export async function sendParentalConsentEmail(
 ): Promise<SendEmailResult> {
   const client = getClient();
   if (!client) {
+    // PII : pas de `to` (email parent) ni `confirmUrl` (token plain) dans les logs.
+    // Le dev qui debug verra dans la console runtime que l'email est mock — pas besoin de leak.
     logger.warn(
-      { to: input.to, confirmUrl: input.confirmUrl },
+      { childEmailMasked: input.childEmail.replace(/(.).+(@.+)/, '$1***$2') },
       'Resend non configuré — email parental mock',
     );
     return { ok: true, id: null, mock: true };

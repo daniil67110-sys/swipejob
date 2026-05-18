@@ -23,9 +23,19 @@ export function normalizeSchoolName(s: string): string {
     .trim();
 }
 
+/**
+ * Échappe les wildcards ILIKE (% et _) + le backslash d'échappement.
+ * Défense en profondeur : `normalizeSchoolName` les supprime déjà, mais on
+ * ajoute ESCAPE '\' au cas où la regex évolue. Évite DoS scans cartographiques.
+ */
+function escapeIlikeWildcards(s: string): string {
+  return s.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
 export async function searchSchools(query: string, limit = 10) {
   const normalized = normalizeSchoolName(query);
   if (!normalized) return [];
+  const ilikePattern = '%' + escapeIlikeWildcards(normalized) + '%';
 
   // pg_trgm similarity — threshold 0.3 par défaut, on prend les 10 meilleurs.
   // Fallback : ILIKE prefix si pg_trgm indispo.
@@ -40,7 +50,7 @@ export async function searchSchools(query: string, limit = 10) {
       SELECT id, name, type, city, similarity(name_normalized, ${normalized}) AS score
       FROM schools
       WHERE name_normalized % ${normalized}
-        OR name_normalized ILIKE ${'%' + normalized + '%'}
+        OR name_normalized ILIKE ${ilikePattern} ESCAPE '\\'
       ORDER BY score DESC NULLS LAST, name ASC
       LIMIT ${limit}
     `);
@@ -51,7 +61,6 @@ export async function searchSchools(query: string, limit = 10) {
       city: r.city,
     }));
   } catch {
-    // Fallback simple ILIKE si pg_trgm indispo
     const rows = await db.execute(sql<{
       id: string;
       name: string;
@@ -60,7 +69,7 @@ export async function searchSchools(query: string, limit = 10) {
     }>`
       SELECT id, name, type, city
       FROM schools
-      WHERE name_normalized ILIKE ${'%' + normalized + '%'}
+      WHERE name_normalized ILIKE ${ilikePattern} ESCAPE '\\'
       ORDER BY name ASC
       LIMIT ${limit}
     `);

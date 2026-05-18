@@ -13,16 +13,42 @@ export type ActionResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: { code: string; message: string } };
 
-const optionalArr = z.array(z.string()).default([]);
+// Enums fermés serveur (cohérent avec PreferencesForm). Reject toute valeur
+// arbitraire envoyée par un client malveillant (XSS, fingerprinting, etc.).
+const CONTRACT_TYPE = z.enum(['stage', 'alternance']);
+const DURATION = z.enum(['1-3 mois', '3-6 mois', '6-12 mois', '12+ mois']);
+const WORK_MODE = z.enum(['on-site', 'hybrid', 'remote']);
+const SECTOR = z.enum([
+  'tech',
+  'finance',
+  'marketing',
+  'conseil',
+  'industrie',
+  'santé',
+  'public',
+  'autre',
+]);
+const COMPANY_SIZE = z.enum(['TPE', 'PME', 'ETI', 'grandes']);
 
 const schema = z.object({
-  contractTypes: optionalArr,
-  durations: optionalArr,
-  cities: optionalArr,
+  contractTypes: z.array(CONTRACT_TYPE).max(10).default([]),
+  durations: z.array(DURATION).max(10).default([]),
+  // Villes : input libre (pas de référentiel V1) MAIS borné en longueur et taille
+  // pour éviter XSS/DoS. Trim + filter chars dangereux.
+  cities: z
+    .array(
+      z
+        .string()
+        .min(1)
+        .max(100)
+        .regex(/^[^<>{}]+$/, 'caractères non autorisés'),
+    )
+    .max(20)
+    .default([]),
   geoRadiusKm: z.number().int().min(0).max(500).optional(),
-  workModes: optionalArr,
-  sectors: optionalArr,
-  companySizes: optionalArr,
+  workModes: z.array(WORK_MODE).max(3).default([]),
+  sectors: z.array(SECTOR).max(10).default([]),
+  companySizes: z.array(COMPANY_SIZE).max(4).default([]),
   salaryMinMonthly: z.number().int().min(0).max(100000).optional().nullable(),
   salaryMaxMonthly: z.number().int().min(0).max(100000).optional().nullable(),
   desiredStartDate: z
@@ -32,7 +58,21 @@ const schema = z.object({
     .nullable(),
 });
 
-export type UpdatePreferencesInput = z.input<typeof schema>;
+// Input client volontairement permissif (string[]) — Zod fait le check enum
+// côté serveur et rejette les valeurs invalides. Ça évite de typer en dur le
+// form client avec les unions Zod (qui sont strictes et propagent).
+export type UpdatePreferencesInput = {
+  contractTypes?: string[];
+  durations?: string[];
+  cities?: string[];
+  geoRadiusKm?: number;
+  workModes?: string[];
+  sectors?: string[];
+  companySizes?: string[];
+  salaryMinMonthly?: number | null;
+  salaryMaxMonthly?: number | null;
+  desiredStartDate?: string | null;
+};
 
 export async function updatePreferencesAction(
   rawInput: UpdatePreferencesInput,

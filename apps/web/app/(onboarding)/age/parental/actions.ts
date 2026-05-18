@@ -11,10 +11,7 @@ import { sendParentalConsentEmail } from '@/lib/email';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { env } from '@/lib/env';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-import { isRateLimitConfigured } from '@/lib/env';
-import { getClientIp } from '@/lib/rate-limit';
+import { getClientIp, parentalConsentRateLimit } from '@/lib/rate-limit';
 import { serverLogger as logger } from '@/lib/logger.server';
 
 export type ActionResult<T> =
@@ -26,27 +23,6 @@ const schema = z.object({
   parentEmail: z.string().email('Email invalide'),
   confirmed: z.literal(true, { errorMap: () => ({ message: 'Confirmation requise.' }) }),
 });
-
-// Dedicated rate limiter (3/h/IP) — local since not exposed elsewhere
-let parentalRl: { limit: (key: string) => Promise<{ success: boolean }> } | null = null;
-function getParentalRl() {
-  if (!isRateLimitConfigured) {
-    return { limit: async () => ({ success: true }) };
-  }
-  if (!parentalRl) {
-    const redis = new Redis({
-      url: env.UPSTASH_REDIS_REST_URL!,
-      token: env.UPSTASH_REDIS_REST_TOKEN!,
-    });
-    parentalRl = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(3, '3600 s'),
-      prefix: 'sj:rl:parental',
-      analytics: false,
-    });
-  }
-  return parentalRl;
-}
 
 function hashToken(plain: string): string {
   return createHash('sha256').update(plain).digest('hex');
@@ -67,7 +43,7 @@ export async function requestParentalConsentAction(rawInput: {
 
   const hdrs = await headers();
   const ip = getClientIp(hdrs);
-  const rl = await getParentalRl().limit(ip);
+  const rl = await parentalConsentRateLimit.limit(ip);
   if (!rl.success) {
     return {
       ok: false,

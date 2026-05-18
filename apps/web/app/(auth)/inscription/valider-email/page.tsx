@@ -118,9 +118,24 @@ export default async function ValiderEmailPage(props: {
     redirect('/deck');
   }
 
-  // Mark email verified + consume token (one-shot)
-  await db.update(users).set({ emailVerified: new Date() }).where(eq(users.id, userRow.id));
-  await db.delete(verificationTokens).where(eq(verificationTokens.token, tokenHash));
+  // Atomic : DELETE token RETURNING garantit qu'une seule requête consomme le
+  // token (TOCTOU fix). Si 0 rows deleted → un autre process a déjà consommé,
+  // on tombe sur "already validated" au prochain refresh. Update users.emailVerified
+  // dans la même transaction pour cohérence.
+  const consumed = await db.transaction(async (tx) => {
+    const deleted = await tx
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.token, tokenHash))
+      .returning({ identifier: verificationTokens.identifier });
+    if (deleted.length === 0) {
+      return false;
+    }
+    await tx.update(users).set({ emailVerified: new Date() }).where(eq(users.id, userRow.id));
+    return true;
+  });
+  if (!consumed) {
+    return renderOutcome('invalid');
+  }
 
   // Create DB session + cookie
   try {

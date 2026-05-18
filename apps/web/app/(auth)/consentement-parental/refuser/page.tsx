@@ -60,7 +60,7 @@ export default async function RefuserPage(props: { searchParams: Promise<{ token
     .limit(1);
   const row = rows[0];
   if (!row) return renderOutcome('invalid');
-  if (row.status !== 'PENDING') return renderOutcome('already');
+  // Expiration AVANT statut (cf. confirmer/page.tsx).
   if (row.expiresAt.getTime() < Date.now()) {
     await db
       .update(parentalConsents)
@@ -68,23 +68,28 @@ export default async function RefuserPage(props: { searchParams: Promise<{ token
       .where(eq(parentalConsents.id, row.id));
     return renderOutcome('expired');
   }
+  if (row.status !== 'PENDING') return renderOutcome('already');
 
   try {
-    await db
-      .update(parentalConsents)
-      .set({
-        status: 'REFUSED',
-        respondedAt: new Date(),
-        ipAddress: ip,
-        userAgent: userAgent ?? null,
-      })
-      .where(and(eq(parentalConsents.id, row.id), eq(parentalConsents.status, 'PENDING')));
-    await db
-      .update(users)
-      .set({ consentStatus: 'REFUSED', deletedAt: new Date() })
-      .where(eq(users.id, row.userId));
-    // Forcer le logout : supprimer toutes les sessions du user
-    await db.delete(sessions).where(eq(sessions.userId, row.userId));
+    // Transaction : les 3 ops doivent être atomiques (RGPD + sécurité).
+    // Sinon un crash entre update users (deletedAt) et delete sessions
+    // laisse un compte soft-deleted avec sessions actives.
+    await db.transaction(async (tx) => {
+      await tx
+        .update(parentalConsents)
+        .set({
+          status: 'REFUSED',
+          respondedAt: new Date(),
+          ipAddress: ip,
+          userAgent: userAgent ?? null,
+        })
+        .where(and(eq(parentalConsents.id, row.id), eq(parentalConsents.status, 'PENDING')));
+      await tx
+        .update(users)
+        .set({ consentStatus: 'REFUSED', deletedAt: new Date() })
+        .where(eq(users.id, row.userId));
+      await tx.delete(sessions).where(eq(sessions.userId, row.userId));
+    });
 
     captureServer('consent.parental_refused', hashUserId(row.userId), {});
     await auditLog({

@@ -114,10 +114,11 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     );
   }
 
-  // 6. Magic bytes check (anti content-type spoofing)
+  // 6. Magic bytes check (anti content-type spoofing).
+  // Vérifie `%PDF-` (5 bytes) plutôt que `%PDF` (4) pour réduire polyglot risk.
   const arrayBuf = await file.arrayBuffer();
   const buf = Buffer.from(arrayBuf);
-  if (buf.length < 4 || buf.subarray(0, 4).toString('ascii') !== '%PDF') {
+  if (buf.length < 5 || buf.subarray(0, 5).toString('ascii') !== '%PDF-') {
     return NextResponse.json(
       {
         ok: false,
@@ -130,24 +131,48 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     );
   }
 
-  // 7. Compute version
-  const lastCv = await db
-    .select({ version: cvs.version })
-    .from(cvs)
-    .where(eq(cvs.userId, userId))
-    .orderBy(desc(cvs.version))
-    .limit(1);
-  const version = (lastCv[0]?.version ?? 0) + 1;
+  // 7. INSERT cvs d'abord (avec r2Key calculé), R2 upload ensuite. Si R2 échoue,
+  // on supprime la row (compensating tx). Évite : (a) fichier R2 orphelin si
+  // INSERT échoue, (b) race condition sur MAX(version) — l'UNIQUE constraint
+  // sur r2Key protège, et on retry sur conflit version.
+  const cvId = await db.transaction(async (tx) => {
+    const lastCv = await tx
+      .select({ version: cvs.version })
+      .from(cvs)
+      .where(eq(cvs.userId, userId))
+      .orderBy(desc(cvs.version))
+      .limit(1);
+    const version = (lastCv[0]?.version ?? 0) + 1;
+    const r2Key = generateR2Key(userId, version);
+    const inserted = await tx
+      .insert(cvs)
+      .values({
+        userId,
+        r2Key,
+        // Ne stocke PAS file.name (PII potentielle). Fallback générique systématique.
+        originalFilename: `cv-v${version}.pdf`,
+        sizeBytes: file.size,
+        mimeType: 'application/pdf',
+        parsingStatus: 'pending',
+        version,
+      })
+      .returning({ id: cvs.id, r2Key: cvs.r2Key, version: cvs.version });
+    const row = inserted[0];
+    if (!row) throw new Error('Insert cv returned no row');
+    return row;
+  });
 
-  // 8. Upload R2
-  const r2Key = generateR2Key(userId, version);
+  // 8. Upload R2 maintenant que la row existe
   const upload = await uploadCvToR2({
     buffer: buf,
     contentType: 'application/pdf',
-    key: r2Key,
+    key: cvId.r2Key,
   });
   if (!upload.ok) {
-    logger.error({ err: upload.error, userId }, 'CV R2 upload failed');
+    logger.error({ err: upload.error, userId, cvId: cvId.id }, 'CV R2 upload failed');
+    // Compensating : delete la row pour éviter un "cvs.parsing_status=pending"
+    // permanent avec aucun objet R2 sous-jacent.
+    await db.delete(cvs).where(eq(cvs.id, cvId.id));
     return NextResponse.json(
       {
         ok: false,
@@ -160,23 +185,7 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     );
   }
 
-  // 9. Insert row cvs
-  const inserted = await db
-    .insert(cvs)
-    .values({
-      userId,
-      r2Key,
-      originalFilename: file.name || `cv-v${version}.pdf`,
-      sizeBytes: file.size,
-      mimeType: 'application/pdf',
-      parsingStatus: 'pending',
-      version,
-    })
-    .returning({ id: cvs.id });
-  const cvId = inserted[0]?.id;
-  if (!cvId) {
-    throw new Error('Insert cv returned no row');
-  }
+  const version = cvId.version;
 
   // 10. Audit + Posthog
   captureServer('cv.uploaded', hashUserId(userId), {
@@ -189,20 +198,20 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     actorType: 'USER',
     event: 'cv.uploaded',
     targetType: 'cv',
-    targetId: cvId,
+    targetId: cvId.id,
     metadata: { size: file.size, version },
   });
 
   // 11. Enqueue cv.parse (Story 2.1 implémente la queue effective)
   logger.warn(
-    { cvId, userId },
+    { cvId: cvId.id, userId },
     'cv.parse job not enqueued (BullMQ Story 2.1) — manual processing required',
   );
 
   return NextResponse.json({
     ok: true,
     data: {
-      cvId,
+      cvId: cvId.id,
       parsingStatus: 'pending' as const,
       version,
       mock: 'mock' in upload ? upload.mock : false,

@@ -8,6 +8,7 @@ import { sessions, users } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { sendAccountDeletionEmail } from '@/lib/email';
+import { accountDeletionRateLimit } from '@/lib/rate-limit';
 import { serverLogger as logger } from '@/lib/logger.server';
 
 export type ActionResult<T> =
@@ -34,15 +35,31 @@ export async function requestAccountDeletionAction(rawInput: {
   }
   const userId = session.user.id;
 
+  // Rate limit (1/h/user) — empêche flood email + audit + jobs RGPD V2
+  const rl = await accountDeletionRateLimit.limit(userId);
+  if (!rl.success) {
+    return {
+      ok: false,
+      error: { code: 'RATE_LIMITED', message: 'Trop de tentatives. Réessaie dans une heure.' },
+    };
+  }
+
   try {
     const rows = await db
-      .select({ id: users.id, email: users.email })
+      .select({ id: users.id, email: users.email, deletedAt: users.deletedAt })
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
     const user = rows[0];
     if (!user) {
       return { ok: false, error: { code: 'NOT_FOUND', message: 'Compte introuvable.' } };
+    }
+    // Idempotence : si compte déjà soft-deleted, ne pas re-fire audit/email/job
+    if (user.deletedAt) {
+      return {
+        ok: false,
+        error: { code: 'ALREADY_DELETED', message: 'Ce compte est déjà supprimé.' },
+      };
     }
     // Comparison citext : email côté DB est case-insensitive. On lowercase aussi côté input.
     if (parsed.data.confirmEmail.toLowerCase() !== user.email.toLowerCase()) {
@@ -55,12 +72,15 @@ export async function requestAccountDeletionAction(rawInput: {
       };
     }
 
-    // Soft delete + invalidate sessions + audit
-    await db
-      .update(users)
-      .set({ deletedAt: new Date(), consentStatus: 'REFUSED' })
-      .where(eq(users.id, userId));
-    await db.delete(sessions).where(eq(sessions.userId, userId));
+    // Transaction atomique : soft delete users + DELETE sessions.
+    // Sinon crash entre les 2 → user marqué deleted mais sessions actives (RGPD).
+    await db.transaction(async (tx) => {
+      await tx
+        .update(users)
+        .set({ deletedAt: new Date(), consentStatus: 'REFUSED' })
+        .where(eq(users.id, userId));
+      await tx.delete(sessions).where(eq(sessions.userId, userId));
+    });
 
     captureServer('account.deletion_requested', hashUserId(userId), {});
     await auditLog({

@@ -120,26 +120,15 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
   // 3. LLM parse (or fallback)
   const { parsedCv, meta } = await parseCvWithLLM(text || '(empty)');
 
-  // 4. Upsert profile
-  await db
-    .insert(profiles)
-    .values({
-      userId,
-      firstName: parsedCv.firstName,
-      lastName: parsedCv.lastName,
-      headline: parsedCv.headline,
-      summary: parsedCv.summary,
-      phone: parsedCv.phoneE164,
-      city: parsedCv.currentLocation,
-      linkedinUrl: parsedCv.linkedinUrl,
-      experiences: parsedCv.experiences,
-      educations: parsedCv.educations,
-      skills: parsedCv.skills,
-      languages: parsedCv.languages,
-    })
-    .onConflictDoUpdate({
-      target: profiles.userId,
-      set: {
+  // 4-6. Transaction : upsert profile + insert ia_audit_logs + update cv status.
+  // Sinon crash entre les 3 → profil créé mais cvs.parsing_status reste 'pending'
+  // → l'utilisateur ne peut jamais accéder à /etape-1-cv/revue.
+  const newStatus = 'completed' as const; // V1 : on accepte fallback comme completed
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(profiles)
+      .values({
+        userId,
         firstName: parsedCv.firstName,
         lastName: parsedCv.lastName,
         headline: parsedCv.headline,
@@ -151,39 +140,52 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
         educations: parsedCv.educations,
         skills: parsedCv.skills,
         languages: parsedCv.languages,
+      })
+      .onConflictDoUpdate({
+        target: profiles.userId,
+        set: {
+          firstName: parsedCv.firstName,
+          lastName: parsedCv.lastName,
+          headline: parsedCv.headline,
+          summary: parsedCv.summary,
+          phone: parsedCv.phoneE164,
+          city: parsedCv.currentLocation,
+          linkedinUrl: parsedCv.linkedinUrl,
+          experiences: parsedCv.experiences,
+          educations: parsedCv.educations,
+          skills: parsedCv.skills,
+          languages: parsedCv.languages,
+        },
+      });
+
+    await tx.insert(iaAuditLogs).values({
+      userId,
+      model: meta.model,
+      provider: meta.parsedByFallback ? 'fallback' : 'mistral',
+      promptHash: meta.promptHash,
+      featureType: 'cv_parse',
+      latencyMs: meta.latencyMs,
+      tokensInput: meta.tokensInput,
+      tokensOutput: meta.tokensOutput,
+      success: meta.success,
+      errorCode: meta.success ? null : 'parse_failed_fallback',
+      metadata: {
+        cvId: cv.id,
+        firstNameFound: Boolean(parsedCv.firstName),
+        schoolsCount: parsedCv.educations.length,
+        experiencesCount: parsedCv.experiences.length,
+        skillsCount: parsedCv.skills.length,
       },
     });
 
-  // 5. Insert ia_audit_logs
-  await db.insert(iaAuditLogs).values({
-    userId,
-    model: meta.model,
-    provider: meta.parsedByFallback ? 'fallback' : 'mistral',
-    promptHash: meta.promptHash,
-    featureType: 'cv_parse',
-    latencyMs: meta.latencyMs,
-    tokensInput: meta.tokensInput,
-    tokensOutput: meta.tokensOutput,
-    success: meta.success,
-    errorCode: meta.success ? null : 'parse_failed_fallback',
-    metadata: {
-      cvId: cv.id,
-      firstNameFound: Boolean(parsedCv.firstName),
-      schoolsCount: parsedCv.educations.length,
-      experiencesCount: parsedCv.experiences.length,
-      skillsCount: parsedCv.skills.length,
-    },
+    await tx
+      .update(cvs)
+      .set({
+        parsingStatus: newStatus,
+        parsingError: meta.parsedByFallback ? 'parsed_with_fallback' : null,
+      })
+      .where(eq(cvs.id, cv.id));
   });
-
-  // 6. Update cv status
-  const newStatus = meta.success ? 'completed' : 'completed'; // V1 : on accepte fallback comme completed
-  await db
-    .update(cvs)
-    .set({
-      parsingStatus: newStatus,
-      parsingError: meta.parsedByFallback ? 'parsed_with_fallback' : null,
-    })
-    .where(eq(cvs.id, cv.id));
 
   // 7. Audit + Posthog
   captureServer('cv.parsed', hashUserId(userId), {

@@ -14,7 +14,12 @@ export type ActionResult<T> =
   | { ok: false; error: { code: string; message: string } };
 
 const schema = z.object({
-  schoolId: z.string().nullable(),
+  // cuid2 : 24 chars lowercase alphanumérique. Borne pour empêcher DB query
+  // sur 10000 chars ou format invalide qui exploite l'index.
+  schoolId: z
+    .string()
+    .regex(/^[a-z0-9]{20,30}$/, 'Format école invalide')
+    .nullable(),
   schoolNameUnverified: z.string().min(2).max(150).nullable(),
   educationLevel: z.enum([
     'BTS/DUT',
@@ -46,6 +51,9 @@ export async function setEducationAction(rawInput: {
   const data = parsed.data;
 
   try {
+    // Transaction : INSERT école unverified + UPDATE profil doivent être atomiques.
+    // Sans ça, une école fantôme peut être créée puis l'UPDATE profil échoue → row
+    // schools orpheline en DB. Lookup école existante reste hors transaction OK.
     let currentSchool: {
       schoolId: string | null;
       name: string;
@@ -62,36 +70,47 @@ export async function setEducationAction(rawInput: {
       if (row) {
         currentSchool = { schoolId: row.id, name: row.name, unverified: false };
       }
-    } else if (data.schoolNameUnverified) {
-      // Insert unverified school for admin moderation
-      const inserted = await db
-        .insert(schools)
-        .values({
-          name: data.schoolNameUnverified,
-          nameNormalized: normalizeSchoolName(data.schoolNameUnverified),
-          unverified: true,
-        })
-        .returning({ id: schools.id, name: schools.name });
-      const row = inserted[0];
-      if (row) {
-        currentSchool = { schoolId: row.id, name: row.name, unverified: true };
+      if (!currentSchool) {
+        return {
+          ok: false,
+          error: { code: 'NO_SCHOOL', message: 'École introuvable.' },
+        };
       }
-    }
-
-    if (!currentSchool) {
+      await db
+        .update(profiles)
+        .set({ currentSchool, educationLevel: data.educationLevel })
+        .where(eq(profiles.userId, userId));
+    } else if (data.schoolNameUnverified) {
+      const nameUnverified = data.schoolNameUnverified;
+      // Atomic : insert école unverified + update profil dans 1 tx.
+      currentSchool = await db.transaction(async (tx) => {
+        const inserted = await tx
+          .insert(schools)
+          .values({
+            name: nameUnverified,
+            nameNormalized: normalizeSchoolName(nameUnverified),
+            unverified: true,
+          })
+          .returning({ id: schools.id, name: schools.name });
+        const row = inserted[0];
+        if (!row) throw new Error('Insert unverified school returned no row');
+        const current = {
+          schoolId: row.id,
+          name: row.name,
+          unverified: true,
+        };
+        await tx
+          .update(profiles)
+          .set({ currentSchool: current, educationLevel: data.educationLevel })
+          .where(eq(profiles.userId, userId));
+        return current;
+      });
+    } else {
       return {
         ok: false,
         error: { code: 'NO_SCHOOL', message: 'Choisis une école ou saisis un nom libre.' },
       };
     }
-
-    await db
-      .update(profiles)
-      .set({
-        currentSchool,
-        educationLevel: data.educationLevel,
-      })
-      .where(eq(profiles.userId, userId));
 
     await auditLog({
       actorId: userId,

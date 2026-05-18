@@ -69,6 +69,18 @@ export const cvUploadRateLimit: Limiter = redis
   ? makeLimiter(redis, 10, 3600, 'sj:rl:cv-upload')
   : makeNoop();
 
+export const accountDeletionRateLimit: Limiter = redis
+  ? makeLimiter(redis, 1, 3600, 'sj:rl:account-deletion')
+  : makeNoop();
+
+export const schoolsSearchRateLimit: Limiter = redis
+  ? makeLimiter(redis, 30, 60, 'sj:rl:schools-search')
+  : makeNoop();
+
+export const parentalConsentRateLimit: Limiter = redis
+  ? makeLimiter(redis, 3, 3600, 'sj:rl:parental')
+  : makeNoop();
+
 export function getClientIp(hdrs: Headers): string {
   const xff = hdrs.get('x-forwarded-for');
   if (xff) {
