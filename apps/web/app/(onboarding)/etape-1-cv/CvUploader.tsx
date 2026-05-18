@@ -49,8 +49,21 @@ export function CvUploader() {
         return;
       }
       setState('success');
-      setMessage("CV reçu ! On l'analyse.");
-      startTransition(() => router.refresh());
+      setMessage("CV reçu ! On l'analyse, c'est rapide…");
+      // Fire-and-forget parse trigger (Story 1.7) — la page se refresh quand fini.
+      const cvId = json.data.cvId;
+      fetch('/api/cv/parse', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ cvId }),
+      })
+        .then(() => {
+          startTransition(() => router.refresh());
+        })
+        .catch(() => {
+          // Erreur silencieuse — l'utilisateur peut re-trigger depuis la page
+          startTransition(() => router.refresh());
+        });
     } catch {
       setState('error');
       setMessage('Erreur réseau. Réessaie.');

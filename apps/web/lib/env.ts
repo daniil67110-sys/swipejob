@@ -61,6 +61,10 @@ const envSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
+
+  // LLM (Story 1.7 — parsing CV)
+  MISTRAL_API_KEY: z.string().optional(),
+  MISTRAL_MODEL: z.string().default('mistral-large-latest'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -102,6 +106,8 @@ export const isR2Configured = Boolean(
   env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME,
 );
 
+export const isLlmConfigured = Boolean(env.MISTRAL_API_KEY);
+
 if (isProduction && !isAuthConfigured) {
   console.warn('[env] Auth is not fully configured in production — /inscription will be disabled.');
 }
@@ -118,4 +124,8 @@ if (isProduction && !isRateLimitConfigured) {
 
 if (isProduction && !isR2Configured) {
   console.warn('[env] Cloudflare R2 missing in production — CV upload will use mock mode.');
+}
+
+if (isProduction && !isLlmConfigured) {
+  console.warn('[env] MISTRAL_API_KEY missing in production — CV parsing will use fallback.');
 }
