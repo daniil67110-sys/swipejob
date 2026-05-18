@@ -2,9 +2,8 @@ import { test, expect } from '@playwright/test';
 
 const routes = [
   { path: '/', name: 'landing' },
-  { path: '/login', name: 'login' },
-  { path: '/register', name: 'register' },
-  { path: '/setup', name: 'onboarding setup' },
+  { path: '/inscription', name: 'inscription' },
+  { path: '/connexion', name: 'connexion' },
 ];
 
 for (const { path, name } of routes) {

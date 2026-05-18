@@ -33,6 +33,9 @@ export const env: DbEnv = parsed.success ? parsed.data : (envSchema.parse({}) as
 
 export const isDatabaseConfigured = Boolean(env.DATABASE_URL);
 
+// En production, log un warning si DATABASE_URL absent. Le throw se fait au
+// runtime via initClient() — évite de bloquer le build Next.js phase de
+// collecte de données (qui charge tous les modules avant que les env soient prêts).
 if (isProduction && !isDatabaseConfigured) {
-  throw new Error('DATABASE_URL is required in production');
+  console.warn('[db/env] DATABASE_URL absent en production — client DB lèvera au runtime.');
 }

@@ -31,6 +31,22 @@ const envSchema = z.object({
   AXIOM_DATASET_AUDIT: z.string().default('swipejob-audit'),
 
   SITE_URL: z.string().url().default('http://localhost:3000'),
+
+  // Auth.js v5 (Story 1.3 — TECH-003)
+  // En prod : reste `optional()` au schema-level pour permettre le boot Next.js
+  // (phase de collecte de pages). La validation runtime se fait via `isAuthConfigured`
+  // ci-dessous + warn log si manquant en prod (cohérent pattern Story 1.2/1.2.5).
+  AUTH_SECRET: z
+    .string()
+    .min(isProduction ? 32 : 1, 'AUTH_SECRET must be ≥32 chars in production')
+    .optional(),
+  AUTH_URL: z.string().url().optional(),
+  AUTH_TRUST_HOST: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
+  AUTH_GOOGLE_ID: z.string().optional(),
+  AUTH_GOOGLE_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -58,3 +74,11 @@ export const isObservabilityEnabled = {
   posthogServer: Boolean(env.POSTHOG_API_KEY),
   axiom: Boolean(env.AXIOM_TOKEN),
 };
+
+export const isAuthConfigured = Boolean(
+  env.AUTH_SECRET && env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET,
+);
+
+if (isProduction && !isAuthConfigured) {
+  console.warn('[env] Auth is not fully configured in production — /inscription will be disabled.');
+}

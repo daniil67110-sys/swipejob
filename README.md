@@ -159,6 +159,7 @@ Runbooks détaillés :
 - [`docs/runbooks/branch-protection.md`](docs/runbooks/branch-protection.md) — required status checks `main`.
 - [`docs/runbooks/audit-export.md`](docs/runbooks/audit-export.md) — export mensuel logs RGPD vers R2 (13 mois).
 - [`docs/runbooks/database.md`](docs/runbooks/database.md) — provisioning Neon, workflows migrations, seed, restauration PITR.
+- [`docs/runbooks/auth-google.md`](docs/runbooks/auth-google.md) — Auth.js v5 + Google OAuth setup, env vars, conformité RGPD.
 
 ---
 

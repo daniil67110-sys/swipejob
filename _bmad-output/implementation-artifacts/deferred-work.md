@@ -20,8 +20,8 @@ Travaux identifiés mais reportés volontairement. Chaque entrée indique l'orig
 - **`ci.yml` job `install` placebo** [`.github/workflows/ci.yml`] — job sans `upload-artifact`, les autres jobs relancent `pnpm install` à zéro. Cache pnpm store gère effectivement. **Reprise :** quand le temps cumulé des installs devient problématique → refacto avec `actions/upload-artifact` sur `node_modules`.
 - **`ci.yml` cache Turbo keyed par `github.sha`** — conforme AC5 mais cache hit principalement via restore-keys. **Reprise :** si temps CI devient un problème, switcher sur une key plus stable (hashFiles sur sources).
 - **`traceId` absent du base logger** [`apps/web/lib/logger.server.ts`, `apps/worker/src/lib/logger.ts`] — `x-trace-id` généré par middleware mais pas propagé dans le contexte Pino. **Reprise :** Story 1.3 via AsyncLocalStorage Node.js.
-- **`withErrorHandler` wrapper Route Handlers manquant** [`apps/web/lib/`] — pattern architecture.md ligne 604. **Reprise :** Story 1.3+ dès première Route Handler métier.
-- **Helper `auditLog(event, payload)` non créé** [`apps/web/lib/audit.ts`] — pattern architecture.md ligne 840. **Reprise :** Story 1.3 (besoin DB `audit_logs` table).
+- ~~**`withErrorHandler` wrapper Route Handlers manquant**~~ — **levé Story 1.3** : `apps/web/lib/with-error-handler.ts` créé avec catch+log+Sentry+format JSON.
+- ~~**Helper `auditLog(event, payload)` non créé**~~ — **levé Story 1.3** : `apps/web/lib/audit.ts` créé avec extraction headers, redactPII, insert dans `audit_logs`, fail-safe.
 - **Event Posthog `app.bootstrap` non implémenté** [`apps/web/lib/analytics.ts`] — exigé AC2 story 1.2. **Reprise :** Story 1.3 dès `userId`/`distinctId` stable disponible.
 - **Playwright e2e jamais exécuté en réel** [`apps/web/e2e/`] — binaire installé, tests écrits, validation CI au premier push GitHub.
 - **Validation manuelle Sentry/Posthog/Axiom non réalisée** — faute de credentials user à ce stade. **Reprise :** dès création des comptes (cf. `docs/runbooks/observability.md`).

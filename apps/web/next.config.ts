@@ -12,6 +12,20 @@ const nextConfig: NextConfig = {
 
   reactStrictMode: true,
 
+  // Transpile workspace packages (TS sources sans build préalable)
+  transpilePackages: ['@swipejob/db', '@swipejob/types'],
+
+  // webpack extensionAlias : autorise les imports `.js` à résoudre vers `.ts`
+  // (nécessaire pour les workspace packages compilés en NodeNext qui utilisent
+  // des imports `.js` mais dont le source réel est `.ts`).
+  webpack: (config) => {
+    config.resolve.extensionAlias = {
+      ...config.resolve.extensionAlias,
+      '.js': ['.ts', '.tsx', '.js'],
+    };
+    return config;
+  },
+
   async headers() {
     return [
       {
