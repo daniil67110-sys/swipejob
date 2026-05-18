@@ -69,7 +69,7 @@ development_status:
   2-1-bootstrap-du-worker-bullmq-et-schemas-d-offres: done
   2-2-integration-de-l-api-france-travail: done
   2-3-integration-d-au-moins-une-source-secondaire-d-offres: done
-  2-4-normalisation-des-offres-en-format-unifie: backlog
+  2-4-normalisation-des-offres-en-format-unifie: done
   2-5-detection-et-fusion-des-doublons-inter-sources: backlog
   2-6-desactivation-automatique-des-offres-expirees-ou-pourvues: backlog
   2-7-maintenir-un-catalogue-de-5000-offres-actives: backlog

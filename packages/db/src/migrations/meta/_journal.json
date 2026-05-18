@@ -64,6 +64,13 @@
       "when": 1779130272194,
       "tag": "0008_add_offers_raw_payload",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1779135574130,
+      "tag": "0009_normalize_offers",
+      "breakpoints": true
     }
   ]
 }

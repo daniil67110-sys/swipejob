@@ -4,6 +4,7 @@ import { db, isDatabaseConfigured } from '@swipejob/db';
 import { offerSources, offers, type NewOffer } from '@swipejob/db/schema';
 import { isAdzunaConfigured } from '../lib/env.js';
 import logger from '../lib/logger.js';
+import { getOfferNormalizeQueue } from '../queues/index.js';
 import { fetchAdzunaOffers, type AdzunaOfferRaw } from '../scrapers/adzuna/client.js';
 import { mapAdzunaToOffer } from '../scrapers/adzuna/mapper.js';
 
@@ -103,6 +104,16 @@ export async function processIngestAdzuna(): Promise<IngestResult> {
       .update(offerSources)
       .set({ lastSyncAt: new Date() })
       .where(eq(offerSources.id, sourceId));
+
+    // Trigger normalize batch (Story 2.4) — idempotent via normalized_at IS NULL.
+    if (inserted > 0) {
+      const normalizeQueue = getOfferNormalizeQueue();
+      if (normalizeQueue) {
+        await normalizeQueue.add('normalize', {}).catch((err) => {
+          logger.warn({ err }, 'Failed to enqueue normalize batch post-ingest');
+        });
+      }
+    }
 
     lastSuccessAt = Date.now();
     const durationMs = Date.now() - start;

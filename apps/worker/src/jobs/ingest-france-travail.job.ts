@@ -4,6 +4,7 @@ import { db, isDatabaseConfigured } from '@swipejob/db';
 import { offerSources, offers, type NewOffer } from '@swipejob/db/schema';
 import { isFranceTravailConfigured } from '../lib/env.js';
 import logger from '../lib/logger.js';
+import { getOfferNormalizeQueue } from '../queues/index.js';
 import {
   fetchFranceTravailOffers,
   type FranceTravailOfferRaw,
@@ -122,6 +123,16 @@ export async function processIngestFranceTravail(): Promise<IngestResult> {
       .update(offerSources)
       .set({ lastSyncAt: new Date() })
       .where(eq(offerSources.id, sourceId));
+
+    // Trigger normalize batch (Story 2.4) — idempotent via normalized_at IS NULL.
+    if (inserted > 0) {
+      const normalizeQueue = getOfferNormalizeQueue();
+      if (normalizeQueue) {
+        await normalizeQueue.add('normalize', {}).catch((err) => {
+          logger.warn({ err }, 'Failed to enqueue normalize batch post-ingest');
+        });
+      }
+    }
 
     lastSuccessAt = Date.now();
     const durationMs = Date.now() - start;

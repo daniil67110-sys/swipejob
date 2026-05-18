@@ -7,6 +7,10 @@ import logger from './lib/logger.js';
 import { env } from './lib/env.js';
 import { startAuditWorker, stopAuditWorker } from './workers/audit.worker.js';
 import { startOfferIngestWorker, stopOfferIngestWorker } from './workers/offer-ingest.worker.js';
+import {
+  startNormalizeOffersWorker,
+  stopNormalizeOffersWorker,
+} from './workers/normalize-offers.worker.js';
 import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker.js';
 import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
 import { startFailedJobsWorker, stopFailedJobsWorker } from './workers/failed-jobs.worker.js';
@@ -63,6 +67,7 @@ try {
     void Promise.all([
       startAuditWorker(),
       startOfferIngestWorker(),
+      startNormalizeOffersWorker(),
       startCvParseWorker(),
       startRgpdDeleteWorker(),
       startFailedJobsWorker(),
@@ -90,6 +95,7 @@ function shutdown(signal: string) {
   void Promise.all([
     stopAuditWorker(),
     stopOfferIngestWorker(),
+    stopNormalizeOffersWorker(),
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
     stopFailedJobsWorker(),

@@ -17,6 +17,7 @@ import logger from '../lib/logger.js';
 
 export const QUEUE_NAMES = {
   OFFER_INGEST: 'offer-ingest',
+  OFFER_NORMALIZE: 'offer-normalize',
   OFFER_DEDUPE: 'offer-dedupe',
   EMBEDDINGS_COMPUTE: 'embeddings-compute',
   MATCH_COMPUTE: 'match-compute',
@@ -48,6 +49,9 @@ export function getQueue(name: QueueName): Queue | null {
 
 export function getOfferIngestQueue() {
   return getQueue(QUEUE_NAMES.OFFER_INGEST);
+}
+export function getOfferNormalizeQueue() {
+  return getQueue(QUEUE_NAMES.OFFER_NORMALIZE);
 }
 export function getOfferDedupeQueue() {
   return getQueue(QUEUE_NAMES.OFFER_DEDUPE);
