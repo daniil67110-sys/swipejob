@@ -14,6 +14,7 @@ export default defineConfig({
     './src/schema/ia-audit-logs.ts',
     './src/schema/parental-consents.ts',
     './src/schema/cvs.ts',
+    './src/schema/preferences.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

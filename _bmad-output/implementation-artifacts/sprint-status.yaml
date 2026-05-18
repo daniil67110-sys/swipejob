@@ -57,7 +57,7 @@ development_status:
   1-5-verification-d-age-et-consentement-parental-pour-mineurs: done
   1-6-upload-de-cv-au-format-pdf-avec-stockage-securise: done
   1-7-parsing-ia-du-cv-avec-correction-manuelle: done
-  1-8-configuration-des-preferences-de-recherche: backlog
+  1-8-configuration-des-preferences-de-recherche: done
   1-9-referentiel-des-ecoles-et-niveau-d-etudes: backlog
   1-10-modification-et-suppression-de-profil: backlog
   epic-1-retrospective: optional

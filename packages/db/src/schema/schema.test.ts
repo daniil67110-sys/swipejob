@@ -10,7 +10,7 @@ import {
 } from './index.js';
 
 describe('schema export', () => {
-  it('exposes the 9 expected tables', () => {
+  it('exposes the 10 expected tables', () => {
     expect(Object.keys(schema).sort()).toEqual(
       [
         'accounts',
@@ -18,6 +18,7 @@ describe('schema export', () => {
         'cvs',
         'iaAuditLogs',
         'parentalConsents',
+        'preferences',
         'profiles',
         'sessions',
         'users',
