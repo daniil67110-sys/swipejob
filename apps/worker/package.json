@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1048.0",
     "@axiomhq/pino": "^1.6.1",
     "@hono/node-server": "^1.14.2",
     "@mistralai/mistralai": "^2.2.1",
@@ -24,6 +25,7 @@
     "hono": "^4.7.10",
     "ioredis": "^5.6.1",
     "pino": "^9.6.0",
+    "resend": "^6.12.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {

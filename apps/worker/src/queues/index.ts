@@ -24,6 +24,7 @@ export const QUEUE_NAMES = {
   MATCH_COMPUTE: 'match-compute',
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
+  APPLICATION_PROCESS: 'application-process',
   FAILED_JOBS: 'failed-jobs',
 } as const;
 
@@ -71,6 +72,9 @@ export function getCvParseQueue() {
 }
 export function getRgpdDeleteQueue() {
   return getQueue(QUEUE_NAMES.RGPD_DELETE);
+}
+export function getApplicationProcessQueue() {
+  return getQueue(QUEUE_NAMES.APPLICATION_PROCESS);
 }
 export function getFailedJobsQueue() {
   return getQueue(QUEUE_NAMES.FAILED_JOBS);

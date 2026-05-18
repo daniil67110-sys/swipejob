@@ -1,4 +1,4 @@
-import { date, integer, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, date, integer, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
 import { createId } from '../lib/id.js';
 import { timestamps } from '../lib/timestamps.js';
 import { users } from './users.js';
@@ -26,6 +26,8 @@ export const preferences = pgTable(
     salaryMinMonthly: integer('salary_min_monthly'),
     salaryMaxMonthly: integer('salary_max_monthly'),
     desiredStartDate: date('desired_start_date'),
+    // Story 3.7 : si true → preview lettre avant envoi (mode review).
+    reviewBeforeSend: boolean('review_before_send').notNull().default(false),
     ...timestamps,
   },
   (table) => [uniqueIndex('idx_preferences_user_id').on(table.userId)],

@@ -1,9 +1,9 @@
 'use server';
 
-import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, notInArray } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
-import { matchScores, offers, preferences } from '@swipejob/db/schema';
+import { matchScores, offers, preferences, swipeEvents } from '@swipejob/db/schema';
 import { captureServer, hashUserId } from '@/lib/analytics';
 
 export type DeckOffer = {
@@ -82,6 +82,22 @@ export async function getDailyDeck(): Promise<DeckResult> {
     sourceUrl: string | null;
   };
 
+  // Story 3.4 : exclure les offres déjà swipées par ce user.
+  const swipedRows = await db
+    .select({ offerId: swipeEvents.offerId })
+    .from(swipeEvents)
+    .where(eq(swipeEvents.userId, userId));
+  const swipedIds = swipedRows.map((r) => r.offerId);
+
+  const matchWhere = swipedIds.length
+    ? and(
+        eq(matchScores.userId, userId),
+        eq(offers.status, 'active'),
+        isNull(offers.canonicalId),
+        notInArray(matchScores.offerId, swipedIds),
+      )
+    : and(eq(matchScores.userId, userId), eq(offers.status, 'active'), isNull(offers.canonicalId));
+
   const matches = (await db
     .select({
       offerId: matchScores.offerId,
@@ -97,9 +113,7 @@ export async function getDailyDeck(): Promise<DeckResult> {
     })
     .from(matchScores)
     .innerJoin(offers, eq(matchScores.offerId, offers.id))
-    .where(
-      and(eq(matchScores.userId, userId), eq(offers.status, 'active'), isNull(offers.canonicalId)),
-    )
+    .where(matchWhere)
     .orderBy(desc(matchScores.score))
     .limit(TARGET_DECK_SIZE)) as unknown as MatchRow[];
 
@@ -120,6 +134,14 @@ export async function getDailyDeck(): Promise<DeckResult> {
   // 2. Fallback freshness si pas de match_scores (compute-matches pas encore tourné)
   if (deckOffers.length === 0) {
     fallback = true;
+    const freshWhere = swipedIds.length
+      ? and(
+          eq(offers.status, 'active'),
+          isNull(offers.canonicalId),
+          isNotNull(offers.publishedAt),
+          notInArray(offers.id, swipedIds),
+        )
+      : and(eq(offers.status, 'active'), isNull(offers.canonicalId), isNotNull(offers.publishedAt));
     const fresh = await db
       .select({
         id: offers.id,
@@ -132,9 +154,7 @@ export async function getDailyDeck(): Promise<DeckResult> {
         sourceUrl: offers.sourceUrl,
       })
       .from(offers)
-      .where(
-        and(eq(offers.status, 'active'), isNull(offers.canonicalId), isNotNull(offers.publishedAt)),
-      )
+      .where(freshWhere)
       .orderBy(desc(offers.publishedAt))
       .limit(TARGET_DECK_SIZE);
 

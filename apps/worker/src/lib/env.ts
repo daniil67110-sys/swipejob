@@ -36,15 +36,26 @@ const envSchema = z.object({
   ADZUNA_APP_KEY: z.string().optional(),
   ADZUNA_BASE_URL: z.string().url().default('https://api.adzuna.com/v1/api/jobs/fr'),
 
-  // Mistral API (Story 2.8 — embeddings + matching)
+  // Mistral API (Story 2.8 — embeddings, Story 3.5 — cover letter chat)
   MISTRAL_API_KEY: z.string().optional(),
   MISTRAL_EMBED_MODEL: z.string().default('mistral-embed'),
+  MISTRAL_MODEL: z.string().default('mistral-large-latest'),
 
   // Story 2.8 + 2.9 : kill switch IA matching (NFR-F5).
   IA_MATCHING_ENABLED: z
     .enum(['true', 'false'])
     .default('true')
     .transform((v) => v === 'true'),
+
+  // Resend transactionnel (Story 3.6 — envoi candidatures)
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().email().default('noreply@swipejob.fr'),
+
+  // Cloudflare R2 (Story 3.6 — download CV pour pièce jointe)
+  R2_ACCOUNT_ID: z.string().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET_NAME: z.string().optional(),
 });
 
 export type WorkerEnv = z.infer<typeof envSchema>;
@@ -78,3 +89,9 @@ export const isFranceTravailConfigured = Boolean(
 export const isAdzunaConfigured = Boolean(env.ADZUNA_APP_ID && env.ADZUNA_APP_KEY);
 
 export const isMistralConfigured = Boolean(env.MISTRAL_API_KEY);
+
+export const isResendConfigured = Boolean(env.RESEND_API_KEY);
+
+export const isR2Configured = Boolean(
+  env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME,
+);

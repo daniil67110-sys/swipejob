@@ -23,6 +23,10 @@ import {
 import { startMatchComputeWorker, stopMatchComputeWorker } from './workers/match-compute.worker.js';
 import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker.js';
 import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
+import {
+  startApplicationProcessWorker,
+  stopApplicationProcessWorker,
+} from './workers/application-process.worker.js';
 import { startFailedJobsWorker, stopFailedJobsWorker } from './workers/failed-jobs.worker.js';
 import {
   closeAllQueues,
@@ -84,6 +88,7 @@ try {
       startMatchComputeWorker(),
       startCvParseWorker(),
       startRgpdDeleteWorker(),
+      startApplicationProcessWorker(),
       startFailedJobsWorker(),
     ]).catch((err) => {
       logger.error({ err }, 'Failed to start one or more workers');
@@ -116,6 +121,7 @@ function shutdown(signal: string) {
     stopMatchComputeWorker(),
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
+    stopApplicationProcessWorker(),
     stopFailedJobsWorker(),
     closeAllQueues(),
     closeRedis(),

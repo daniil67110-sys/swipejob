@@ -17,6 +17,7 @@ export const QUEUE_NAMES = {
   RGPD_DELETE: 'rgpd-delete',
   OFFER_INGEST: 'offer-ingest',
   MATCH_COMPUTE: 'match-compute',
+  APPLICATION_PROCESS: 'application-process',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
@@ -88,6 +89,23 @@ export async function enqueueMatchComputeFirst(payload: {
     return { ok: true, jobId: job.id ?? 'unknown' };
   } catch (err) {
     logger.error({ err, payload }, 'match-compute-first enqueue failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
+export async function enqueueApplicationProcess(payload: {
+  applicationId: string;
+}): Promise<EnqueueResult> {
+  const q = getQueue(QUEUE_NAMES.APPLICATION_PROCESS);
+  if (!q) {
+    logger.warn({ applicationId: payload.applicationId }, 'application-process enqueue mock');
+    return { ok: true, jobId: null, mock: true };
+  }
+  try {
+    const job = await q.add('process', payload, { priority: 5 });
+    return { ok: true, jobId: job.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, payload }, 'application-process enqueue failed');
     return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
   }
 }

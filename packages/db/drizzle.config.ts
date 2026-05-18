@@ -19,6 +19,8 @@ export default defineConfig({
     './src/schema/offer-sources.ts',
     './src/schema/offers.ts',
     './src/schema/match-scores.ts',
+    './src/schema/swipe-events.ts',
+    './src/schema/applications.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

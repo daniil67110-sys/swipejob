@@ -12,8 +12,11 @@ export * from './schools.js';
 export * from './offer-sources.js';
 export * from './offers.js';
 export * from './match-scores.js';
+export * from './swipe-events.js';
+export * from './applications.js';
 
 import { accounts } from './accounts.js';
+import { applicationEvents, applications, watchlist } from './applications.js';
 import { auditLogs } from './audit-logs.js';
 import { cvs } from './cvs.js';
 import { iaAuditLogs } from './ia-audit-logs.js';
@@ -25,6 +28,7 @@ import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
 import { schools } from './schools.js';
 import { sessions } from './sessions.js';
+import { swipeEvents } from './swipe-events.js';
 import { users } from './users.js';
 import { verificationTokens } from './verification-tokens.js';
 
@@ -43,6 +47,10 @@ export const schema = {
   offerSources,
   offers,
   matchScores,
+  swipeEvents,
+  applications,
+  applicationEvents,
+  watchlist,
 } as const;
 
 export type Schema = typeof schema;

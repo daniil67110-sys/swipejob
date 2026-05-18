@@ -92,6 +92,13 @@
       "when": 1779146187301,
       "tag": "0012_profile_embedding",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1779147514348,
+      "tag": "0013_swipe_applications",
+      "breakpoints": true
     }
   ]
 }
