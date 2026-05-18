@@ -4,11 +4,15 @@ import { getRedisConnection } from '../lib/redis.js';
 import { getFailedJobsQueue, getOfferMaintenanceQueue, QUEUE_NAMES } from '../queues/index.js';
 import logger from '../lib/logger.js';
 import { processDeactivateOffers } from '../jobs/deactivate-offers.job.js';
+import { processMonitorCatalog } from '../jobs/monitor-catalog.job.js';
 
 let worker: Worker | null = null;
 
 const DEACTIVATE_JOB_NAME = 'deactivate';
-const DEACTIVATE_CRON = '0 3 * * *'; // quotidien 03h UTC (heure creuse)
+const DEACTIVATE_CRON = '0 3 * * *'; // quotidien 03h UTC
+
+const MONITOR_JOB_NAME = 'monitor-catalog';
+const MONITOR_CRON = '15 3 * * *'; // 15 min après deactivate (Story 2.7)
 
 /**
  * Worker `offer-maintenance` (Story 2.6).
@@ -28,6 +32,8 @@ async function processMaintenanceJob(
   let result: unknown = null;
   if (job.name === DEACTIVATE_JOB_NAME) {
     result = await processDeactivateOffers();
+  } else if (job.name === MONITOR_JOB_NAME) {
+    result = await processMonitorCatalog();
   } else {
     logger.warn({ jobName: job.name }, 'offer-maintenance unknown job name — ignored');
   }
@@ -46,6 +52,16 @@ async function scheduleMaintenanceCron(): Promise<void> {
     logger.info({ cron: DEACTIVATE_CRON }, 'offer-maintenance deactivate cron scheduled');
   } catch (err) {
     logger.warn({ err }, 'Failed to schedule deactivate cron — repeatable may exist');
+  }
+  try {
+    await queue.add(
+      MONITOR_JOB_NAME,
+      {},
+      { repeat: { pattern: MONITOR_CRON }, jobId: `cron:${MONITOR_JOB_NAME}` },
+    );
+    logger.info({ cron: MONITOR_CRON }, 'offer-maintenance monitor-catalog cron scheduled');
+  } catch (err) {
+    logger.warn({ err }, 'Failed to schedule monitor-catalog cron — repeatable may exist');
   }
 }
 

@@ -72,7 +72,7 @@ development_status:
   2-4-normalisation-des-offres-en-format-unifie: done
   2-5-detection-et-fusion-des-doublons-inter-sources: done
   2-6-desactivation-automatique-des-offres-expirees-ou-pourvues: done
-  2-7-maintenir-un-catalogue-de-5000-offres-actives: backlog
+  2-7-maintenir-un-catalogue-de-5000-offres-actives: done
   2-8-calcul-des-embeddings-et-score-de-matching-ia-explicable: backlog
   2-9-exclusion-stricte-des-criteres-proteges-du-matching: backlog
   2-10-generation-du-deck-quotidien-personnalise: backlog
