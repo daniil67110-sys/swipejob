@@ -3,6 +3,7 @@ import NextAuth, { type NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { redirect } from 'next/navigation';
+import { eq } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from '@swipejob/db';
 import * as schema from '@swipejob/db/schema';
 import { captureServer, hashUserId } from './analytics';
@@ -160,6 +161,29 @@ export async function requireAuth(nextPath?: string) {
   if (!session?.user) {
     const next = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
     redirect(`/inscription${next}`);
+  }
+  return session;
+}
+
+/**
+ * Same as requireAuth but ALSO enforces email_verified_at (Story 1.4).
+ * Used by /(app) + /(onboarding) layouts. Defense in depth vs middleware
+ * (which runs in Edge runtime and can't touch the DB).
+ */
+export async function requireVerifiedAuth(nextPath?: string) {
+  const session = await requireAuth(nextPath);
+  if (!isDatabaseConfigured) return session;
+  const userId = session.user?.id;
+  if (!userId) return session;
+
+  const rows = await db
+    .select({ emailVerified: schema.users.emailVerified })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId))
+    .limit(1);
+
+  if (!rows[0]?.emailVerified) {
+    redirect('/inscription/valider-email?from=protected');
   }
   return session;
 }

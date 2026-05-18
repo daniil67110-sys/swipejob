@@ -48,13 +48,16 @@ export default async function InscriptionPage(props: {
 
       <div className="space-y-2 text-center text-sm">
         <p className="text-neutral-500">
+          Pas envie d'utiliser Google ?{' '}
+          <a className="font-medium text-primary-500 hover:underline" href="/inscription/email">
+            S'inscrire avec un email
+          </a>
+        </p>
+        <p className="text-neutral-500">
           Déjà inscrit ?{' '}
           <a className="font-medium text-primary-500 hover:underline" href="/connexion">
             Se connecter
           </a>
-        </p>
-        <p className="text-xs text-neutral-400">
-          L'inscription par email arrive bientôt (Story 1.4).
         </p>
       </div>
     </div>

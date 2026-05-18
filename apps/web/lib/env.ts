@@ -47,6 +47,14 @@ const envSchema = z.object({
     .transform((v) => v === 'true'),
   AUTH_GOOGLE_ID: z.string().optional(),
   AUTH_GOOGLE_SECRET: z.string().optional(),
+
+  // Email transactionnel (Story 1.4 — Resend)
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM: z.string().email().default('noreply@swipejob.fr'),
+
+  // Rate limiting (Story 1.4 — Upstash Redis EU Frankfurt)
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -79,6 +87,21 @@ export const isAuthConfigured = Boolean(
   env.AUTH_SECRET && env.AUTH_GOOGLE_ID && env.AUTH_GOOGLE_SECRET,
 );
 
+export const isEmailConfigured = Boolean(env.RESEND_API_KEY);
+export const isRateLimitConfigured = Boolean(
+  env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN,
+);
+
 if (isProduction && !isAuthConfigured) {
   console.warn('[env] Auth is not fully configured in production — /inscription will be disabled.');
+}
+
+if (isProduction && !isEmailConfigured) {
+  console.warn(
+    '[env] RESEND_API_KEY missing in production — email/password signup will be disabled.',
+  );
+}
+
+if (isProduction && !isRateLimitConfigured) {
+  console.warn('[env] Upstash Redis missing in production — rate limiting disabled (NFR-S5 risk).');
 }

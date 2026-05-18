@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   // Transpile workspace packages (TS sources sans build préalable)
   transpilePackages: ['@swipejob/db', '@swipejob/types'],
 
+  // argon2 = native binding (.node) — ne pas bundler côté webpack (Story 1.4).
+  serverExternalPackages: ['argon2'],
+
   // webpack extensionAlias : autorise les imports `.js` à résoudre vers `.ts`
   // (nécessaire pour les workspace packages compilés en NodeNext qui utilisent
   // des imports `.js` mais dont le source réel est `.ts`).

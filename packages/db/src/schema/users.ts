@@ -36,6 +36,7 @@ export const users = pgTable(
       .$defaultFn(() => createId()),
     email: citext('email').notNull().unique(),
     emailVerified: timestamp('email_verified_at', { withTimezone: true, mode: 'date' }),
+    passwordHash: text('password_hash'),
     name: text('name'),
     image: text('image'),
     locale: text('locale').notNull().default('fr-FR'),
