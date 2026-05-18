@@ -3,17 +3,19 @@ import {
   actorType,
   authSource,
   consentStatus,
+  cvParsingStatus,
   parentalConsentStatus,
   schema,
   userRole,
 } from './index.js';
 
 describe('schema export', () => {
-  it('exposes the 8 expected tables', () => {
+  it('exposes the 9 expected tables', () => {
     expect(Object.keys(schema).sort()).toEqual(
       [
         'accounts',
         'auditLogs',
+        'cvs',
         'iaAuditLogs',
         'parentalConsents',
         'profiles',
@@ -26,11 +28,12 @@ describe('schema export', () => {
 });
 
 describe('enum exports', () => {
-  it('exposes the 5 expected enums', () => {
+  it('exposes the 6 expected enums', () => {
     expect(userRole).toBeDefined();
     expect(authSource).toBeDefined();
     expect(consentStatus).toBeDefined();
     expect(actorType).toBeDefined();
     expect(parentalConsentStatus).toBeDefined();
+    expect(cvParsingStatus).toBeDefined();
   });
 });

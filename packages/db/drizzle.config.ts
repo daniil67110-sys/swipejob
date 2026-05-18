@@ -13,6 +13,7 @@ export default defineConfig({
     './src/schema/audit-logs.ts',
     './src/schema/ia-audit-logs.ts',
     './src/schema/parental-consents.ts',
+    './src/schema/cvs.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

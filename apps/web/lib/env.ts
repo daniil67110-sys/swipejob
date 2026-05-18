@@ -55,6 +55,12 @@ const envSchema = z.object({
   // Rate limiting (Story 1.4 — Upstash Redis EU Frankfurt)
   UPSTASH_REDIS_REST_URL: z.string().url().optional(),
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+
+  // Cloudflare R2 — CV/docs storage (Story 1.6)
+  R2_ACCOUNT_ID: z.string().optional(),
+  R2_ACCESS_KEY_ID: z.string().optional(),
+  R2_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_BUCKET_NAME: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -92,6 +98,10 @@ export const isRateLimitConfigured = Boolean(
   env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN,
 );
 
+export const isR2Configured = Boolean(
+  env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME,
+);
+
 if (isProduction && !isAuthConfigured) {
   console.warn('[env] Auth is not fully configured in production — /inscription will be disabled.');
 }
@@ -104,4 +114,8 @@ if (isProduction && !isEmailConfigured) {
 
 if (isProduction && !isRateLimitConfigured) {
   console.warn('[env] Upstash Redis missing in production — rate limiting disabled (NFR-S5 risk).');
+}
+
+if (isProduction && !isR2Configured) {
+  console.warn('[env] Cloudflare R2 missing in production — CV upload will use mock mode.');
 }

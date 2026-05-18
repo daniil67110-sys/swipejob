@@ -65,6 +65,10 @@ export const verifyEmailRateLimit: Limiter = redis
   ? makeLimiter(redis, 10, 3600, 'sj:rl:verify-email')
   : makeNoop();
 
+export const cvUploadRateLimit: Limiter = redis
+  ? makeLimiter(redis, 10, 3600, 'sj:rl:cv-upload')
+  : makeNoop();
+
 export function getClientIp(hdrs: Headers): string {
   const xff = hdrs.get('x-forwarded-for');
   if (xff) {

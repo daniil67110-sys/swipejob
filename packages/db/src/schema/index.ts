@@ -6,9 +6,11 @@ export * from './profiles.js';
 export * from './audit-logs.js';
 export * from './ia-audit-logs.js';
 export * from './parental-consents.js';
+export * from './cvs.js';
 
 import { accounts } from './accounts.js';
 import { auditLogs } from './audit-logs.js';
+import { cvs } from './cvs.js';
 import { iaAuditLogs } from './ia-audit-logs.js';
 import { parentalConsents } from './parental-consents.js';
 import { profiles } from './profiles.js';
@@ -25,6 +27,7 @@ export const schema = {
   auditLogs,
   iaAuditLogs,
   parentalConsents,
+  cvs,
 } as const;
 
 export type Schema = typeof schema;
