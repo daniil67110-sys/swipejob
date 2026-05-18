@@ -1,6 +1,6 @@
 # Story 2.11: Affichage de l'explication textuelle du score par offre
 
-Status: in-progress (back livré, UI Story 2.10)
+Status: done
 
 ## Story
 
