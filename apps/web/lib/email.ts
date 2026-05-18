@@ -151,6 +151,40 @@ export async function sendParentalConsentEmail(
   }
 }
 
+export async function sendAccountDeletionEmail(input: { to: string }): Promise<SendEmailResult> {
+  const client = getClient();
+  const html = `<!doctype html>
+<html lang="fr">
+  <body style="font-family:system-ui,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111">
+    <h1 style="font-size:20px;margin:0 0 16px">SwipeJob — Suppression de ton compte</h1>
+    <p>Bonjour,</p>
+    <p>Ta demande de suppression a bien été enregistrée. Ton compte est désactivé immédiatement.</p>
+    <p>Conformément au RGPD, l'ensemble de tes données personnelles (CV, profil, candidatures) sera effacé de nos systèmes dans un délai maximum de 30 jours.</p>
+    <p>Si c'était une erreur, contacte <a href="mailto:support@swipejob.fr">support@swipejob.fr</a> dans les 24 heures.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+    <p style="color:#888;font-size:12px">Merci d'avoir utilisé SwipeJob. À bientôt peut-être.</p>
+  </body>
+</html>`;
+  if (!client) {
+    logger.warn({ to: input.to }, 'Resend non configuré — deletion email mock');
+    return { ok: true, id: null, mock: true };
+  }
+  try {
+    const res = await client.emails.send({
+      from: env.RESEND_FROM,
+      to: input.to,
+      subject: 'SwipeJob — Confirmation de suppression de ton compte',
+      html,
+      text: 'Ton compte SwipeJob est désactivé. Suppression effective sous 30 jours (RGPD).',
+    });
+    if (res.error) return { ok: false, error: res.error.message };
+    return { ok: true, id: res.data?.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, to: input.to }, 'deletion email failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
 export async function sendVerificationEmail(
   input: SendVerificationEmailInput,
 ): Promise<SendEmailResult> {

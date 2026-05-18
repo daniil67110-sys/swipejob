@@ -48,7 +48,7 @@ development_status:
   # =========================================================================
   # EPIC 1: Foundation & Authenticated Onboarding
   # =========================================================================
-  epic-1: in-progress
+  epic-1: done
   1-1-bootstrap-monorepo-turborepo-et-infrastructure-de-base: done
   1-2-setup-observability-et-pipeline-ci-cd: done
   1-2-5-setup-neon-drizzle-schemas-initiaux: done
@@ -59,7 +59,7 @@ development_status:
   1-7-parsing-ia-du-cv-avec-correction-manuelle: done
   1-8-configuration-des-preferences-de-recherche: done
   1-9-referentiel-des-ecoles-et-niveau-d-etudes: done
-  1-10-modification-et-suppression-de-profil: backlog
+  1-10-modification-et-suppression-de-profil: done
   epic-1-retrospective: optional
 
   # =========================================================================

@@ -1,0 +1,89 @@
+'use server';
+
+import { eq } from 'drizzle-orm';
+import { z } from 'zod';
+import { auth } from '@/lib/auth';
+import { db, isDatabaseConfigured } from '@/lib/db';
+import { sessions, users } from '@swipejob/db/schema';
+import { auditLog } from '@/lib/audit';
+import { captureServer, hashUserId } from '@/lib/analytics';
+import { sendAccountDeletionEmail } from '@/lib/email';
+import { serverLogger as logger } from '@/lib/logger.server';
+
+export type ActionResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: { code: string; message: string } };
+
+const schema = z.object({
+  confirmEmail: z.string().email('Email invalide.'),
+});
+
+export async function requestAccountDeletionAction(rawInput: {
+  confirmEmail: string;
+}): Promise<ActionResult<{ redirectTo: string }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: { code: 'UNAUTHENTICATED', message: 'Non authentifié.' } };
+  }
+  if (!isDatabaseConfigured) {
+    return { ok: false, error: { code: 'NOT_CONFIGURED', message: 'Service indisponible.' } };
+  }
+  const parsed = schema.safeParse(rawInput);
+  if (!parsed.success) {
+    return { ok: false, error: { code: 'VALIDATION_ERROR', message: 'Email invalide.' } };
+  }
+  const userId = session.user.id;
+
+  try {
+    const rows = await db
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+    const user = rows[0];
+    if (!user) {
+      return { ok: false, error: { code: 'NOT_FOUND', message: 'Compte introuvable.' } };
+    }
+    // Comparison citext : email côté DB est case-insensitive. On lowercase aussi côté input.
+    if (parsed.data.confirmEmail.toLowerCase() !== user.email.toLowerCase()) {
+      return {
+        ok: false,
+        error: {
+          code: 'EMAIL_MISMATCH',
+          message: "L'email saisi ne correspond pas à celui de ton compte.",
+        },
+      };
+    }
+
+    // Soft delete + invalidate sessions + audit
+    await db
+      .update(users)
+      .set({ deletedAt: new Date(), consentStatus: 'REFUSED' })
+      .where(eq(users.id, userId));
+    await db.delete(sessions).where(eq(sessions.userId, userId));
+
+    captureServer('account.deletion_requested', hashUserId(userId), {});
+    await auditLog({
+      actorId: userId,
+      actorType: 'USER',
+      event: 'account.deletion_requested',
+      targetType: 'user',
+      targetId: userId,
+      metadata: { method: 'self_service' },
+    });
+
+    // Stub enqueue rgpd.delete (Story 6.5 implémente le worker)
+    logger.warn(
+      { userId },
+      'rgpd.delete job not enqueued (BullMQ Story 2.1 + worker Story 6.5) — effective data purge pending',
+    );
+
+    // Email confirmation (mode mock OK)
+    await sendAccountDeletionEmail({ to: user.email });
+
+    return { ok: true, data: { redirectTo: '/' } };
+  } catch (err) {
+    logger.error({ err, userId }, 'requestAccountDeletionAction failed');
+    return { ok: false, error: { code: 'INTERNAL_ERROR', message: 'Erreur. Réessaie.' } };
+  }
+}
