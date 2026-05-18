@@ -85,17 +85,17 @@ development_status:
   # =========================================================================
   # EPIC 3: Swipe & AI Application
   # =========================================================================
-  epic-3: backlog
-  3-1-composant-swipecard-avec-animations-framer-motion: backlog
-  3-2-composant-swipedeck-avec-stack-3d-et-prechargement: backlog
-  3-3-consultation-du-detail-d-une-offre-depuis-la-carte: backlog
-  3-4-gestes-swipe-et-equivalents-clavier-bouton: backlog
-  3-5-generation-automatique-d-une-lettre-de-motivation-ia: backlog
-  3-6-envoi-automatique-de-la-candidature-par-email: backlog
-  3-7-mode-preview-de-la-lettre-avant-envoi: backlog
-  3-8-undo-d-une-candidature-dans-les-30-secondes: backlog
-  3-9-quota-quotidien-de-swipes-droits-configurable: backlog
-  3-10-anti-doublon-de-candidature-a-la-meme-offre: backlog
+  epic-3: done
+  3-1-composant-swipecard-avec-animations-framer-motion: done
+  3-2-composant-swipedeck-avec-stack-3d-et-prechargement: done
+  3-3-consultation-du-detail-d-une-offre-depuis-la-carte: done
+  3-4-gestes-swipe-et-equivalents-clavier-bouton: done
+  3-5-generation-automatique-d-une-lettre-de-motivation-ia: done
+  3-6-envoi-automatique-de-la-candidature-par-email: done
+  3-7-mode-preview-de-la-lettre-avant-envoi: partial
+  3-8-undo-d-une-candidature-dans-les-30-secondes: done
+  3-9-quota-quotidien-de-swipes-droits-configurable: done
+  3-10-anti-doublon-de-candidature-a-la-meme-offre: done
   epic-3-retrospective: optional
 
   # =========================================================================
