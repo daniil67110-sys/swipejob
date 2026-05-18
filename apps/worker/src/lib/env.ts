@@ -17,6 +17,19 @@ const envSchema = z.object({
     .default('false')
     .transform((v) => v === 'true'),
   REDIS_URL: z.string().optional(),
+
+  // France Travail API (Story 2.2)
+  FRANCE_TRAVAIL_CLIENT_ID: z.string().optional(),
+  FRANCE_TRAVAIL_CLIENT_SECRET: z.string().optional(),
+  FRANCE_TRAVAIL_SCOPE: z.string().default('o2dsoffre api_offresdemploiv2'),
+  FRANCE_TRAVAIL_BASE_URL: z
+    .string()
+    .url()
+    .default('https://api.francetravail.io/partenaire/offresdemploi/v2'),
+  FRANCE_TRAVAIL_AUTH_URL: z
+    .string()
+    .url()
+    .default('https://entreprise.francetravail.fr/connexion/oauth2/access_token'),
 });
 
 export type WorkerEnv = z.infer<typeof envSchema>;
@@ -42,3 +55,7 @@ export const isObservabilityEnabled = {
 };
 
 export const isRedisConfigured = Boolean(env.REDIS_URL);
+
+export const isFranceTravailConfigured = Boolean(
+  env.FRANCE_TRAVAIL_CLIENT_ID && env.FRANCE_TRAVAIL_CLIENT_SECRET,
+);

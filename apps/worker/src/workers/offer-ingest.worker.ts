@@ -1,26 +1,58 @@
 import { Worker, type Job } from 'bullmq';
 import * as Sentry from '@sentry/node';
 import { getRedisConnection } from '../lib/redis.js';
-import { getFailedJobsQueue, QUEUE_NAMES } from '../queues/index.js';
+import { getFailedJobsQueue, getOfferIngestQueue, QUEUE_NAMES } from '../queues/index.js';
 import logger from '../lib/logger.js';
+import { processIngestFranceTravail } from '../jobs/ingest-france-travail.job.js';
 
 let worker: Worker | null = null;
 
+const FRANCE_TRAVAIL_JOB_NAME = 'france-travail';
+const FRANCE_TRAVAIL_CRON = '*/30 * * * *'; // toutes les 30 min
+
 /**
- * Worker `offer-ingest` (Story 2.1).
+ * Worker `offer-ingest` (Story 2.2).
  *
- * V1 : stub qui ack le job sans rien faire (l'implémentation France Travail
- * arrive en Story 2.2). Le but de cette story est juste de prouver que la
- * chaîne queue → worker → ack → log fonctionne.
+ * Délègue par `job.name` :
+ * - `france-travail` → `processIngestFranceTravail`
+ * - Autres sources (Story 2.3+) ajouteront leurs branches ici.
  *
- * En cas d'épuisement des retries, le job est republié sur `failed-jobs`
- * pour archivage + alerte Sentry.
+ * Repeatable BullMQ job (cron toutes les 30 min) enregistré au boot.
+ * jobId fixe → idempotent (BullMQ dedupe sur restart).
  */
 
-async function processOfferIngestJob(job: Job): Promise<{ ok: true; jobId: string }> {
-  logger.info({ jobId: job.id, name: job.name, data: job.data }, 'offer-ingest job received');
-  // V1 stub : Story 2.2 implémentera fetch France Travail + insert offers.
-  return { ok: true, jobId: job.id ?? 'unknown' };
+async function processOfferIngestJob(
+  job: Job,
+): Promise<{ ok: true; jobId: string; result: unknown }> {
+  logger.info({ jobId: job.id, name: job.name }, 'offer-ingest job received');
+  let result: unknown = null;
+  if (job.name === FRANCE_TRAVAIL_JOB_NAME) {
+    result = await processIngestFranceTravail();
+  } else {
+    logger.warn({ jobName: job.name }, 'offer-ingest unknown job name — ignored');
+  }
+  return { ok: true, jobId: job.id ?? 'unknown', result };
+}
+
+async function scheduleFranceTravailCron(): Promise<void> {
+  const queue = getOfferIngestQueue();
+  if (!queue) return;
+  try {
+    await queue.add(
+      FRANCE_TRAVAIL_JOB_NAME,
+      {},
+      {
+        repeat: { pattern: FRANCE_TRAVAIL_CRON },
+        jobId: `cron:${FRANCE_TRAVAIL_JOB_NAME}`,
+      },
+    );
+    logger.info({ cron: FRANCE_TRAVAIL_CRON }, 'France Travail cron scheduled');
+  } catch (err) {
+    logger.warn(
+      { err },
+      'Failed to schedule France Travail cron — repeatable job may already exist',
+    );
+  }
 }
 
 export async function startOfferIngestWorker(): Promise<Worker | null> {
@@ -32,6 +64,9 @@ export async function startOfferIngestWorker(): Promise<Worker | null> {
   }
 
   worker = new Worker(QUEUE_NAMES.OFFER_INGEST, processOfferIngestJob, { connection });
+
+  // Schedule le cron France Travail (idempotent)
+  await scheduleFranceTravailCron();
 
   worker.on('failed', async (job, err) => {
     logger.error(

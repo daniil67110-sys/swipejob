@@ -58,6 +58,8 @@ export const offers = pgTable(
       languages?: string[];
     }>(),
     embedding: vector1024('embedding'),
+    // Story 2.2 : payload brut de la source (audit, débug, re-mapping si schéma évolue).
+    rawPayload: jsonb('raw_payload').$type<Record<string, unknown>>(),
     expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }),
     isActive: boolean('is_active').notNull().default(true),
     ...timestamps,
