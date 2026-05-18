@@ -73,12 +73,12 @@ development_status:
   2-5-detection-et-fusion-des-doublons-inter-sources: done
   2-6-desactivation-automatique-des-offres-expirees-ou-pourvues: done
   2-7-maintenir-un-catalogue-de-5000-offres-actives: done
-  2-8-calcul-des-embeddings-et-score-de-matching-ia-explicable: backlog
-  2-9-exclusion-stricte-des-criteres-proteges-du-matching: backlog
+  2-8-calcul-des-embeddings-et-score-de-matching-ia-explicable: done
+  2-9-exclusion-stricte-des-criteres-proteges-du-matching: done
   2-10-generation-du-deck-quotidien-personnalise: backlog
-  2-11-affichage-de-l-explication-textuelle-du-score-par-offre: backlog
+  2-11-affichage-de-l-explication-textuelle-du-score-par-offre: in-progress
   2-12-detection-de-penurie-et-suggestion-d-elargissement: backlog
-  2-13-journal-auditable-des-calculs-de-matching-ia-act: backlog
+  2-13-journal-auditable-des-calculs-de-matching-ia-act: done
   2-14-performance-du-calcul-de-deck-post-upload-cv: backlog
   epic-2-retrospective: optional
 

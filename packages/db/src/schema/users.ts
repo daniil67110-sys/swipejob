@@ -22,6 +22,13 @@ const citext = customType<{ data: string }>({
   dataType: () => 'citext',
 });
 
+// pgvector 1024 dim (Mistral-Embed) — Story 2.8.
+const vector1024 = customType<{ data: number[]; driverData: string }>({
+  dataType: () => 'vector(1024)',
+  toDriver: (value) => `[${value.join(',')}]`,
+  fromDriver: (value) => JSON.parse(value),
+});
+
 /**
  * Convention adapter `@auth/drizzle-adapter` : clé TS doit être `emailVerified`
  * (pas `emailVerifiedAt`). Le nom SQL `email_verified_at` reste en snake_case.
@@ -47,6 +54,9 @@ export const users = pgTable(
     birthDate: date('birth_date'),
     consentStatus: consentStatus('consent_status').notNull().default('PENDING'),
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'date' }),
+    // Story 2.8 : embedding profil utilisateur pour matching cosine.
+    profileEmbedding: vector1024('profile_embedding'),
+    embeddingComputedAt: timestamp('embedding_computed_at', { withTimezone: true, mode: 'date' }),
     ...timestamps,
   },
   // Pas d'index explicite sur `email` : la contrainte UNIQUE crée déjà un index unique

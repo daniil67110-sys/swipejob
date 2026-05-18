@@ -85,6 +85,13 @@
       "when": 1779138244064,
       "tag": "0011_offer_status",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1779146187301,
+      "tag": "0012_profile_embedding",
+      "breakpoints": true
     }
   ]
 }

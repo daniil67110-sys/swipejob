@@ -35,6 +35,16 @@ const envSchema = z.object({
   ADZUNA_APP_ID: z.string().optional(),
   ADZUNA_APP_KEY: z.string().optional(),
   ADZUNA_BASE_URL: z.string().url().default('https://api.adzuna.com/v1/api/jobs/fr'),
+
+  // Mistral API (Story 2.8 — embeddings + matching)
+  MISTRAL_API_KEY: z.string().optional(),
+  MISTRAL_EMBED_MODEL: z.string().default('mistral-embed'),
+
+  // Story 2.8 + 2.9 : kill switch IA matching (NFR-F5).
+  IA_MATCHING_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
 });
 
 export type WorkerEnv = z.infer<typeof envSchema>;
@@ -66,3 +76,5 @@ export const isFranceTravailConfigured = Boolean(
 );
 
 export const isAdzunaConfigured = Boolean(env.ADZUNA_APP_ID && env.ADZUNA_APP_KEY);
+
+export const isMistralConfigured = Boolean(env.MISTRAL_API_KEY);
