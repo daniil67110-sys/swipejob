@@ -30,6 +30,11 @@ const envSchema = z.object({
     .string()
     .url()
     .default('https://entreprise.francetravail.fr/connexion/oauth2/access_token'),
+
+  // Adzuna API (Story 2.3) — source secondaire
+  ADZUNA_APP_ID: z.string().optional(),
+  ADZUNA_APP_KEY: z.string().optional(),
+  ADZUNA_BASE_URL: z.string().url().default('https://api.adzuna.com/v1/api/jobs/fr'),
 });
 
 export type WorkerEnv = z.infer<typeof envSchema>;
@@ -59,3 +64,5 @@ export const isRedisConfigured = Boolean(env.REDIS_URL);
 export const isFranceTravailConfigured = Boolean(
   env.FRANCE_TRAVAIL_CLIENT_ID && env.FRANCE_TRAVAIL_CLIENT_SECRET,
 );
+
+export const isAdzunaConfigured = Boolean(env.ADZUNA_APP_ID && env.ADZUNA_APP_KEY);

@@ -24,13 +24,32 @@ agrégées par SwipeJob. Mis à jour par story d'intégration.
 
 > "Source : France Travail" sur chaque card d'offre. Implémentation : composant `<OfferSourceBadge>` (Story 3.x).
 
-## Sources futures (V2)
+## Adzuna (Story 2.3)
+
+- **API utilisée** : Adzuna Job Search API v1
+- **URL** : https://api.adzuna.com/v1/api/jobs/fr
+- **Authentification** : query string `app_id` + `app_key`
+- **ToS** : https://developer.adzuna.com/info
+- **Statut juridique** :
+  - ✅ Usage commercial autorisé (free tier inclus)
+  - ✅ Agrégation autorisée avec mention source
+  - ⚠️ Obligation de respecter `redirect_url` (lien vers page Adzuna originale pour postuler — composant `<OfferDetailsCta>` à implémenter Story 3.x)
+  - ⚠️ Pas de revente brute — SwipeJob ajoute valeur (matching IA, swipe UX) donc OK
+- **Quota free tier** : ~250 req/jour, ~25 req/sec
+- **Champs PII collectés** : aucun (offres publiques)
+- **Implémentation** : `apps/worker/src/scrapers/adzuna/` + Story 2.3
+
+### Mention légale à afficher
+
+> "Source : Adzuna · [Voir l'offre originale]({redirect_url})" sur chaque card V2.
+
+## Sources futures (V2+)
 
 À documenter quand ajoutées :
 
-- **APEC** (Story 2.3 candidate) — vérifier ToS API APEC
-- **JobTeaser** (Story 2.3 candidate) — partenariat requis ?
-- **RSS publics** — toujours OK si flux explicite
+- **APEC** — vérifier ToS API APEC (cible cadres, payant)
+- **JobTeaser** — partenariat requis
+- **RSS publics** (L'Étudiant, WTTJ) — toujours OK si flux explicite
 
 ## Procédure d'ajout d'une nouvelle source
 

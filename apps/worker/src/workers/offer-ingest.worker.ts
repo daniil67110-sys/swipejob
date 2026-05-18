@@ -4,21 +4,25 @@ import { getRedisConnection } from '../lib/redis.js';
 import { getFailedJobsQueue, getOfferIngestQueue, QUEUE_NAMES } from '../queues/index.js';
 import logger from '../lib/logger.js';
 import { processIngestFranceTravail } from '../jobs/ingest-france-travail.job.js';
+import { processIngestAdzuna } from '../jobs/ingest-adzuna.job.js';
 
 let worker: Worker | null = null;
 
 const FRANCE_TRAVAIL_JOB_NAME = 'france-travail';
-const FRANCE_TRAVAIL_CRON = '*/30 * * * *'; // toutes les 30 min
+const FRANCE_TRAVAIL_CRON = '*/30 * * * *'; // toutes les 30 min, début d'heure
+
+const ADZUNA_JOB_NAME = 'adzuna';
+const ADZUNA_CRON = '15,45 * * * *'; // décalé +15 min vs France Travail (étale la charge DB)
 
 /**
- * Worker `offer-ingest` (Story 2.2).
+ * Worker `offer-ingest` (Stories 2.2 + 2.3).
  *
  * Délègue par `job.name` :
  * - `france-travail` → `processIngestFranceTravail`
- * - Autres sources (Story 2.3+) ajouteront leurs branches ici.
+ * - `adzuna` → `processIngestAdzuna`
+ * - Nouvelles sources (Story 2.x+) : ajouter une branche ici + 1 job + 1 cron.
  *
- * Repeatable BullMQ job (cron toutes les 30 min) enregistré au boot.
- * jobId fixe → idempotent (BullMQ dedupe sur restart).
+ * Repeatable BullMQ jobs (jobId fixe) → idempotent au restart.
  */
 
 async function processOfferIngestJob(
@@ -28,30 +32,22 @@ async function processOfferIngestJob(
   let result: unknown = null;
   if (job.name === FRANCE_TRAVAIL_JOB_NAME) {
     result = await processIngestFranceTravail();
+  } else if (job.name === ADZUNA_JOB_NAME) {
+    result = await processIngestAdzuna();
   } else {
     logger.warn({ jobName: job.name }, 'offer-ingest unknown job name — ignored');
   }
   return { ok: true, jobId: job.id ?? 'unknown', result };
 }
 
-async function scheduleFranceTravailCron(): Promise<void> {
+async function scheduleCron(name: string, pattern: string): Promise<void> {
   const queue = getOfferIngestQueue();
   if (!queue) return;
   try {
-    await queue.add(
-      FRANCE_TRAVAIL_JOB_NAME,
-      {},
-      {
-        repeat: { pattern: FRANCE_TRAVAIL_CRON },
-        jobId: `cron:${FRANCE_TRAVAIL_JOB_NAME}`,
-      },
-    );
-    logger.info({ cron: FRANCE_TRAVAIL_CRON }, 'France Travail cron scheduled');
+    await queue.add(name, {}, { repeat: { pattern }, jobId: `cron:${name}` });
+    logger.info({ name, pattern }, 'cron scheduled');
   } catch (err) {
-    logger.warn(
-      { err },
-      'Failed to schedule France Travail cron — repeatable job may already exist',
-    );
+    logger.warn({ err, name }, 'Failed to schedule cron — repeatable job may already exist');
   }
 }
 
@@ -65,8 +61,11 @@ export async function startOfferIngestWorker(): Promise<Worker | null> {
 
   worker = new Worker(QUEUE_NAMES.OFFER_INGEST, processOfferIngestJob, { connection });
 
-  // Schedule le cron France Travail (idempotent)
-  await scheduleFranceTravailCron();
+  // Schedule tous les crons (idempotent)
+  await Promise.all([
+    scheduleCron(FRANCE_TRAVAIL_JOB_NAME, FRANCE_TRAVAIL_CRON),
+    scheduleCron(ADZUNA_JOB_NAME, ADZUNA_CRON),
+  ]);
 
   worker.on('failed', async (job, err) => {
     logger.error(
