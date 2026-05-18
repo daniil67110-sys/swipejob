@@ -7,6 +7,7 @@ import { db, isDatabaseConfigured } from '@/lib/db';
 import { preferences } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
+import { enqueueMatchComputeFirst } from '@/lib/queue';
 import { serverLogger as logger } from '@/lib/logger.server';
 
 export type ActionResult<T> =
@@ -157,6 +158,15 @@ export async function updatePreferencesAction(
         fields: Object.keys(data),
       },
     });
+
+    // Story 2.14 : trigger job prioritaire match.compute.first pour générer
+    // le premier deck en arrière-plan pendant la redirection vers /deck.
+    const enqueued = await enqueueMatchComputeFirst({ userId });
+    if (!enqueued.ok) {
+      logger.warn({ err: enqueued.error, userId }, 'match-compute-first enqueue failed');
+    } else if ('mock' in enqueued && enqueued.mock) {
+      logger.warn({ userId }, 'match-compute-first enqueued in mock mode');
+    }
 
     return { ok: true, data: { redirectTo: '/deck' } };
   } catch (err) {

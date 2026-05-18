@@ -8,11 +8,19 @@ import { processComputeMatches } from '../jobs/compute-matches.job.js';
 let worker: Worker | null = null;
 
 const MATCH_JOB_NAME = 'compute';
+const MATCH_FIRST_JOB_NAME = 'compute-first'; // Story 2.14 — priority post-onboarding
 const MATCH_CRON = '0 2 * * *'; // 02h UTC nocturne (Story 2.8)
 
 async function processJob(job: Job): Promise<{ ok: true; jobId: string; result: unknown }> {
   logger.info({ jobId: job.id, name: job.name }, 'match-compute job received');
-  const result = await processComputeMatches();
+  let result: unknown;
+  if (job.name === MATCH_FIRST_JOB_NAME) {
+    const userId = job.data?.userId as string | undefined;
+    if (!userId) throw new Error('compute-first job missing userId');
+    result = await processComputeMatches({ userId });
+  } else {
+    result = await processComputeMatches();
+  }
   return { ok: true, jobId: job.id ?? 'unknown', result };
 }
 

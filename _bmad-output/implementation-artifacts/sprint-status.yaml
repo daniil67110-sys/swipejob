@@ -65,7 +65,7 @@ development_status:
   # =========================================================================
   # EPIC 2: Offer Discovery & AI Matching
   # =========================================================================
-  epic-2: in-progress
+  epic-2: done
   2-1-bootstrap-du-worker-bullmq-et-schemas-d-offres: done
   2-2-integration-de-l-api-france-travail: done
   2-3-integration-d-au-moins-une-source-secondaire-d-offres: done
@@ -79,7 +79,7 @@ development_status:
   2-11-affichage-de-l-explication-textuelle-du-score-par-offre: done
   2-12-detection-de-penurie-et-suggestion-d-elargissement: done
   2-13-journal-auditable-des-calculs-de-matching-ia-act: done
-  2-14-performance-du-calcul-de-deck-post-upload-cv: backlog
+  2-14-performance-du-calcul-de-deck-post-upload-cv: done
   epic-2-retrospective: optional
 
   # =========================================================================

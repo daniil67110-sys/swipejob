@@ -16,6 +16,7 @@ export const QUEUE_NAMES = {
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
   OFFER_INGEST: 'offer-ingest',
+  MATCH_COMPUTE: 'match-compute',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
@@ -70,6 +71,23 @@ export async function enqueueCvParse(payload: {
     return { ok: true, jobId: job.id ?? 'unknown' };
   } catch (err) {
     logger.error({ err, payload }, 'cv-parse enqueue failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
+export async function enqueueMatchComputeFirst(payload: {
+  userId: string;
+}): Promise<EnqueueResult> {
+  const q = getQueue(QUEUE_NAMES.MATCH_COMPUTE);
+  if (!q) {
+    logger.warn({ userId: payload.userId }, 'match-compute-first enqueue mock');
+    return { ok: true, jobId: null, mock: true };
+  }
+  try {
+    const job = await q.add('compute-first', payload, { priority: 1 });
+    return { ok: true, jobId: job.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, payload }, 'match-compute-first enqueue failed');
     return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
   }
 }

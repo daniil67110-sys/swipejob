@@ -39,7 +39,11 @@ export type ComputeMatchesResult =
  *
  * Kill switch IA_MATCHING_ENABLED=false (Story 2.9 NFR-F5) → bypass + log.
  */
-export async function processComputeMatches(): Promise<ComputeMatchesResult> {
+export async function processComputeMatches(
+  opts: {
+    userId?: string;
+  } = {},
+): Promise<ComputeMatchesResult> {
   if (!env.IA_MATCHING_ENABLED) {
     logger.warn('IA_MATCHING_ENABLED=false — compute-matches bypass');
     return { ok: true, killSwitched: true };
@@ -50,7 +54,23 @@ export async function processComputeMatches(): Promise<ComputeMatchesResult> {
 
   const start = Date.now();
   try {
-    // Users avec embedding calculé + non-deleted + emailVerified + consent GRANTED
+    // Users avec embedding calculé + non-deleted + emailVerified + consent GRANTED.
+    // Story 2.14 : si userId fourni → traite uniquement ce user (job prioritaire post-onboarding).
+    const whereClause = opts.userId
+      ? and(
+          eq(users.id, opts.userId),
+          isNotNull(users.profileEmbedding),
+          isNotNull(users.emailVerified),
+          isNull(users.deletedAt),
+          eq(users.consentStatus, 'GRANTED'),
+        )
+      : and(
+          isNotNull(users.profileEmbedding),
+          isNotNull(users.emailVerified),
+          isNull(users.deletedAt),
+          eq(users.consentStatus, 'GRANTED'),
+        );
+
     const userRows = await db
       .select({
         id: users.id,
@@ -65,15 +85,8 @@ export async function processComputeMatches(): Promise<ComputeMatchesResult> {
       .from(users)
       .innerJoin(profiles, eq(profiles.userId, users.id))
       .innerJoin(preferences, eq(preferences.userId, users.id))
-      .where(
-        and(
-          isNotNull(users.profileEmbedding),
-          isNotNull(users.emailVerified),
-          isNull(users.deletedAt),
-          eq(users.consentStatus, 'GRANTED'),
-        ),
-      )
-      .limit(USER_BATCH);
+      .where(whereClause)
+      .limit(opts.userId ? 1 : USER_BATCH);
 
     let usersProcessed = 0;
     let matchesWritten = 0;
