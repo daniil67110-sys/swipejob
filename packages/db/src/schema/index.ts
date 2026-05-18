@@ -8,6 +8,7 @@ export * from './ia-audit-logs.js';
 export * from './parental-consents.js';
 export * from './cvs.js';
 export * from './preferences.js';
+export * from './schools.js';
 
 import { accounts } from './accounts.js';
 import { auditLogs } from './audit-logs.js';
@@ -16,6 +17,7 @@ import { iaAuditLogs } from './ia-audit-logs.js';
 import { parentalConsents } from './parental-consents.js';
 import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
+import { schools } from './schools.js';
 import { sessions } from './sessions.js';
 import { users } from './users.js';
 import { verificationTokens } from './verification-tokens.js';
@@ -31,6 +33,7 @@ export const schema = {
   parentalConsents,
   cvs,
   preferences,
+  schools,
 } as const;
 
 export type Schema = typeof schema;

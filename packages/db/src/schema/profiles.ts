@@ -47,6 +47,13 @@ export const profiles = pgTable(
     >(),
     skills: jsonb('skills').$type<string[]>(),
     languages: jsonb('languages').$type<string[]>(),
+    // Story 1.9 : référentiel écoles + niveau
+    currentSchool: jsonb('current_school').$type<{
+      schoolId: string | null;
+      name: string;
+      unverified: boolean;
+    } | null>(),
+    educationLevel: text('education_level'),
     ...timestamps,
   },
   (table) => [uniqueIndex('idx_profiles_user_id').on(table.userId)],

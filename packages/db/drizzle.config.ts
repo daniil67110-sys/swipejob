@@ -15,6 +15,7 @@ export default defineConfig({
     './src/schema/parental-consents.ts',
     './src/schema/cvs.ts',
     './src/schema/preferences.ts',
+    './src/schema/schools.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

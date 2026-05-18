@@ -4,6 +4,7 @@ import { requireVerifiedAuth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { profiles } from '@swipejob/db/schema';
 import { ReviewCvForm } from './ReviewCvForm';
+import { SchoolEducationSection } from './SchoolEducationSection';
 
 export default async function RevueCvPage() {
   const session = await requireVerifiedAuth({});
@@ -31,6 +32,8 @@ export default async function RevueCvPage() {
       educations: profiles.educations,
       skills: profiles.skills,
       languages: profiles.languages,
+      currentSchool: profiles.currentSchool,
+      educationLevel: profiles.educationLevel,
     })
     .from(profiles)
     .where(eq(profiles.userId, userId))
@@ -71,6 +74,11 @@ export default async function RevueCvPage() {
           city: profile.city ?? '',
           linkedinUrl: profile.linkedinUrl ?? '',
         }}
+      />
+
+      <SchoolEducationSection
+        initialSchool={profile.currentSchool}
+        initialLevel={profile.educationLevel}
       />
 
       {/* Lecture seule V1 — édition listes en Story 1.9/1.10 */}
