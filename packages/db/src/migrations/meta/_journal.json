@@ -50,6 +50,13 @@
       "when": 1779109369496,
       "tag": "0006_add_schools",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1779127720028,
+      "tag": "0007_add_offers_and_matches",
+      "breakpoints": true
     }
   ]
 }

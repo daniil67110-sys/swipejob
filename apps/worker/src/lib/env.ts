@@ -40,3 +40,5 @@ export const isObservabilityEnabled = {
   sentry: Boolean(env.SENTRY_DSN),
   axiom: Boolean(env.AXIOM_TOKEN),
 };
+
+export const isRedisConfigured = Boolean(env.REDIS_URL);

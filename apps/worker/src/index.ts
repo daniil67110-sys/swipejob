@@ -6,22 +6,46 @@ import { Hono } from 'hono';
 import logger from './lib/logger.js';
 import { env } from './lib/env.js';
 import { startAuditWorker, stopAuditWorker } from './workers/audit.worker.js';
+import { startOfferIngestWorker, stopOfferIngestWorker } from './workers/offer-ingest.worker.js';
+import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker.js';
+import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
+import { startFailedJobsWorker, stopFailedJobsWorker } from './workers/failed-jobs.worker.js';
+import {
+  closeAllQueues,
+  getAllQueueStats,
+  initializeAllQueues,
+  type QueueStats,
+} from './queues/index.js';
+import { closeRedis, isRedisHealthy } from './lib/redis.js';
+import { buildMetricsResponse } from './http/metrics.js';
 
 const app = new Hono();
 
-app.get('/health', (c) => {
-  return c.json({
-    status: 'ok',
-    service: 'worker',
-    version: process.env['APP_VERSION'] ?? 'dev',
-    commit: env.RAILWAY_GIT_COMMIT_SHA ?? 'local',
-    env: env.NODE_ENV,
-    queues: { active: 0, waiting: 0 },
-    timestamp: new Date().toISOString(),
-  });
+app.get('/health', async (c) => {
+  const redisOk = await isRedisHealthy();
+  const queues = await getAllQueueStats();
+  const allQueuesUp = Object.values(queues).every((v): v is QueueStats => v !== null);
+  const status = redisOk && allQueuesUp ? 'ok' : 'degraded';
+
+  return c.json(
+    {
+      status,
+      service: 'worker',
+      version: process.env['APP_VERSION'] ?? 'dev',
+      commit: env.RAILWAY_GIT_COMMIT_SHA ?? 'local',
+      env: env.NODE_ENV,
+      redis: redisOk ? 'connected' : 'disconnected',
+      queues,
+      timestamp: new Date().toISOString(),
+    },
+    status === 'ok' ? 200 : 503,
+  );
 });
 
-app.get('/metrics', (c) => c.text('# Not implemented\n', 501));
+app.get('/metrics', async (c) => {
+  const body = await buildMetricsResponse();
+  return c.text(body, 200, { 'content-type': 'text/plain; version=0.0.4' });
+});
 
 const PORT = env.WORKER_PORT;
 
@@ -33,8 +57,17 @@ try {
   });
 
   if (env.WORKER_ROLE !== 'http-only') {
-    void startAuditWorker().catch((err) => {
-      logger.error({ err }, 'Failed to start audit worker — continuing without it.');
+    const initialized = initializeAllQueues();
+    logger.info({ initialized }, 'Queues initialized');
+
+    void Promise.all([
+      startAuditWorker(),
+      startOfferIngestWorker(),
+      startCvParseWorker(),
+      startRgpdDeleteWorker(),
+      startFailedJobsWorker(),
+    ]).catch((err) => {
+      logger.error({ err }, 'Failed to start one or more workers');
     });
   }
 } catch (error: unknown) {
@@ -54,7 +87,15 @@ try {
 
 function shutdown(signal: string) {
   logger.info({ signal }, 'Signal reçu — arrêt gracieux du worker en cours...');
-  void stopAuditWorker().catch(() => {});
+  void Promise.all([
+    stopAuditWorker(),
+    stopOfferIngestWorker(),
+    stopCvParseWorker(),
+    stopRgpdDeleteWorker(),
+    stopFailedJobsWorker(),
+    closeAllQueues(),
+    closeRedis(),
+  ]).catch(() => {});
   if (server) {
     server.close(() => {
       logger.info('Serveur fermé proprement.');

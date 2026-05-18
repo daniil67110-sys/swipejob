@@ -7,6 +7,7 @@ import { generateR2Key, uploadCvToR2 } from '@/lib/r2';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { cvUploadRateLimit, getClientIp } from '@/lib/rate-limit';
+import { enqueueCvParse } from '@/lib/queue';
 import { withErrorHandler } from '@/lib/with-error-handler';
 import { serverLogger as logger } from '@/lib/logger.server';
 
@@ -202,11 +203,15 @@ export const POST = withErrorHandler(async (request: NextRequest) => {
     metadata: { size: file.size, version },
   });
 
-  // 11. Enqueue cv.parse (Story 2.1 implémente la queue effective)
-  logger.warn(
-    { cvId: cvId.id, userId },
-    'cv.parse job not enqueued (BullMQ Story 2.1) — manual processing required',
-  );
+  // 11. Enqueue cv.parse (Story 2.1 — queue effective).
+  // En l'absence de REDIS_URL, l'enqueue est mocked (CvUploader appelle quand
+  // même /api/cv/parse en sync inline — fallback Story 1.7).
+  const enqueued = await enqueueCvParse({ cvId: cvId.id, userId });
+  if (!enqueued.ok) {
+    logger.warn({ err: enqueued.error, cvId: cvId.id }, 'cv-parse enqueue failed');
+  } else if ('mock' in enqueued && enqueued.mock) {
+    logger.warn({ cvId: cvId.id }, 'cv-parse enqueued in mock mode (REDIS_URL absent)');
+  }
 
   return NextResponse.json({
     ok: true,

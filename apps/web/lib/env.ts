@@ -65,6 +65,9 @@ const envSchema = z.object({
   // LLM (Story 1.7 — parsing CV)
   MISTRAL_API_KEY: z.string().optional(),
   MISTRAL_MODEL: z.string().default('mistral-large-latest'),
+
+  // BullMQ + Redis (Story 2.1) — partagé worker/web pour enqueue depuis Server Actions
+  REDIS_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -107,6 +110,7 @@ export const isR2Configured = Boolean(
 );
 
 export const isLlmConfigured = Boolean(env.MISTRAL_API_KEY);
+export const isQueueConfigured = Boolean(env.REDIS_URL);
 
 if (isProduction && !isAuthConfigured) {
   console.warn('[env] Auth is not fully configured in production — /inscription will be disabled.');
@@ -128,4 +132,8 @@ if (isProduction && !isR2Configured) {
 
 if (isProduction && !isLlmConfigured) {
   console.warn('[env] MISTRAL_API_KEY missing in production — CV parsing will use fallback.');
+}
+
+if (isProduction && !isQueueConfigured) {
+  console.warn('[env] REDIS_URL missing in production — BullMQ enqueue will be mocked (no async).');
 }

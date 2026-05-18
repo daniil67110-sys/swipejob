@@ -10,13 +10,16 @@ import {
 } from './index.js';
 
 describe('schema export', () => {
-  it('exposes the 11 expected tables', () => {
+  it('exposes the 14 expected tables', () => {
     expect(Object.keys(schema).sort()).toEqual(
       [
         'accounts',
         'auditLogs',
         'cvs',
         'iaAuditLogs',
+        'matchScores',
+        'offerSources',
+        'offers',
         'parentalConsents',
         'preferences',
         'profiles',

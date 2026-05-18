@@ -9,11 +9,17 @@ export * from './parental-consents.js';
 export * from './cvs.js';
 export * from './preferences.js';
 export * from './schools.js';
+export * from './offer-sources.js';
+export * from './offers.js';
+export * from './match-scores.js';
 
 import { accounts } from './accounts.js';
 import { auditLogs } from './audit-logs.js';
 import { cvs } from './cvs.js';
 import { iaAuditLogs } from './ia-audit-logs.js';
+import { matchScores } from './match-scores.js';
+import { offerSources } from './offer-sources.js';
+import { offers } from './offers.js';
 import { parentalConsents } from './parental-consents.js';
 import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
@@ -34,6 +40,9 @@ export const schema = {
   cvs,
   preferences,
   schools,
+  offerSources,
+  offers,
+  matchScores,
 } as const;
 
 export type Schema = typeof schema;

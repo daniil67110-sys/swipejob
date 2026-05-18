@@ -8,6 +8,7 @@ import { sessions, users } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { sendAccountDeletionEmail } from '@/lib/email';
+import { enqueueRgpdDelete } from '@/lib/queue';
 import { accountDeletionRateLimit } from '@/lib/rate-limit';
 import { serverLogger as logger } from '@/lib/logger.server';
 
@@ -92,11 +93,14 @@ export async function requestAccountDeletionAction(rawInput: {
       metadata: { method: 'self_service' },
     });
 
-    // Stub enqueue rgpd.delete (Story 6.5 implémente le worker)
-    logger.warn(
-      { userId },
-      'rgpd.delete job not enqueued (BullMQ Story 2.1 + worker Story 6.5) — effective data purge pending',
-    );
+    // Enqueue rgpd.delete (Story 2.1 — délai 30j via job.delay). L'effective
+    // purge des données est implémentée par le worker en Story 6.5.
+    const enqueued = await enqueueRgpdDelete({ userId });
+    if (!enqueued.ok) {
+      logger.warn({ err: enqueued.error, userId }, 'rgpd-delete enqueue failed');
+    } else if ('mock' in enqueued && enqueued.mock) {
+      logger.warn({ userId }, 'rgpd-delete enqueued in mock mode (REDIS_URL absent)');
+    }
 
     // Email confirmation (mode mock OK)
     await sendAccountDeletionEmail({ to: user.email });
