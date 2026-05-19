@@ -1,4 +1,9 @@
+import { config as loadEnv } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
+
+// Charge .env.local (priorité) puis .env depuis la racine du repo monorepo.
+loadEnv({ path: '../../.env.local' });
+loadEnv({ path: '../../.env' });
 
 const databaseUrl = process.env['DATABASE_URL'];
 
@@ -21,6 +26,9 @@ export default defineConfig({
     './src/schema/match-scores.ts',
     './src/schema/swipe-events.ts',
     './src/schema/applications.ts',
+    './src/schema/interview-preps.ts',
+    './src/schema/push-subscriptions.ts',
+    './src/schema/notification-events.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',
