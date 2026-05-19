@@ -68,6 +68,9 @@ const envSchema = z.object({
 
   // BullMQ + Redis (Story 2.1) — partagé worker/web pour enqueue depuis Server Actions
   REDIS_URL: z.string().optional(),
+
+  // Web Push (Story 4.4) — la clé publique est aussi exposée côté client.
+  NEXT_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
