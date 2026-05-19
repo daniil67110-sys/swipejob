@@ -38,7 +38,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-15
-last_updated: 2026-05-18
+last_updated: 2026-05-19
 project: mon-test-bmad
 project_key: NOKEY
 tracking_system: file-system
@@ -101,14 +101,14 @@ development_status:
   # =========================================================================
   # EPIC 4: Application Lifecycle & Coaching
   # =========================================================================
-  epic-4: backlog
-  4-1-dashboard-des-candidatures-envoyees-avec-statuts: backlog
-  4-2-modification-manuelle-du-statut-d-une-candidature: backlog
-  4-3-reporter-une-signature-avec-celebration: backlog
-  4-4-notifications-push-web-quotidiennes-configurables: backlog
-  4-5-email-recapitulatif-hebdomadaire-d-activite: backlog
-  4-6-preferences-des-canaux-de-communication: backlog
-  4-7-mini-coach-ia-pre-entretien-interviewprepcard: backlog
+  epic-4: done
+  4-1-dashboard-des-candidatures-envoyees-avec-statuts: done
+  4-2-modification-manuelle-du-statut-d-une-candidature: done
+  4-3-reporter-une-signature-avec-celebration: done
+  4-4-notifications-push-web-quotidiennes-configurables: done
+  4-5-email-recapitulatif-hebdomadaire-d-activite: done
+  4-6-preferences-des-canaux-de-communication: done
+  4-7-mini-coach-ia-pre-entretien-interviewprepcard: done
   epic-4-retrospective: optional
 
   # =========================================================================
