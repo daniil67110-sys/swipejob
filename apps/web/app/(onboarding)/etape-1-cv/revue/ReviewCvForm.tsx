@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { updateProfileAction } from './actions';
+import { CityAutocomplete } from './CityAutocomplete';
 
 const schema = z.object({
   firstName: z.string().max(100).optional(),
@@ -28,10 +29,11 @@ export function ReviewCvForm({ initial }: { initial: FormValues }) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isValid },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: initial,
   });
 
@@ -73,7 +75,12 @@ export function ReviewCvForm({ initial }: { initial: FormValues }) {
         register={register('phone')}
         error={errors.phone?.message}
       />
-      <Field label="Ville" id="city" register={register('city')} error={errors.city?.message} />
+      <CityAutocomplete<FormValues>
+        defaultValue={initial.city}
+        register={register('city')}
+        setValue={setValue}
+        error={errors.city?.message}
+      />
       <Field
         label="LinkedIn (URL)"
         id="linkedinUrl"
