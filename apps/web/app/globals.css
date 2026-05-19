@@ -1,10 +1,46 @@
 @import 'tailwindcss';
 
 /* SwipeJob — Design System Global CSS */
-
 /* Fonts chargées via next/font dans app/layout.tsx */
 
-/* Variables CSS custom (spécifiques à l'app — les tokens couleurs sont dans le preset Tailwind) */
+/* Tailwind v4 — Design tokens en CSS-first (@theme).
+   Source de vérité : ux-design-specification.md lignes 659-829.
+   Le preset JS @swipejob/config/tailwind/base reste pour les utilitaires
+   non-couleurs (animations, etc.) mais les couleurs DOIVENT être ici. */
+@theme {
+  /* Primary — Indigo */
+  --color-primary-50: #eef1ff;
+  --color-primary-100: #dce3ff;
+  --color-primary-500: #4f5bff;
+  --color-primary-600: #3d48e5;
+  --color-primary-900: #1a1e5c;
+
+  /* Accent — Coral */
+  --color-accent-100: #ffe5dc;
+  --color-accent-500: #ff7b5a;
+
+  /* Neutral */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #fafafb;
+  --color-neutral-100: #f2f2f4;
+  --color-neutral-200: #e5e5ea;
+  --color-neutral-400: #9999a5;
+  --color-neutral-600: #5c5c70;
+  --color-neutral-900: #1a1a22;
+  --color-neutral-950: #0d0d14;
+
+  /* Sémantiques */
+  --color-success-100: #d4f4e4;
+  --color-success-500: #1fb87a;
+  --color-error-100: #ffe2e5;
+  --color-error-500: #ff4757;
+  --color-warning-500: #ffa940;
+  --color-info-500: #3998ff;
+
+  /* Ring helper (focus-visible) */
+  --color-ring: var(--color-primary-500);
+}
+
 :root {
   /* Transitions globales */
   --transition-default: 150ms ease;

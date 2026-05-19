@@ -26,7 +26,7 @@ export function BirthDateForm() {
     formState: { errors, isValid },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const onSubmit = (values: FormValues) => {
