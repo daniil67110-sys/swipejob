@@ -14,18 +14,24 @@ export * from './offers.js';
 export * from './match-scores.js';
 export * from './swipe-events.js';
 export * from './applications.js';
+export * from './interview-preps.js';
+export * from './push-subscriptions.js';
+export * from './notification-events.js';
 
 import { accounts } from './accounts.js';
 import { applicationEvents, applications, watchlist } from './applications.js';
 import { auditLogs } from './audit-logs.js';
 import { cvs } from './cvs.js';
 import { iaAuditLogs } from './ia-audit-logs.js';
+import { interviewPreps } from './interview-preps.js';
 import { matchScores } from './match-scores.js';
+import { notificationEvents } from './notification-events.js';
 import { offerSources } from './offer-sources.js';
 import { offers } from './offers.js';
 import { parentalConsents } from './parental-consents.js';
 import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
+import { pushSubscriptions } from './push-subscriptions.js';
 import { schools } from './schools.js';
 import { sessions } from './sessions.js';
 import { swipeEvents } from './swipe-events.js';
@@ -51,6 +57,9 @@ export const schema = {
   applications,
   applicationEvents,
   watchlist,
+  interviewPreps,
+  pushSubscriptions,
+  notificationEvents,
 } as const;
 
 export type Schema = typeof schema;

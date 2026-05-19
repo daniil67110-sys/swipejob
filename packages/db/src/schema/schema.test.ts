@@ -14,7 +14,7 @@ import {
 } from './index.js';
 
 describe('schema export', () => {
-  it('exposes the 18 expected tables', () => {
+  it('exposes the 21 expected tables', () => {
     expect(Object.keys(schema).sort()).toEqual(
       [
         'accounts',
@@ -23,12 +23,15 @@ describe('schema export', () => {
         'auditLogs',
         'cvs',
         'iaAuditLogs',
+        'interviewPreps',
         'matchScores',
+        'notificationEvents',
         'offerSources',
         'offers',
         'parentalConsents',
         'preferences',
         'profiles',
+        'pushSubscriptions',
         'schools',
         'sessions',
         'swipeEvents',

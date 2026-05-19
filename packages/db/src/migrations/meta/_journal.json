@@ -99,6 +99,13 @@
       "when": 1779147514348,
       "tag": "0013_swipe_applications",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1779228000000,
+      "tag": "0014_epic4_lifecycle",
+      "breakpoints": true
     }
   ]
 }

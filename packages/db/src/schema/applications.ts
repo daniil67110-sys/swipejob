@@ -1,4 +1,4 @@
-import { index, pgEnum, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { createId } from '../lib/id.js';
 import { timestamps } from '../lib/timestamps.js';
@@ -12,6 +12,12 @@ export const applicationStatus = pgEnum('application_status', [
   'sent',
   'cancelled_by_user',
   'failed',
+  // Epic 4 — lifecycle post-envoi (Story 4.1/4.2/4.3)
+  'read',
+  'replied',
+  'interview_scheduled',
+  'signed',
+  'rejected',
 ]);
 
 export const coverLetterStatus = pgEnum('cover_letter_status', [
@@ -48,6 +54,15 @@ export const applications = pgTable(
     coverLetterStatus: coverLetterStatus('cover_letter_status'),
     sentAt: timestamp('sent_at', { withTimezone: true, mode: 'date' }),
     cancelledAt: timestamp('cancelled_at', { withTimezone: true, mode: 'date' }),
+    // Epic 4 lifecycle
+    interviewAt: timestamp('interview_at', { withTimezone: true, mode: 'date' }),
+    signedAt: timestamp('signed_at', { withTimezone: true, mode: 'date' }),
+    signedSalaryAnnualCents: integer('signed_salary_annual_cents'),
+    signedCompanySnapshot: text('signed_company_snapshot'),
+    signedJobTitleSnapshot: text('signed_job_title_snapshot'),
+    lastStatusAt: timestamp('last_status_at', { withTimezone: true, mode: 'date' }),
+    /** 'system' (worker), 'manual' (Story 4.2), 'undo' (Story 3.8). */
+    statusSource: text('status_source'),
     ...timestamps,
   },
   (table) => [
@@ -56,6 +71,10 @@ export const applications = pgTable(
       .where(sql`${table.status} != 'cancelled_by_user'`),
     index('idx_applications_status').on(table.status),
     index('idx_applications_user_sent_at').on(table.userId, table.sentAt),
+    index('idx_applications_user_last_status_at').on(table.userId, table.lastStatusAt),
+    index('idx_applications_interview_at')
+      .on(table.interviewAt)
+      .where(sql`${table.interviewAt} IS NOT NULL`),
   ],
 );
 

@@ -1,4 +1,5 @@
 import { boolean, date, integer, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { createId } from '../lib/id.js';
 import { timestamps } from '../lib/timestamps.js';
 import { users } from './users.js';
@@ -28,9 +29,29 @@ export const preferences = pgTable(
     desiredStartDate: date('desired_start_date'),
     // Story 3.7 : si true → preview lettre avant envoi (mode review).
     reviewBeforeSend: boolean('review_before_send').notNull().default(false),
+    // Epic 4 — Notifications (Story 4.4/4.5/4.6)
+    /** Story 4.4 — opt-in Web Push. */
+    pushEnabled: boolean('push_enabled').notNull().default(false),
+    /** Story 4.4 — heure d'envoi push deck du jour (format HH:MM 24h, locale user). */
+    pushTime: text('push_time').notNull().default('08:00'),
+    /** Story 4.6 — emails opérationnels (verif, RGPD, application) — toujours on par défaut. */
+    emailTransactionalEnabled: boolean('email_transactional_enabled').notNull().default(true),
+    /** Story 4.6 — emails marketing (annonces produit). */
+    emailMarketingEnabled: boolean('email_marketing_enabled').notNull().default(false),
+    /** Story 4.5 — digest hebdomadaire. */
+    emailDigestEnabled: boolean('email_digest_enabled').notNull().default(false),
+    /** Story 4.5/4.6 — fréquence : 'weekly' | 'never'. (daily = V2). */
+    emailDigestFrequency: text('email_digest_frequency').notNull().default('weekly'),
+    /** Story 4.5 — token un-clic unsubscribe (généré lazy). */
+    emailUnsubscribeToken: text('email_unsubscribe_token'),
     ...timestamps,
   },
-  (table) => [uniqueIndex('idx_preferences_user_id').on(table.userId)],
+  (table) => [
+    uniqueIndex('idx_preferences_user_id').on(table.userId),
+    uniqueIndex('idx_preferences_email_unsubscribe_token')
+      .on(table.emailUnsubscribeToken)
+      .where(sql`${table.emailUnsubscribeToken} IS NOT NULL`),
+  ],
 );
 
 export type Preferences = typeof preferences.$inferSelect;
