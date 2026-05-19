@@ -104,6 +104,14 @@ const authConfig: NextAuthConfig = {
     async createUser({ user }) {
       if (!user.id) return;
       try {
+        // Google OAuth garantit email_verified=true (vérifié dans signIn callback).
+        // Le DrizzleAdapter ne marque pas emailVerified : on le force ici.
+        if (isDatabaseConfigured) {
+          await db
+            .update(schema.users)
+            .set({ emailVerified: new Date() })
+            .where(eq(schema.users.id, user.id));
+        }
         captureServer('user.signup', hashUserId(user.id), {
           method: 'google',
           locale: 'fr-FR',
