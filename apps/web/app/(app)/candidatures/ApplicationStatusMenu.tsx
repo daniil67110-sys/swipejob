@@ -1,0 +1,131 @@
+'use client';
+
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { updateApplicationStatusAction } from './actions';
+import { ReportSignatureModal } from './ReportSignatureModal';
+import { MANUAL_STATUSES, statusLabel, type ApplicationStatus, type ManualStatus } from './lib';
+import { StatusBadge } from './StatusBadge';
+
+const PICKABLE: ManualStatus[] = MANUAL_STATUSES.filter((s) => s !== 'signed') as ManualStatus[];
+
+export function ApplicationStatusMenu({
+  applicationId,
+  status,
+}: {
+  applicationId: string;
+  status: ApplicationStatus;
+}) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [interviewModalOpen, setInterviewModalOpen] = useState(false);
+  const [signatureOpen, setSignatureOpen] = useState(false);
+  const [interviewAt, setInterviewAt] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [optimisticStatus, setOptimisticStatus] = useState<ApplicationStatus>(status);
+
+  const apply = (next: ManualStatus, interview?: string) => {
+    setError(null);
+    setOptimisticStatus(next);
+    startTransition(async () => {
+      const res = await updateApplicationStatusAction({
+        applicationId,
+        status: next,
+        ...(interview ? { interviewAt: interview } : {}),
+      });
+      if (!res.ok) {
+        setOptimisticStatus(status);
+        setError(res.error.message);
+        return;
+      }
+      router.refresh();
+    });
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild aria-label="Modifier le statut" disabled={isPending}>
+          <button className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md">
+            <StatusBadge status={optimisticStatus} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          {PICKABLE.map((s) => (
+            <DropdownMenuItem
+              key={s}
+              onSelect={() => {
+                if (s === 'interview_scheduled') {
+                  setInterviewModalOpen(true);
+                } else {
+                  apply(s);
+                }
+              }}
+            >
+              {statusLabel(s)}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuItem
+            onSelect={() => setSignatureOpen(true)}
+            className="text-primary-600 font-medium"
+          >
+            🎉 Reporter ma signature
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {error ? (
+        <span role="status" aria-live="polite" className="text-xs text-error-500">
+          {error}
+        </span>
+      ) : null}
+
+      <Dialog open={interviewModalOpen} onOpenChange={setInterviewModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Date de l’entretien</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Label htmlFor="interview-at">Quand est l’entretien ?</Label>
+            <Input
+              id="interview-at"
+              type="datetime-local"
+              value={interviewAt}
+              onChange={(e) => setInterviewAt(e.target.value)}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setInterviewModalOpen(false)}>
+                Annuler
+              </Button>
+              <Button
+                disabled={!interviewAt || isPending}
+                onClick={() => {
+                  const iso = new Date(interviewAt).toISOString();
+                  setInterviewModalOpen(false);
+                  apply('interview_scheduled', iso);
+                }}
+              >
+                Confirmer
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <ReportSignatureModal
+        applicationId={applicationId}
+        open={signatureOpen}
+        onOpenChange={setSignatureOpen}
+      />
+    </div>
+  );
+}
