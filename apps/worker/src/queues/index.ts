@@ -25,6 +25,10 @@ export const QUEUE_NAMES = {
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
   APPLICATION_PROCESS: 'application-process',
+  // Epic 4 — notifications + coach
+  NOTIFICATIONS_DIGEST: 'notifications-digest',
+  NOTIFICATIONS_PUSH: 'notifications-push',
+  COACH_INTERVIEW_PREP: 'coach-interview-prep',
   FAILED_JOBS: 'failed-jobs',
 } as const;
 
@@ -75,6 +79,15 @@ export function getRgpdDeleteQueue() {
 }
 export function getApplicationProcessQueue() {
   return getQueue(QUEUE_NAMES.APPLICATION_PROCESS);
+}
+export function getNotificationsDigestQueue() {
+  return getQueue(QUEUE_NAMES.NOTIFICATIONS_DIGEST);
+}
+export function getNotificationsPushQueue() {
+  return getQueue(QUEUE_NAMES.NOTIFICATIONS_PUSH);
+}
+export function getCoachInterviewPrepQueue() {
+  return getQueue(QUEUE_NAMES.COACH_INTERVIEW_PREP);
 }
 export function getFailedJobsQueue() {
   return getQueue(QUEUE_NAMES.FAILED_JOBS);

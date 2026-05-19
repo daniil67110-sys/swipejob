@@ -29,6 +29,18 @@ import {
 } from './workers/application-process.worker.js';
 import { startFailedJobsWorker, stopFailedJobsWorker } from './workers/failed-jobs.worker.js';
 import {
+  startNotificationsDigestWorker,
+  stopNotificationsDigestWorker,
+} from './workers/notifications-digest.worker.js';
+import {
+  startNotificationsPushWorker,
+  stopNotificationsPushWorker,
+} from './workers/notifications-push.worker.js';
+import {
+  startCoachInterviewPrepWorker,
+  stopCoachInterviewPrepWorker,
+} from './workers/coach-interview-prep.worker.js';
+import {
   closeAllQueues,
   getAllQueueStats,
   initializeAllQueues,
@@ -89,6 +101,9 @@ try {
       startCvParseWorker(),
       startRgpdDeleteWorker(),
       startApplicationProcessWorker(),
+      startNotificationsDigestWorker(),
+      startNotificationsPushWorker(),
+      startCoachInterviewPrepWorker(),
       startFailedJobsWorker(),
     ]).catch((err) => {
       logger.error({ err }, 'Failed to start one or more workers');
@@ -122,6 +137,9 @@ function shutdown(signal: string) {
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
     stopApplicationProcessWorker(),
+    stopNotificationsDigestWorker(),
+    stopNotificationsPushWorker(),
+    stopCoachInterviewPrepWorker(),
     stopFailedJobsWorker(),
     closeAllQueues(),
     closeRedis(),
