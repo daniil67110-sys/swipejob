@@ -13,7 +13,8 @@ import { mapFranceTravailToOffer } from '../scrapers/france-travail/mapper.js';
 
 const SOURCE_NAME = 'france-travail';
 const PAGE_SIZE = 150; // limite API France Travail
-const MAX_OFFERS_PER_RUN = 5000;
+const FT_PAGINATION_MAX_START = 3000; // FT refuse rangeStart > 3000
+const MAX_OFFERS_PER_RUN = 3000;
 const STALE_THRESHOLD_MS = 15 * 60 * 1000; // NFR-I1 : alerte si pas de succès depuis 15 min
 
 export type IngestResult =
@@ -55,15 +56,15 @@ async function getOrCreateSource(): Promise<string> {
 }
 
 async function fetchAllPages(
-  typeContrat: 'E2' | 'MIS',
-  publieeDepuisDays: number,
+  natureContrat: 'E2' | 'FS',
+  publieeDepuisDays: 1 | 3 | 7 | 14 | 31,
 ): Promise<FranceTravailOfferRaw[]> {
   const all: FranceTravailOfferRaw[] = [];
   let rangeStart = 0;
-  while (all.length < MAX_OFFERS_PER_RUN) {
+  while (all.length < MAX_OFFERS_PER_RUN && rangeStart <= FT_PAGINATION_MAX_START) {
     const rangeEnd = rangeStart + PAGE_SIZE - 1;
     const page = await fetchFranceTravailOffers({
-      typeContrat,
+      natureContrat,
       publieeDepuisDays,
       rangeStart,
       rangeEnd,
@@ -88,14 +89,18 @@ export async function processIngestFranceTravail(): Promise<IngestResult> {
   try {
     const sourceId = await getOrCreateSource();
 
-    const [apprentissage, stages] = await Promise.all([
-      fetchAllPages('E2', 30),
-      fetchAllPages('MIS', 30),
+    const [apprentissage, professionnalisation] = await Promise.all([
+      fetchAllPages('E2', 31),
+      fetchAllPages('FS', 31),
     ]);
 
-    const allRaw = [...apprentissage, ...stages];
+    const allRaw = [...apprentissage, ...professionnalisation];
     logger.info(
-      { fetched: allRaw.length, alternance: apprentissage.length, stage: stages.length },
+      {
+        fetched: allRaw.length,
+        apprentissage: apprentissage.length,
+        professionnalisation: professionnalisation.length,
+      },
       'France Travail fetch complete',
     );
 

@@ -28,10 +28,10 @@ export type FranceTravailOfferRaw = {
 };
 
 export type FetchOffersParams = {
-  /** Type contrat France Travail : E2=apprentissage, MIS=stage, FS=stage non-rémunéré */
-  typeContrat?: 'E2' | 'MIS' | 'FS';
-  /** Offres publiées depuis N jours */
-  publieeDepuisDays?: number;
+  /** Nature contrat France Travail : E2=apprentissage, FS=professionnalisation. */
+  natureContrat?: 'E2' | 'FS';
+  /** Offres publiées depuis N jours (FT n'accepte que 1, 3, 7, 14 ou 31). */
+  publieeDepuisDays?: 1 | 3 | 7 | 14 | 31;
   /** Pagination : index début (inclus) */
   rangeStart?: number;
   /** Pagination : index fin (inclus). Max 149 (limite API). */
@@ -72,7 +72,7 @@ export async function fetchFranceTravailOffers(
   const qs = new URLSearchParams({
     range: `${rangeStart}-${rangeEnd}`,
   });
-  if (params.typeContrat) qs.set('typeContrat', params.typeContrat);
+  if (params.natureContrat) qs.set('natureContrat', params.natureContrat);
   if (params.publieeDepuisDays) qs.set('publieeDepuis', String(params.publieeDepuisDays));
 
   const url = `${env.FRANCE_TRAVAIL_BASE_URL}/offres/search?${qs.toString()}`;

@@ -2,16 +2,16 @@ import type { NewOffer } from '@swipejob/db/schema';
 import type { FranceTravailOfferRaw } from './client.js';
 
 /**
- * France Travail typeContrat codes (référentiel partenaire) :
- * - E2 : apprentissage / alternance
- * - MIS : stage (rémunéré)
- * - FS  : stage non-rémunéré
- * - Autres codes (CDI/CDD/...) ignorés V1.
+ * France Travail natureContrat libellés (filtrage par code en API = E2/FS, mais
+ * la réponse `/offres/search` renvoie le libellé, pas le code).
+ * Codes :
+ * - E2 → "Contrat apprentissage"
+ * - FS → "Contrat de professionnalisation" (ou variantes)
  */
-function mapContractType(code: string | undefined): 'stage' | 'alternance' | null {
-  if (!code) return null;
-  if (code === 'E2') return 'alternance';
-  if (code === 'MIS' || code === 'FS') return 'stage';
+function mapContractType(natureContrat: string | undefined): 'stage' | 'alternance' | null {
+  if (!natureContrat) return null;
+  const lc = natureContrat.toLowerCase();
+  if (lc.includes('apprentissage') || lc.includes('professionnalisation')) return 'alternance';
   return null;
 }
 
@@ -48,8 +48,8 @@ export function mapFranceTravailToOffer(
   raw: FranceTravailOfferRaw,
   sourceId: string,
 ): NewOffer | null {
-  const contractType = mapContractType(raw.typeContrat);
-  if (!contractType) return null; // Skip CDI/CDD etc.
+  const contractType = mapContractType(raw.natureContrat);
+  if (!contractType) return null; // Skip natures non-alternance.
   if (!raw.id || !raw.intitule) return null;
 
   const salary = parseSalaryLibelle(raw.salaire?.libelle);
