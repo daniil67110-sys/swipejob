@@ -1,6 +1,6 @@
 'use server';
 
-import { and, desc, eq, isNotNull, isNull, notInArray } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, notInArray, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { matchScores, offers, preferences, swipeEvents } from '@swipejob/db/schema';
@@ -89,14 +89,40 @@ export async function getDailyDeck(): Promise<DeckResult> {
     .where(eq(swipeEvents.userId, userId));
   const swipedIds = swipedRows.map((r) => r.offerId);
 
-  const matchWhere = swipedIds.length
-    ? and(
-        eq(matchScores.userId, userId),
-        eq(offers.status, 'active'),
-        isNull(offers.canonicalId),
-        notInArray(matchScores.offerId, swipedIds),
-      )
-    : and(eq(matchScores.userId, userId), eq(offers.status, 'active'), isNull(offers.canonicalId));
+  // Filtre rayon : si l'utilisateur a renseigné des villes géoréférencées + rayon,
+  // n'afficher que les offres dont la distance min vers une ville préférée ≤ rayon.
+  const prefRow = await db
+    .select({ citiesGeo: preferences.citiesGeo, geoRadiusKm: preferences.geoRadiusKm })
+    .from(preferences)
+    .where(eq(preferences.userId, userId))
+    .limit(1);
+  const prefCities = prefRow[0]?.citiesGeo ?? [];
+  const radius = prefRow[0]?.geoRadiusKm ?? 50;
+
+  const radiusFilter =
+    prefCities.length > 0
+      ? sql`(
+          ${offers.locationLat} IS NULL OR ${offers.locationLng} IS NULL OR EXISTS (
+            SELECT 1 FROM jsonb_array_elements(${JSON.stringify(prefCities)}::jsonb) AS pc
+            WHERE 6371 * acos(
+              LEAST(1.0, GREATEST(-1.0,
+                cos(radians((pc->>'lat')::float)) * cos(radians(${offers.locationLat}))
+                * cos(radians(${offers.locationLng}) - radians((pc->>'lng')::float))
+                + sin(radians((pc->>'lat')::float)) * sin(radians(${offers.locationLat}))
+              ))
+            ) <= ${radius}
+          )
+        )`
+      : undefined;
+
+  const matchConditions = [
+    eq(matchScores.userId, userId),
+    eq(offers.status, 'active'),
+    isNull(offers.canonicalId),
+  ];
+  if (swipedIds.length) matchConditions.push(notInArray(matchScores.offerId, swipedIds));
+  if (radiusFilter) matchConditions.push(radiusFilter);
+  const matchWhere = and(...matchConditions);
 
   const matches = (await db
     .select({
@@ -134,14 +160,14 @@ export async function getDailyDeck(): Promise<DeckResult> {
   // 2. Fallback freshness si pas de match_scores (compute-matches pas encore tourné)
   if (deckOffers.length === 0) {
     fallback = true;
-    const freshWhere = swipedIds.length
-      ? and(
-          eq(offers.status, 'active'),
-          isNull(offers.canonicalId),
-          isNotNull(offers.publishedAt),
-          notInArray(offers.id, swipedIds),
-        )
-      : and(eq(offers.status, 'active'), isNull(offers.canonicalId), isNotNull(offers.publishedAt));
+    const freshConditions = [
+      eq(offers.status, 'active'),
+      isNull(offers.canonicalId),
+      isNotNull(offers.publishedAt),
+    ];
+    if (swipedIds.length) freshConditions.push(notInArray(offers.id, swipedIds));
+    if (radiusFilter) freshConditions.push(radiusFilter);
+    const freshWhere = and(...freshConditions);
     const fresh = await db
       .select({
         id: offers.id,

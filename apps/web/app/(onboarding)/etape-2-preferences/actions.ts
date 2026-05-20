@@ -46,6 +46,16 @@ const schema = z.object({
     )
     .max(20)
     .default([]),
+  citiesGeo: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(100),
+        lat: z.number().min(-90).max(90),
+        lng: z.number().min(-180).max(180),
+      }),
+    )
+    .max(20)
+    .default([]),
   geoRadiusKm: z.number().int().min(0).max(500).optional(),
   workModes: z.array(WORK_MODE).max(3).default([]),
   sectors: z.array(SECTOR).max(10).default([]),
@@ -66,6 +76,7 @@ export type UpdatePreferencesInput = {
   contractTypes?: string[];
   durations?: string[];
   cities?: string[];
+  citiesGeo?: Array<{ label: string; lat: number; lng: number }>;
   geoRadiusKm?: number;
   workModes?: string[];
   sectors?: string[];
@@ -114,6 +125,7 @@ export async function updatePreferencesAction(
         contractTypes: data.contractTypes,
         durations: data.durations,
         cities: data.cities,
+        citiesGeo: data.citiesGeo,
         geoRadiusKm: data.geoRadiusKm ?? 50,
         workModes: data.workModes,
         sectors: data.sectors,
@@ -128,6 +140,7 @@ export async function updatePreferencesAction(
           contractTypes: data.contractTypes,
           durations: data.durations,
           cities: data.cities,
+          citiesGeo: data.citiesGeo,
           geoRadiusKm: data.geoRadiusKm ?? 50,
           workModes: data.workModes,
           sectors: data.sectors,

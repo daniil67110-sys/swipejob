@@ -35,7 +35,7 @@ export default async function EtapePreferencesPage() {
         initial={{
           contractTypes: existing?.contractTypes ?? [],
           durations: existing?.durations ?? [],
-          citiesCsv: existing?.cities?.join(', ') ?? '',
+          citiesGeo: existing?.citiesGeo ?? [],
           geoRadiusKm: existing?.geoRadiusKm ?? 50,
           workModes: existing?.workModes ?? [],
           sectors: existing?.sectors ?? [],

@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 import { db } from './db';
 
 export const EDUCATION_LEVELS = [
+  'Lycée',
   'BTS/DUT',
   'Licence',
   'Bachelor',

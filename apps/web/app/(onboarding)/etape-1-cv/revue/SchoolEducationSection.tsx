@@ -6,6 +6,7 @@ import { setEducationAction } from './education-actions';
 type SchoolResult = { id: string; name: string; type: string | null; city: string | null };
 
 const EDUCATION_LEVELS = [
+  'Lycée',
   'BTS/DUT',
   'Licence',
   'Bachelor',

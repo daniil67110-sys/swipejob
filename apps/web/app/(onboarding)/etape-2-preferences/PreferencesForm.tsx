@@ -4,10 +4,37 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { updatePreferencesAction, type UpdatePreferencesInput } from './actions';
+import { CitiesMultiAutocomplete, type CityGeo } from './CitiesMultiAutocomplete';
 
 const CONTRACT_TYPES = ['stage', 'alternance'];
 const DURATIONS = ['1-3 mois', '3-6 mois', '6-12 mois', '12+ mois'];
 const WORK_MODES = ['on-site', 'hybrid', 'remote'];
+
+// Labels FR pour l'affichage (les valeurs en DB restent en anglais pour cohérence
+// avec offers.remote_mode + match-score worker).
+const LABELS: Record<string, string> = {
+  // contract types
+  stage: 'Stage',
+  alternance: 'Alternance',
+  // work modes
+  'on-site': 'Sur site',
+  hybrid: 'Hybride',
+  remote: 'Télétravail',
+  // sectors
+  tech: 'Tech',
+  finance: 'Finance',
+  marketing: 'Marketing',
+  conseil: 'Conseil',
+  industrie: 'Industrie',
+  santé: 'Santé',
+  public: 'Public',
+  autre: 'Autre',
+  // company sizes (labels FR explicites au lieu des sigles)
+  TPE: 'Très petite (1-9 employés)',
+  PME: 'Petite/moyenne (10-249)',
+  ETI: 'Intermédiaire (250-4 999)',
+  grandes: 'Grande (5 000+)',
+};
 const SECTORS = [
   'tech',
   'finance',
@@ -23,7 +50,7 @@ const COMPANY_SIZES = ['TPE', 'PME', 'ETI', 'grandes'];
 type FormValues = {
   contractTypes: string[];
   durations: string[];
-  citiesCsv: string;
+  citiesGeo: CityGeo[];
   geoRadiusKm: number | undefined;
   workModes: string[];
   sectors: string[];
@@ -38,11 +65,11 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const { register, handleSubmit } = useForm<FormValues>({
+  const { register, handleSubmit, setValue, watch } = useForm<FormValues>({
     defaultValues: {
       contractTypes: initial.contractTypes ?? [],
       durations: initial.durations ?? [],
-      citiesCsv: initial.citiesCsv ?? '',
+      citiesGeo: initial.citiesGeo ?? [],
       geoRadiusKm: initial.geoRadiusKm ?? 50,
       workModes: initial.workModes ?? [],
       sectors: initial.sectors ?? [],
@@ -55,23 +82,22 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
 
   const onSubmit = (values: FormValues) => {
     setServerError(null);
-    const cities = values.citiesCsv
-      ? values.citiesCsv
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
+
+    // valueAsNumber transforme un input vide en NaN — on normalise en null.
+    const cleanNum = (n: number | undefined): number | null =>
+      typeof n === 'number' && Number.isFinite(n) ? n : null;
 
     const input: UpdatePreferencesInput = {
       contractTypes: values.contractTypes,
       durations: values.durations,
-      cities,
-      geoRadiusKm: values.geoRadiusKm ?? 50,
+      cities: values.citiesGeo.map((c) => c.label),
+      citiesGeo: values.citiesGeo,
+      geoRadiusKm: cleanNum(values.geoRadiusKm) ?? 50,
       workModes: values.workModes,
       sectors: values.sectors,
       companySizes: values.companySizes,
-      salaryMinMonthly: values.salaryMinMonthly ?? null,
-      salaryMaxMonthly: values.salaryMaxMonthly ?? null,
+      salaryMinMonthly: cleanNum(values.salaryMinMonthly),
+      salaryMaxMonthly: cleanNum(values.salaryMaxMonthly),
       desiredStartDate: values.desiredStartDate || null,
     };
 
@@ -95,14 +121,14 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
         <CheckGroup name="durations" options={DURATIONS} register={register} />
       </Section>
 
-      <Section title="Villes (séparées par des virgules)">
-        <input
-          type="text"
-          placeholder="Paris, Lyon, Lille"
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
-          {...register('citiesCsv')}
+      <Section title="Villes">
+        <CitiesMultiAutocomplete
+          defaultGeo={watch('citiesGeo') ?? []}
+          onChange={(geo) =>
+            setValue('citiesGeo', geo, { shouldDirty: true, shouldValidate: true })
+          }
         />
-        <label className="mt-2 block text-sm">
+        <label className="mt-3 block text-sm">
           Rayon (km) :
           <input
             type="number"
@@ -127,6 +153,10 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
       </Section>
 
       <Section title="Salaire (€/mois, optionnel)">
+        <p className="mb-2 text-xs text-neutral-600">
+          Laisse vide si tu n&apos;es pas sûr·e — la gratification de stage et la rémunération
+          d&apos;alternance sont encadrées par la loi.
+        </p>
         <div className="flex gap-3 items-center">
           <label className="text-sm">
             Min :
@@ -210,7 +240,7 @@ function CheckGroup({
             className="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500"
             {...register(name)}
           />
-          <span>{opt}</span>
+          <span>{LABELS[opt] ?? opt}</span>
         </label>
       ))}
     </div>

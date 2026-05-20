@@ -6,7 +6,7 @@ import { auth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { profiles, schools } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
-import { EDUCATION_LEVELS, normalizeSchoolName } from '@/lib/schools';
+import { normalizeSchoolName } from '@/lib/schools';
 import { serverLogger as logger } from '@/lib/logger.server';
 
 export type ActionResult<T> =
@@ -22,6 +22,7 @@ const schema = z.object({
     .nullable(),
   schoolNameUnverified: z.string().min(2).max(150).nullable(),
   educationLevel: z.enum([
+    'Lycée',
     'BTS/DUT',
     'Licence',
     'Bachelor',
@@ -131,5 +132,3 @@ export async function setEducationAction(rawInput: {
     return { ok: false, error: { code: 'INTERNAL_ERROR', message: 'Erreur. Réessaie.' } };
   }
 }
-
-export { EDUCATION_LEVELS };
