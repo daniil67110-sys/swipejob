@@ -99,6 +99,12 @@ const authConfig: NextAuthConfig = {
       }
       return baseUrl;
     },
+    async session({ session, user }) {
+      if (session.user && user?.id) {
+        session.user.id = user.id;
+      }
+      return session;
+    },
   },
   events: {
     async createUser({ user }) {
