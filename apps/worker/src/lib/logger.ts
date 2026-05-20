@@ -21,16 +21,8 @@ function buildTransport(): pino.LoggerOptions['transport'] | undefined {
       },
     };
   }
-  if (env.NODE_ENV !== 'production') {
-    return {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        translateTime: 'HH:MM:ss',
-        ignore: 'pid,hostname',
-      },
-    };
-  }
+  // En dev : pas de transport (pino-pretty utilise un worker thread qui hang
+  // avec tsx --import sur certaines configs). Output direct JSON sync sur stdout.
   return undefined;
 }
 
