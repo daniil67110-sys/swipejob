@@ -106,6 +106,13 @@
       "when": 1779228000000,
       "tag": "0014_epic4_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1779314400000,
+      "tag": "0015_preferences_cities_geo",
+      "breakpoints": true
     }
   ]
 }

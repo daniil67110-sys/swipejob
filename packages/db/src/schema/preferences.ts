@@ -1,4 +1,4 @@
-import { boolean, date, integer, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, date, integer, jsonb, pgTable, text, uniqueIndex } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { createId } from '../lib/id.js';
 import { timestamps } from '../lib/timestamps.js';
@@ -20,6 +20,11 @@ export const preferences = pgTable(
     contractTypes: text('contract_types').array().notNull().default([]),
     durations: text('durations').array().notNull().default([]),
     cities: text('cities').array().notNull().default([]),
+    /** Coords des villes préférées (issues de adresse.data.gouv.fr). */
+    citiesGeo: jsonb('cities_geo')
+      .$type<Array<{ label: string; lat: number; lng: number }>>()
+      .notNull()
+      .default([]),
     geoRadiusKm: integer('geo_radius_km').default(50),
     workModes: text('work_modes').array().notNull().default([]),
     sectors: text('sectors').array().notNull().default([]),
