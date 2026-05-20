@@ -4,6 +4,8 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { users } from '@swipejob/db/schema';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Page-pivot post-OAuth : décide où envoyer l'utilisateur fraîchement authentifié.
  *
