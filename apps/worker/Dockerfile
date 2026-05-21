@@ -1,5 +1,5 @@
 # SwipeJob Worker — Dockerfile multi-stage (Railway-ready)
-# Utilise Node 20 Alpine pour minimiser la taille de l'image
+# Utilise Node 22 Alpine pour minimiser la taille de l'image
 
 # ============================================================
 # Stage 1: Base
@@ -7,6 +7,10 @@
 FROM node:22-alpine AS base
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm
+
+# Skip lefthook install hook (root `prepare` script): CI image has no
+# git binary and no .git folder, so `lefthook install` would fail.
+ENV CI=true
 
 WORKDIR /app
 
