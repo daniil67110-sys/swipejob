@@ -33,6 +33,10 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Idem deps stage : pnpm 11 ré-exécute install au démarrage (deps status check),
+# qui déclenche le prepare script (lefthook install) qui exige un repo git.
+RUN git init -q && git config user.email "ci@swipejob.local" && git config user.name "ci"
+
 RUN pnpm --filter=@swipejob/worker build
 
 # Extraire uniquement les dépendances runtime via pnpm deploy
