@@ -46,12 +46,12 @@ export function MatchExplanationPopover({
     };
   }, [open]);
 
-  const colorClass =
+  const gradientClass =
     score >= 75
-      ? 'bg-success-500 text-white'
+      ? 'bg-gradient-to-r from-accent-500 to-primary-500 text-white shadow-md'
       : score >= 50
-        ? 'bg-primary-500 text-white'
-        : 'bg-neutral-300 text-neutral-900';
+        ? 'bg-gradient-to-r from-info-500 to-primary-500 text-white shadow-sm'
+        : 'bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-600';
 
   return (
     <div ref={ref} className="relative inline-block">
@@ -60,10 +60,19 @@ export function MatchExplanationPopover({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="dialog"
-        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${colorClass} min-h-[28px]`}
+        aria-label={`Score de compatibilité ${score}% — ouvrir le détail`}
+        className={`group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all hover:scale-105 hover:shadow-md ${gradientClass} min-h-[28px]`}
       >
-        Match {score}
-        <span aria-hidden>ℹ️</span>
+        <span aria-hidden className="text-sm leading-none">
+          ✨
+        </span>
+        <span>{score}% match</span>
+        <span
+          aria-hidden
+          className="ml-0.5 text-[10px] opacity-70 transition-transform group-hover:translate-x-0.5"
+        >
+          ›
+        </span>
       </button>
       {open ? (
         <div
