@@ -69,4 +69,7 @@ EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:4000/health || exit 1
 
-CMD ["node", "dist/index.js"]
+# tsx en runtime : nécessaire car les packages workspace (@swipejob/types/db/llm)
+# exposent leurs sources .ts sans build, et Node 22 ne sait pas stripper du TS
+# dans node_modules. tsx transpile à la volée, y compris node_modules.
+CMD ["node", "--import", "tsx/esm", "dist/index.js"]
