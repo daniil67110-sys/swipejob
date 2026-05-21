@@ -41,7 +41,7 @@ RUN pnpm --filter=@swipejob/worker build
 
 # Extraire uniquement les dépendances runtime via pnpm deploy
 # Cela crée un dossier /app/runtime avec uniquement les deps de prod
-RUN pnpm deploy --filter=@swipejob/worker --prod /app/runtime
+RUN pnpm deploy --filter=@swipejob/worker --prod --legacy /app/runtime
 
 # ============================================================
 # Stage 4: Runtime (production)
