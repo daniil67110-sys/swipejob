@@ -227,7 +227,7 @@ try {
   let matchInserted = 0;
   for (const u of users) {
     for (const o of allOffers) {
-      const score = 0.55 + Math.random() * 0.4; // 55-95 %
+      const score = Math.round((0.55 + Math.random() * 0.4) * 100); // 55-95 (échelle 0-100, alignée sur compositeScore())
       const explanation = JSON.stringify({
         contributingFactors: [
           { factor: 'pref_contract_type', weight: 0.25, value: true },

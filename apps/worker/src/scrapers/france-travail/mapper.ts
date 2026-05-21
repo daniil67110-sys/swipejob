@@ -76,6 +76,7 @@ export function mapFranceTravailToOffer(
         raw.formations?.map((f) => f.niveauLibelle).filter((s): s is string => Boolean(s)) ?? [],
       languages: raw.langues?.map((l) => l.libelle).filter(Boolean) ?? [],
     },
+    sourceUrl: raw.origineOffre?.urlOrigine ?? null,
     embedding: null,
     rawPayload: raw as unknown as Record<string, unknown>,
     expiresAt: null,

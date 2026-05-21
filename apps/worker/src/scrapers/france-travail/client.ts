@@ -25,6 +25,7 @@ export type FranceTravailOfferRaw = {
   competences?: Array<{ libelle: string }>;
   formations?: Array<{ niveauLibelle?: string }>;
   langues?: Array<{ libelle: string }>;
+  origineOffre?: { origine?: string; urlOrigine?: string };
 };
 
 export type FetchOffersParams = {
