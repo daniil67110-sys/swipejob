@@ -99,10 +99,13 @@ export async function getDailyDeck(): Promise<DeckResult> {
   const prefCities = prefRow[0]?.citiesGeo ?? [];
   const radius = prefRow[0]?.geoRadiusKm ?? 50;
 
+  // Filtre strict : sans coordonnées, on ne peut pas vérifier la distance,
+  // donc on exclut. Sinon l'utilisateur reçoit des offres à 400 km de chez lui
+  // (cas réel : pref Paris+50km → offre Charente-Maritime sans géo passait).
   const radiusFilter =
     prefCities.length > 0
       ? sql`(
-          ${offers.locationLat} IS NULL OR ${offers.locationLng} IS NULL OR EXISTS (
+          ${offers.locationLat} IS NOT NULL AND ${offers.locationLng} IS NOT NULL AND EXISTS (
             SELECT 1 FROM jsonb_array_elements(${JSON.stringify(prefCities)}::jsonb) AS pc
             WHERE 6371 * acos(
               LEAST(1.0, GREATEST(-1.0,
