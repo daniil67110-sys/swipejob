@@ -5,12 +5,9 @@
 # Stage 1: Base
 # ============================================================
 FROM node:22-alpine AS base
-RUN apk add --no-cache libc6-compat
+# git: needed by root `prepare` script (lefthook install) during pnpm install
+RUN apk add --no-cache libc6-compat git
 RUN npm install -g pnpm
-
-# Skip lefthook install hook (root `prepare` script): CI image has no
-# git binary and no .git folder, so `lefthook install` would fail.
-ENV CI=true
 
 WORKDIR /app
 
@@ -22,6 +19,10 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/worker/package.json ./apps/worker/package.json
 COPY packages/config/package.json ./packages/config/package.json
 COPY packages/types/package.json ./packages/types/package.json
+
+# Initialiser un repo git vide : la racine package.json a `prepare: lefthook install`
+# qui exige un repo git, même en CI. On évite ainsi de hacker autour des hooks.
+RUN git init -q && git config user.email "ci@swipejob.local" && git config user.name "ci"
 
 RUN pnpm install --frozen-lockfile --filter=@swipejob/worker...
 
