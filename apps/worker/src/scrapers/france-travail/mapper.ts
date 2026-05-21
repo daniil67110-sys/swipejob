@@ -8,6 +8,21 @@ import type { FranceTravailOfferRaw } from './client.js';
  * - E2 → "Contrat apprentissage"
  * - FS → "Contrat de professionnalisation" (ou variantes)
  */
+/**
+ * FT renvoie `commune` = code INSEE ("75102") et `libelle` = "75 - Paris 2e
+ * Arrondissement". On préfère le libelle lisible et on retire le préfixe
+ * département. Fallback sur commune si libelle manque.
+ */
+function extractCity(
+  lieuTravail: { libelle?: string; commune?: string } | undefined,
+): string | null {
+  if (!lieuTravail) return null;
+  if (lieuTravail.libelle) {
+    return lieuTravail.libelle.replace(/^[0-9]{2,3}\s*-\s*/, '').trim() || null;
+  }
+  return lieuTravail.commune ?? null;
+}
+
 function mapContractType(natureContrat: string | undefined): 'stage' | 'alternance' | null {
   if (!natureContrat) return null;
   const lc = natureContrat.toLowerCase();
@@ -62,7 +77,7 @@ export function mapFranceTravailToOffer(
     companyName: raw.entreprise?.nom ?? null,
     companyLogoUrl: raw.entreprise?.logo ?? null,
     contractType,
-    locationCity: raw.lieuTravail?.commune ?? raw.lieuTravail?.libelle ?? null,
+    locationCity: extractCity(raw.lieuTravail),
     locationLat: typeof raw.lieuTravail?.latitude === 'number' ? raw.lieuTravail.latitude : null,
     locationLng: typeof raw.lieuTravail?.longitude === 'number' ? raw.lieuTravail.longitude : null,
     remoteMode: null,
