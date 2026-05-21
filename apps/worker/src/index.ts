@@ -51,6 +51,11 @@ import { buildMetricsResponse } from './http/metrics.js';
 
 const app = new Hono();
 
+// Liveness probe : le serveur HTTP répond, c'est tout. Pas d'appel Redis/queue
+// pour rester sub-ms et éviter un faux negatif quand les queues sont en charge.
+// /health reste la readiness probe (utile en monitoring/observability).
+app.get('/alive', (c) => c.json({ status: 'ok' }, 200));
+
 app.get('/health', async (c) => {
   const redisOk = await isRedisHealthy();
   const queues = await getAllQueueStats();
