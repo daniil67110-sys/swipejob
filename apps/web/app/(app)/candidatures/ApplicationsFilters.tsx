@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { statusLabel, type ApplicationStatus } from './lib';
 
 const FILTERABLE: ApplicationStatus[] = [
@@ -57,9 +58,8 @@ export function ApplicationsFilters() {
   );
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-neutral-600">Filtrer :</span>
         {FILTERABLE.map((s) => {
           const active = activeStatuses.has(s);
           return (
@@ -69,10 +69,10 @@ export function ApplicationsFilters() {
               onClick={() => toggleStatus(s)}
               aria-pressed={active}
               className={
-                'rounded-full border px-3 py-1 text-xs transition ' +
+                'rounded-full px-3.5 py-1.5 text-caption font-medium transition ' +
                 (active
-                  ? 'border-primary-500 bg-primary-100 text-primary-600'
-                  : 'border-neutral-200 bg-neutral-0 text-neutral-700 hover:bg-neutral-100')
+                  ? 'bg-neutral-900 text-white'
+                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200')
               }
             >
               {statusLabel(s)}
@@ -81,21 +81,27 @@ export function ApplicationsFilters() {
         })}
       </div>
       <div className="flex items-center gap-2">
-        <label htmlFor="sort" className="text-xs font-medium text-neutral-600">
-          Trier :
+        <label htmlFor="sort" className="text-caption text-neutral-500">
+          Trier par
         </label>
-        <select
-          id="sort"
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="rounded-md border border-neutral-200 bg-neutral-0 px-2 py-1 text-xs"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            id="sort"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="appearance-none rounded-md border border-neutral-200 bg-white pl-3 pr-8 py-1.5 text-caption font-medium text-neutral-700 hover:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none"
+            aria-hidden="true"
+          />
+        </div>
       </div>
     </div>
   );

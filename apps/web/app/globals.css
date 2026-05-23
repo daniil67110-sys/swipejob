@@ -34,7 +34,9 @@
   --color-success-500: #1fb87a;
   --color-error-100: #ffe2e5;
   --color-error-500: #ff4757;
+  --color-warning-100: #ffe9d6;
   --color-warning-500: #ffa940;
+  --color-info-100: #dbeeff;
   --color-info-500: #3998ff;
 
   /* Ring helper (focus-visible) */

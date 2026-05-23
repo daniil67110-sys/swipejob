@@ -2,174 +2,367 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { swipeOfferAction, undoApplicationAction } from './swipe-actions';
+import {
+  Briefcase,
+  CalendarDays,
+  Clock,
+  Euro,
+  GraduationCap,
+  Hammer,
+  Heart,
+  Languages,
+  Laptop,
+  MapPin,
+  Sparkles,
+  TrendingUp,
+} from 'lucide-react';
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  type PanInfo,
+} from 'framer-motion';
+import { CompanyLogo } from '@/components/shared/CompanyLogo';
+import { undoApplicationAction } from './swipe-actions';
 import { MatchExplanationPopover, type MatchReason } from './MatchExplanationPopover';
 
 export type SwipeCardData = {
   id: string;
   title: string;
+  description?: string | null;
   companyName: string | null;
+  companyLogoUrl?: string | null;
   locationCity: string | null;
   contractType: string | null;
-  description?: string | null;
+  remoteMode?: string | null;
   salaryMinMonthly: number | null;
   salaryMaxMonthly: number | null;
+  startDate?: string | null;
+  duration?: string | null;
+  publishedAt?: Date | string | null;
+  requirements?: {
+    skills?: string[];
+    educationLevels?: string[];
+    languages?: string[];
+  } | null;
   sourceUrl: string | null;
   matchScore: number;
   matchReasons: MatchReason[];
 };
 
-/**
- * Story 3.1 V1 — SwipeCard avec boutons d'action (sans Framer Motion).
- * Story 3.4 — boutons + raccourcis clavier ←/→/↑/Espace.
- * Story 3.8 — UndoToast post-swipe droite (30s window).
- *
- * V2 : Framer Motion drag/spring/rotation, overlays colorés, prefers-reduced-motion.
- * V1 garde la simplicité : boutons accessibles + raccourcis clavier.
- */
+const SWIPE_THRESHOLD = 100;
+const VELOCITY_THRESHOLD = 500;
+
+function formatSalary(min: number | null, max: number | null): string | null {
+  if (!min && !max) return null;
+  if (min && max) return `${min} - ${max} €/mois`;
+  return `${min ?? max} €/mois`;
+}
+
+function formatDateShort(d: Date | string | null | undefined): string | null {
+  if (!d) return null;
+  const date = typeof d === 'string' ? new Date(d) : d;
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+}
+
+function formatPublishedAgo(d: Date | string | null | undefined): string | null {
+  if (!d) return null;
+  const date = typeof d === 'string' ? new Date(d) : d;
+  if (Number.isNaN(date.getTime())) return null;
+  const days = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  if (days < 1) return "Publiée aujourd'hui";
+  if (days === 1) return 'Publiée hier';
+  if (days < 7) return `Publiée il y a ${days} jours`;
+  if (days < 30) return `Publiée il y a ${Math.floor(days / 7)} sem.`;
+  return `Publiée il y a ${Math.floor(days / 30)} mois`;
+}
+
+function formatRemoteMode(mode: string | null | undefined): string | null {
+  if (!mode) return null;
+  const lower = mode.toLowerCase();
+  if (lower.includes('full') || lower.includes('100')) return 'Télétravail';
+  if (lower.includes('partial') || lower.includes('hybrid')) return 'Hybride';
+  if (lower.includes('no') || lower.includes('on-site') || lower.includes('on_site'))
+    return 'Sur site';
+  return mode;
+}
+
 export function SwipeCard({
   offer,
   showExplanation,
-  onSwiped,
+  onSwipe,
   onShowDetail,
-  focused,
 }: {
   offer: SwipeCardData;
   showExplanation: boolean;
-  onSwiped: (direction: 'left' | 'right' | 'up', applicationId?: string) => void;
+  onSwipe: (direction: 'left' | 'right' | 'up') => void;
   onShowDetail: () => void;
-  focused: boolean;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
-  const swipe = (direction: 'left' | 'right' | 'up') => {
-    setError(null);
-    startTransition(async () => {
-      const res = await swipeOfferAction({ offerId: offer.id, direction });
-      if (!res.ok) {
-        setError(res.error.message);
-        return;
-      }
-      onSwiped(direction, res.data.applicationId);
-      startTransition(() => router.refresh());
-    });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotate = useTransform(x, [-300, 0, 300], [-18, 0, 18]);
+
+  const passOpacity = useTransform(x, [-160, -40, 0], [1, 0, 0]);
+  const applyOpacity = useTransform(x, [0, 40, 160], [0, 0, 1]);
+  const saveOpacity = useTransform(y, [-160, -40, 0], [1, 0, 0]);
+
+  const handleDragEnd = (_: unknown, info: PanInfo) => {
+    const { offset, velocity } = info;
+    const swipedUp = offset.y < -SWIPE_THRESHOLD || velocity.y < -VELOCITY_THRESHOLD;
+    const swipedLeft = offset.x < -SWIPE_THRESHOLD || velocity.x < -VELOCITY_THRESHOLD;
+    const swipedRight = offset.x > SWIPE_THRESHOLD || velocity.x > VELOCITY_THRESHOLD;
+
+    if (swipedUp && Math.abs(offset.y) > Math.abs(offset.x)) {
+      onSwipe('up');
+      return;
+    }
+    if (swipedLeft) {
+      onSwipe('left');
+      return;
+    }
+    if (swipedRight) {
+      onSwipe('right');
+      return;
+    }
   };
 
-  useEffect(() => {
-    if (!focused) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        swipe('left');
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        swipe('right');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        swipe('up');
-      } else if (e.key === ' ') {
-        e.preventDefault();
-        onShowDetail();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [focused, offer.id, onShowDetail]);
+  const salary = formatSalary(offer.salaryMinMonthly, offer.salaryMaxMonthly);
+  const scorePct = Math.round(offer.matchScore * 100);
+  const isStrongMatch = scorePct >= 80;
+  const hasScore = scorePct > 0;
+  const remoteLabel = formatRemoteMode(offer.remoteMode);
+  const publishedAgo = formatPublishedAgo(offer.publishedAt);
+  const startDate = formatDateShort(offer.startDate);
+  const skills = offer.requirements?.skills?.slice(0, 4) ?? [];
+  const educationLevels = offer.requirements?.educationLevels ?? [];
+  const languages = offer.requirements?.languages ?? [];
 
   return (
-    <article
+    <motion.article
       role="article"
       aria-label={`Offre ${offer.title} chez ${offer.companyName ?? 'entreprise non précisée'}`}
-      className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm space-y-4"
+      className="relative rounded-2xl bg-white shadow-lg overflow-hidden border border-neutral-100 touch-pan-y select-none"
+      drag={prefersReducedMotion ? false : true}
+      dragSnapToOrigin
+      dragElastic={0.7}
+      style={{ x, y, rotate }}
+      onDragEnd={handleDragEnd}
+      whileTap={prefersReducedMotion ? undefined : { cursor: 'grabbing' }}
+      whileDrag={{ cursor: 'grabbing' }}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1 flex-1 min-w-0">
-          <h2 className="text-lg font-semibold text-neutral-900">{offer.title}</h2>
-          <p className="text-sm text-neutral-700">
-            {offer.companyName ?? 'Entreprise non précisée'}
-            {offer.locationCity ? ` · ${offer.locationCity}` : ''}
-          </p>
-          <p className="text-xs text-neutral-500">
-            {offer.contractType ? `${offer.contractType} · ` : ''}
-            {offer.salaryMinMonthly || offer.salaryMaxMonthly
-              ? `${offer.salaryMinMonthly ?? '?'}–${offer.salaryMaxMonthly ?? '?'}€/mois`
-              : 'Salaire NC'}
-          </p>
+      {/* Bandeau gradient top */}
+      <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+
+      {/* Overlays de feedback geste */}
+      <motion.div
+        style={{ opacity: passOpacity }}
+        className="absolute inset-0 z-20 flex items-center justify-center bg-error-500/15 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div className="rounded-2xl border-4 border-error-500 bg-white/95 px-6 py-3 -rotate-12 shadow-xl">
+          <span className="text-display-md font-display font-bold text-error-500 tracking-wider">
+            PASSER
+          </span>
         </div>
-        {showExplanation && offer.matchScore > 0 ? (
-          <MatchExplanationPopover score={offer.matchScore} reasons={offer.matchReasons} />
+      </motion.div>
+      <motion.div
+        style={{ opacity: applyOpacity }}
+        className="absolute inset-0 z-20 flex items-center justify-center bg-success-500/15 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div className="rounded-2xl border-4 border-success-500 bg-white/95 px-6 py-3 rotate-12 shadow-xl">
+          <span className="text-display-md font-display font-bold text-success-500 tracking-wider">
+            CANDIDATER
+          </span>
+        </div>
+      </motion.div>
+      <motion.div
+        style={{ opacity: saveOpacity }}
+        className="absolute inset-0 z-20 flex items-start justify-center pt-12 bg-info-500/15 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div className="rounded-2xl border-4 border-info-500 bg-white/95 px-6 py-3 shadow-xl">
+          <span className="text-display-md font-display font-bold text-info-500 tracking-wider">
+            FAVORIS
+          </span>
+        </div>
+      </motion.div>
+
+      <div className="p-7">
+        {/* En-tête : avatar + entreprise + score */}
+        <div className="flex items-start justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3 min-w-0">
+            <CompanyLogo name={offer.companyName} logoUrl={offer.companyLogoUrl} size="md" />
+            <div className="min-w-0">
+              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold">
+                Entreprise
+              </p>
+              <p className="text-body-md font-semibold text-neutral-900 truncate">
+                {offer.companyName ?? 'Non précisée'}
+              </p>
+            </div>
+          </div>
+          {showExplanation && hasScore ? (
+            <MatchExplanationPopover score={offer.matchScore} reasons={offer.matchReasons} />
+          ) : hasScore ? (
+            <div
+              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold text-caption ${
+                isStrongMatch ? 'bg-success-100 text-success-500' : 'bg-info-100 text-info-500'
+              }`}
+              aria-label={`Score de matching : ${scorePct} pourcent`}
+            >
+              {isStrongMatch ? (
+                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+              ) : (
+                <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+              )}
+              {scorePct}% match
+            </div>
+          ) : (
+            <div className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 font-semibold text-caption">
+              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />À découvrir
+            </div>
+          )}
+        </div>
+
+        <h2 className="text-display-md font-display font-bold text-neutral-900 leading-tight mb-2">
+          {offer.title}
+        </h2>
+        {publishedAgo ? (
+          <p className="text-caption text-neutral-400 mb-5 inline-flex items-center gap-1.5">
+            <Clock className="w-3 h-3" aria-hidden="true" />
+            {publishedAgo}
+          </p>
+        ) : (
+          <div className="mb-5" />
+        )}
+
+        <div className="flex flex-wrap gap-2 mb-5">
+          {offer.locationCity ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-info-100 text-info-500 text-body-sm font-semibold">
+              <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+              {offer.locationCity}
+            </span>
+          ) : null}
+          {remoteLabel ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-info-100 text-info-500 text-body-sm font-semibold">
+              <Laptop className="w-3.5 h-3.5" aria-hidden="true" />
+              {remoteLabel}
+            </span>
+          ) : null}
+          {salary ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success-100 text-success-500 text-body-sm font-semibold">
+              <Euro className="w-3.5 h-3.5" aria-hidden="true" />
+              {salary}
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-500 text-body-sm font-medium">
+              <Euro className="w-3.5 h-3.5" aria-hidden="true" />
+              Salaire non communiqué
+            </span>
+          )}
+          {offer.contractType ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-100 text-primary-500 text-body-sm font-semibold">
+              <Briefcase className="w-3.5 h-3.5" aria-hidden="true" />
+              {offer.contractType}
+            </span>
+          ) : null}
+          {offer.duration ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-100 text-warning-500 text-body-sm font-semibold">
+              <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+              {offer.duration}
+            </span>
+          ) : null}
+          {startDate ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-100 text-warning-500 text-body-sm font-semibold">
+              <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
+              Démarre le {startDate}
+            </span>
+          ) : null}
+        </div>
+
+        {skills.length > 0 ? (
+          <div className="mb-5">
+            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
+              <Hammer className="w-3 h-3" aria-hidden="true" />
+              Compétences
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="inline-flex items-center px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-700 text-caption font-medium"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
         ) : null}
-      </div>
 
-      {offer.description ? (
-        <p className="text-sm italic text-neutral-700 line-clamp-2">{offer.description}</p>
-      ) : null}
+        {(educationLevels.length > 0 || languages.length > 0) && (
+          <div className="mb-5 grid grid-cols-2 gap-4">
+            {educationLevels.length > 0 ? (
+              <div>
+                <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
+                  <GraduationCap className="w-3 h-3" aria-hidden="true" />
+                  Niveau
+                </p>
+                <p className="text-body-sm text-neutral-700 font-medium">
+                  {educationLevels.join(' · ')}
+                </p>
+              </div>
+            ) : null}
+            {languages.length > 0 ? (
+              <div>
+                <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
+                  <Languages className="w-3 h-3" aria-hidden="true" />
+                  Langues
+                </p>
+                <p className="text-body-sm text-neutral-700 font-medium">{languages.join(' · ')}</p>
+              </div>
+            ) : null}
+          </div>
+        )}
 
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={onShowDetail}
-          className="text-xs font-medium text-primary-500 hover:underline"
-        >
-          Plus d&apos;infos →
-        </button>
-        {offer.sourceUrl ? (
-          <a
-            href={offer.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-neutral-500 hover:underline"
+        {offer.description ? (
+          <div>
+            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2">
+              Description
+            </p>
+            <p className="text-body-sm text-neutral-700 leading-relaxed line-clamp-4">
+              {offer.description}
+            </p>
+            <button
+              type="button"
+              onClick={onShowDetail}
+              className="text-body-sm font-semibold text-primary-500 hover:text-primary-600 hover:underline mt-2 block"
+            >
+              Voir l&apos;offre complète →
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onShowDetail}
+            className="text-body-sm font-semibold text-primary-500 hover:text-primary-600 hover:underline block"
           >
-            Voir source
-          </a>
-        ) : null}
+            Voir l&apos;offre complète →
+          </button>
+        )}
       </div>
-
-      <div className="flex items-center justify-around border-t border-neutral-200 pt-3 gap-2">
-        <button
-          type="button"
-          onClick={() => swipe('left')}
-          disabled={isPending}
-          aria-label="Passer cette offre (raccourci flèche gauche)"
-          className="flex items-center justify-center rounded-full bg-error-100 hover:bg-error-100/80 text-error-500 w-14 h-14 disabled:opacity-50 min-h-[44px]"
-        >
-          ❌
-        </button>
-        <button
-          type="button"
-          onClick={() => swipe('up')}
-          disabled={isPending}
-          aria-label="Sauvegarder cette offre (raccourci flèche haut)"
-          className="flex items-center justify-center rounded-full bg-primary-100 hover:bg-primary-100/80 text-primary-500 w-14 h-14 disabled:opacity-50 min-h-[44px]"
-        >
-          💾
-        </button>
-        <button
-          type="button"
-          onClick={() => swipe('right')}
-          disabled={isPending}
-          aria-label="Candidater à cette offre (raccourci flèche droite)"
-          className="flex items-center justify-center rounded-full bg-success-100 hover:bg-success-100/80 text-success-500 w-14 h-14 disabled:opacity-50 min-h-[44px]"
-        >
-          💌
-        </button>
-      </div>
-
-      {error ? (
-        <p role="alert" aria-live="polite" className="text-xs text-error-500">
-          {error}
-        </p>
-      ) : null}
-    </article>
+    </motion.article>
   );
 }
 
-/**
- * UndoToast (Story 3.8) — apparait après swipe droite, 30s window.
- */
 export function UndoToast({
   applicationId,
   onDismiss,
@@ -204,14 +397,17 @@ export function UndoToast({
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-md bg-neutral-900 text-white px-4 py-3 shadow-lg flex items-center gap-3 z-50"
+      className="fixed bottom-28 left-1/2 -translate-x-1/2 lg:left-[calc(50%+128px)] rounded-xl bg-neutral-900 text-white px-5 py-3.5 shadow-xl flex items-center gap-4 z-50"
     >
-      <span className="text-sm">Candidature envoyée 💌 · annulable ({secondsLeft}s)</span>
+      <span className="w-7 h-7 rounded-full bg-gradient-to-br from-success-500 to-info-500 flex items-center justify-center shrink-0">
+        <Heart className="w-3.5 h-3.5 text-white" fill="currentColor" aria-hidden="true" />
+      </span>
+      <span className="text-body-sm">Candidature envoyée · annulable ({secondsLeft}s)</span>
       <button
         type="button"
         onClick={handleUndo}
         disabled={isPending}
-        className="text-xs font-medium text-primary-100 hover:text-white underline disabled:opacity-50"
+        className="text-caption font-semibold text-info-100 hover:text-white hover:underline disabled:opacity-50 ml-2"
       >
         Annuler
       </button>

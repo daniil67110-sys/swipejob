@@ -1,3 +1,4 @@
+import { Lightbulb, Sparkles, Target } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { getDailyDeck } from './actions';
 import { SwipeDeck } from './SwipeDeck';
@@ -8,37 +9,45 @@ export default async function DeckPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-bold">Ton deck quotidien 🎴</h1>
-        <p className="text-sm text-neutral-600">
-          {deck.offers.length} offre{deck.offers.length > 1 ? 's' : ''} pour toi aujourd&apos;hui.
-          {deck.fallback ? ' (mode découverte : on calcule encore ton matching)' : ''}
-        </p>
-        <p className="text-xs text-neutral-500">
-          Raccourcis : ← passer · ↑ sauvegarder · → candidater · espace détail
-        </p>
+      <header>
+        {deck.fallback ? (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+            Mode découverte
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success-100 text-success-500 text-caption font-semibold tracking-wide">
+            <Target className="w-3.5 h-3.5" aria-hidden="true" />
+            Matching personnalisé
+          </span>
+        )}
       </header>
 
       {deck.scarcityHint ? (
-        <div className="rounded-md border border-primary-500/40 bg-primary-100/30 p-4">
-          <p className="text-sm font-medium text-neutral-900">💡 Conseil du coach</p>
-          <p className="mt-1 text-sm text-neutral-700">{deck.scarcityHint.message}</p>
-          {deck.scarcityHint.type === 'broaden_radius' ||
-          deck.scarcityHint.type === 'broaden_cities' ? (
-            <a
-              href="/etape-2-preferences"
-              className="mt-2 inline-block rounded-md bg-primary-500 px-3 py-2 text-xs font-medium text-white hover:bg-primary-600 min-h-[40px]"
-            >
-              Modifier mes préférences
-            </a>
-          ) : (
-            <a
-              href="/profil"
-              className="mt-2 inline-block rounded-md bg-primary-500 px-3 py-2 text-xs font-medium text-white hover:bg-primary-600 min-h-[40px]"
-            >
-              Revoir mon profil
-            </a>
-          )}
+        <div className="rounded-2xl border border-primary-100 bg-primary-50 p-5">
+          <div className="flex items-start gap-3">
+            <Lightbulb className="w-5 h-5 text-primary-500 shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="flex-1">
+              <p className="text-body-sm font-semibold text-neutral-900 mb-1">Conseil du coach</p>
+              <p className="text-body-sm text-neutral-700 mb-3">{deck.scarcityHint.message}</p>
+              {deck.scarcityHint.type === 'broaden_radius' ||
+              deck.scarcityHint.type === 'broaden_cities' ? (
+                <a
+                  href="/etape-2-preferences"
+                  className="inline-flex items-center justify-center rounded-md bg-primary-500 px-3 py-2 text-caption font-semibold text-white hover:bg-primary-600 min-h-[40px]"
+                >
+                  Modifier mes préférences
+                </a>
+              ) : (
+                <a
+                  href="/profil"
+                  className="inline-flex items-center justify-center rounded-md bg-primary-500 px-3 py-2 text-caption font-semibold text-white hover:bg-primary-600 min-h-[40px]"
+                >
+                  Revoir mon profil
+                </a>
+              )}
+            </div>
+          </div>
         </div>
       ) : null}
 

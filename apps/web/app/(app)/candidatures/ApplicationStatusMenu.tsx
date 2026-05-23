@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { PartyPopper } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,9 +78,10 @@ export function ApplicationStatusMenu({
           ))}
           <DropdownMenuItem
             onSelect={() => setSignatureOpen(true)}
-            className="text-primary-600 font-medium"
+            className="text-primary-600 font-semibold flex items-center gap-2"
           >
-            🎉 Reporter ma signature
+            <PartyPopper className="w-4 h-4" aria-hidden="true" />
+            Reporter ma signature
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
