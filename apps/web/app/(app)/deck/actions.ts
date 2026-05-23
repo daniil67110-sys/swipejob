@@ -9,11 +9,22 @@ import { captureServer, hashUserId } from '@/lib/analytics';
 export type DeckOffer = {
   id: string;
   title: string;
+  description: string | null;
   companyName: string | null;
+  companyLogoUrl: string | null;
   locationCity: string | null;
   contractType: string | null;
+  remoteMode: string | null;
   salaryMinMonthly: number | null;
   salaryMaxMonthly: number | null;
+  startDate: string | null;
+  duration: string | null;
+  publishedAt: Date | null;
+  requirements: {
+    skills?: string[];
+    educationLevels?: string[];
+    languages?: string[];
+  } | null;
   sourceUrl: string | null;
   matchScore: number;
   matchReasons: Array<{
@@ -74,11 +85,22 @@ export async function getDailyDeck(): Promise<DeckResult> {
       }>;
     } | null;
     title: string;
+    description: string | null;
     companyName: string | null;
+    companyLogoUrl: string | null;
     locationCity: string | null;
     contractType: string | null;
+    remoteMode: string | null;
     salaryMinMonthly: number | null;
     salaryMaxMonthly: number | null;
+    startDate: string | null;
+    duration: string | null;
+    publishedAt: Date | null;
+    requirements: {
+      skills?: string[];
+      educationLevels?: string[];
+      languages?: string[];
+    } | null;
     sourceUrl: string | null;
   };
 
@@ -133,11 +155,18 @@ export async function getDailyDeck(): Promise<DeckResult> {
       score: matchScores.score,
       explanation: matchScores.explanation,
       title: offers.title,
+      description: offers.description,
       companyName: offers.companyName,
+      companyLogoUrl: offers.companyLogoUrl,
       locationCity: offers.locationCity,
       contractType: offers.contractType,
+      remoteMode: offers.remoteMode,
       salaryMinMonthly: offers.salaryMinMonthly,
       salaryMaxMonthly: offers.salaryMaxMonthly,
+      startDate: offers.startDate,
+      duration: offers.duration,
+      publishedAt: offers.publishedAt,
+      requirements: offers.requirements,
       sourceUrl: offers.sourceUrl,
     })
     .from(matchScores)
@@ -149,11 +178,18 @@ export async function getDailyDeck(): Promise<DeckResult> {
   let deckOffers: DeckOffer[] = matches.map((m) => ({
     id: m.offerId,
     title: m.title,
+    description: m.description,
     companyName: m.companyName,
+    companyLogoUrl: m.companyLogoUrl,
     locationCity: m.locationCity,
     contractType: m.contractType,
+    remoteMode: m.remoteMode,
     salaryMinMonthly: m.salaryMinMonthly,
     salaryMaxMonthly: m.salaryMaxMonthly,
+    startDate: m.startDate,
+    duration: m.duration,
+    publishedAt: m.publishedAt,
+    requirements: m.requirements,
     sourceUrl: m.sourceUrl,
     matchScore: m.score,
     matchReasons: m.explanation?.contributingFactors ?? [],
@@ -175,11 +211,18 @@ export async function getDailyDeck(): Promise<DeckResult> {
       .select({
         id: offers.id,
         title: offers.title,
+        description: offers.description,
         companyName: offers.companyName,
+        companyLogoUrl: offers.companyLogoUrl,
         locationCity: offers.locationCity,
         contractType: offers.contractType,
+        remoteMode: offers.remoteMode,
         salaryMinMonthly: offers.salaryMinMonthly,
         salaryMaxMonthly: offers.salaryMaxMonthly,
+        startDate: offers.startDate,
+        duration: offers.duration,
+        publishedAt: offers.publishedAt,
+        requirements: offers.requirements,
         sourceUrl: offers.sourceUrl,
       })
       .from(offers)

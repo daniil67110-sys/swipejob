@@ -51,9 +51,11 @@ const basePreset = {
           500: '#FF4757', // Rouge cohérent — swipe gauche overlay, erreurs critiques
         },
         warning: {
+          100: '#FFE9D6', // Background warning subtil
           500: '#FFA940', // Ambre doux — avertissements, pénurie d'offres
         },
         info: {
+          100: '#DBEEFF', // Background info subtil
           500: '#3998FF', // Bleu informatif — swipe haut (sauver), tips
         },
       },

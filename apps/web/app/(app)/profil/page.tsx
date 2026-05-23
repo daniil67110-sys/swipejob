@@ -1,8 +1,10 @@
 import { eq } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
+import { AlertTriangle, BookOpen, FileText, Pencil, Search, User as UserIcon } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { cvs, preferences, profiles, users } from '@swipejob/db/schema';
-import { desc } from 'drizzle-orm';
+import type { LucideIcon } from 'lucide-react';
 
 export default async function ProfilPage() {
   const session = await requireVerifiedAuth({});
@@ -12,7 +14,7 @@ export default async function ProfilPage() {
   if (!isDatabaseConfigured) {
     return (
       <div className="mx-auto max-w-2xl p-8">
-        <p className="text-sm text-neutral-600">Service non configuré.</p>
+        <p className="text-body-sm text-neutral-600">Service non configuré.</p>
       </div>
     );
   }
@@ -39,10 +41,31 @@ export default async function ProfilPage() {
   const cv = cvRows[0];
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-8">
-      <h1 className="text-3xl font-bold">Mon profil</h1>
+    <div className="mx-auto max-w-3xl space-y-8 p-6 pb-24">
+      {/* Header */}
+      <header className="space-y-3">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
+          <UserIcon className="w-3.5 h-3.5" aria-hidden="true" />
+          Mon compte
+        </span>
+        <h1 className="text-display-lg font-display font-bold text-neutral-900 leading-[1.05]">
+          Mon{' '}
+          <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
+            profil
+          </span>
+        </h1>
+        <p className="text-body-md text-neutral-600">
+          Tes informations personnelles et préférences de recherche.
+        </p>
+      </header>
 
-      <Section title="Identité" editHref="/etape-1-cv/revue">
+      <Section
+        title="Identité"
+        icon={UserIcon}
+        iconBg="bg-info-100"
+        iconColor="text-info-500"
+        editHref="/etape-1-cv/revue"
+      >
         <Row label="Email" value={user?.email} />
         <Row label="Prénom" value={profile?.firstName} />
         <Row label="Nom" value={profile?.lastName} />
@@ -53,12 +76,24 @@ export default async function ProfilPage() {
         <Row label="LinkedIn" value={profile?.linkedinUrl} />
       </Section>
 
-      <Section title="École & niveau" editHref="/etape-1-cv/revue">
+      <Section
+        title="École & niveau"
+        icon={BookOpen}
+        iconBg="bg-primary-100"
+        iconColor="text-primary-500"
+        editHref="/etape-1-cv/revue"
+      >
         <Row label="École" value={profile?.currentSchool?.name} />
         <Row label="Niveau" value={profile?.educationLevel} />
       </Section>
 
-      <Section title="Préférences de recherche" editHref="/etape-2-preferences">
+      <Section
+        title="Préférences de recherche"
+        icon={Search}
+        iconBg="bg-success-100"
+        iconColor="text-success-500"
+        editHref="/etape-2-preferences"
+      >
         <Row label="Contrats" value={pref?.contractTypes?.join(', ') ?? ''} />
         <Row label="Villes" value={pref?.cities?.join(', ') ?? ''} />
         <Row label="Mode de travail" value={pref?.workModes?.join(', ') ?? ''} />
@@ -73,23 +108,40 @@ export default async function ProfilPage() {
         />
       </Section>
 
-      <Section title="CV" editHref="/etape-1-cv">
+      <Section
+        title="CV"
+        icon={FileText}
+        iconBg="bg-warning-100"
+        iconColor="text-warning-500"
+        editHref="/etape-1-cv"
+      >
         <Row label="Version" value={cv ? `v${cv.version}` : 'Aucun CV uploadé'} />
         <Row label="Fichier" value={cv?.originalFilename} />
       </Section>
 
-      <section className="space-y-3 rounded-md border border-error-500/40 bg-error-100/30 p-4">
-        <h2 className="text-base font-semibold">Zone dangereuse</h2>
-        <p className="text-sm text-neutral-800">
-          Supprimer définitivement ton compte. Tes données seront effacées sous 30 jours
-          conformément au RGPD.
-        </p>
-        <a
-          href="/profil/supprimer"
-          className="inline-block rounded-md border border-error-500 px-4 py-3 text-sm font-medium text-error-500 hover:bg-error-100 min-h-[44px]"
-        >
-          Supprimer mon compte
-        </a>
+      {/* Zone dangereuse */}
+      <section className="relative rounded-2xl bg-white shadow-sm overflow-hidden border border-error-100">
+        <div className="h-1 bg-gradient-to-r from-error-500 to-warning-500" />
+        <div className="p-6">
+          <div className="flex items-start gap-3 mb-3">
+            <span className="w-10 h-10 rounded-xl bg-error-100 text-error-500 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="text-heading-md font-semibold text-neutral-900">Zone dangereuse</h2>
+              <p className="text-body-sm text-neutral-600 mt-1">
+                Supprimer définitivement ton compte. Tes données seront effacées sous 30 jours
+                conformément au RGPD.
+              </p>
+            </div>
+          </div>
+          <a
+            href="/profil/supprimer"
+            className="inline-flex items-center justify-center rounded-md border border-error-500 px-4 py-2.5 text-body-sm font-semibold text-error-500 hover:bg-error-100/50 transition-colors min-h-[44px]"
+          >
+            Supprimer mon compte
+          </a>
+        </div>
       </section>
     </div>
   );
@@ -97,32 +149,52 @@ export default async function ProfilPage() {
 
 function Section({
   title,
+  icon: Icon,
+  iconBg,
+  iconColor,
   editHref,
   children,
 }: {
   title: string;
+  icon: LucideIcon;
+  iconBg: string;
+  iconColor: string;
   editHref: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-3 rounded-md border border-neutral-200 bg-white p-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold">{title}</h2>
-        <a href={editHref} className="text-sm font-medium text-primary-500 hover:underline">
-          Modifier
-        </a>
+    <section className="relative rounded-2xl bg-white shadow-sm overflow-hidden border border-neutral-100 hover:shadow-md transition-shadow">
+      <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span
+              className={`w-10 h-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center`}
+            >
+              <Icon className="w-5 h-5" aria-hidden="true" />
+            </span>
+            <h2 className="text-heading-md font-semibold text-neutral-900">{title}</h2>
+          </div>
+          <a
+            href={editHref}
+            className="inline-flex items-center gap-1.5 text-caption font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+          >
+            <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
+            Modifier
+          </a>
+        </div>
+        <dl className="space-y-2.5">{children}</dl>
       </div>
-      <dl className="space-y-1 text-sm">{children}</dl>
     </section>
   );
 }
 
 function Row({ label, value }: { label: string; value?: string | null }) {
   return (
-    <div className="flex gap-2">
-      <dt className="w-32 text-neutral-500">{label}</dt>
+    <div className="flex gap-3 text-body-sm">
+      <dt className="w-36 text-neutral-500 font-medium shrink-0">{label}</dt>
       <dd className="flex-1 text-neutral-900">
-        {value || <span className="text-neutral-400">—</span>}
+        {value || <span className="text-neutral-400 italic">Non renseigné</span>}
       </dd>
     </div>
   );
