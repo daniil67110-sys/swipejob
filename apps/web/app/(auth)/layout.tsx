@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +34,31 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         {children}
+
+        {/* Liens légaux discrets */}
+        <nav
+          aria-label="Liens légaux"
+          className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-caption text-neutral-400"
+        >
+          <Link href="/mentions-legales" className="hover:text-neutral-600 hover:underline">
+            Mentions légales
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/cgu" className="hover:text-neutral-600 hover:underline">
+            CGU
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link
+            href="/politique-confidentialite"
+            className="hover:text-neutral-600 hover:underline"
+          >
+            Confidentialité
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/cookies" className="hover:text-neutral-600 hover:underline">
+            Cookies
+          </Link>
+        </nav>
       </div>
     </div>
   );
