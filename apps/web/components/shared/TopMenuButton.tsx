@@ -129,9 +129,45 @@ export function TopMenuButton() {
             </ul>
           </nav>
 
-          {/* Footer */}
-          <div className="absolute bottom-0 left-0 right-0 px-6 py-5 border-t border-neutral-100 bg-neutral-50">
-            <p className="text-caption text-neutral-500 text-center">SwipeJob · Beta privée</p>
+          {/* Footer : liens légaux */}
+          <div className="absolute bottom-0 left-0 right-0 px-6 py-5 border-t border-neutral-100 bg-neutral-50 space-y-2">
+            <nav
+              aria-label="Liens légaux"
+              className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-neutral-500"
+            >
+              <Link
+                href="/mentions-legales"
+                className="hover:text-neutral-700 hover:underline"
+                onClick={() => setOpen(false)}
+              >
+                Mentions
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link
+                href="/cgu"
+                className="hover:text-neutral-700 hover:underline"
+                onClick={() => setOpen(false)}
+              >
+                CGU
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link
+                href="/politique-confidentialite"
+                className="hover:text-neutral-700 hover:underline"
+                onClick={() => setOpen(false)}
+              >
+                Confidentialité
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link
+                href="/cookies"
+                className="hover:text-neutral-700 hover:underline"
+                onClick={() => setOpen(false)}
+              >
+                Cookies
+              </Link>
+            </nav>
+            <p className="text-caption text-neutral-400 text-center">SwipeJob · Beta privée</p>
           </div>
         </SheetContent>
       </Sheet>

@@ -98,8 +98,43 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="pt-4 mt-4 border-t border-neutral-100">
+      {/* Footer : liens légaux */}
+      <div className="pt-4 mt-4 border-t border-neutral-100 space-y-2">
+        <nav aria-label="Liens légaux" className="flex flex-wrap gap-x-2 gap-y-1">
+          <Link
+            href="/mentions-legales"
+            className="text-[11px] text-neutral-400 hover:text-neutral-700 hover:underline"
+          >
+            Mentions
+          </Link>
+          <span className="text-[11px] text-neutral-300" aria-hidden="true">
+            ·
+          </span>
+          <Link
+            href="/cgu"
+            className="text-[11px] text-neutral-400 hover:text-neutral-700 hover:underline"
+          >
+            CGU
+          </Link>
+          <span className="text-[11px] text-neutral-300" aria-hidden="true">
+            ·
+          </span>
+          <Link
+            href="/politique-confidentialite"
+            className="text-[11px] text-neutral-400 hover:text-neutral-700 hover:underline"
+          >
+            Confidentialité
+          </Link>
+          <span className="text-[11px] text-neutral-300" aria-hidden="true">
+            ·
+          </span>
+          <Link
+            href="/cookies"
+            className="text-[11px] text-neutral-400 hover:text-neutral-700 hover:underline"
+          >
+            Cookies
+          </Link>
+        </nav>
         <p className="text-caption text-neutral-400 text-center">SwipeJob · Beta privée</p>
       </div>
     </aside>
