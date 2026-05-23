@@ -165,18 +165,21 @@ export default async function ValiderEmailPage(props: {
 function renderOutcome(outcome: Outcome) {
   const m = MESSAGES[outcome];
   return (
-    <div className="space-y-6 rounded-lg border border-neutral-200 bg-white p-8 shadow-sm">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">{m.title}</h2>
-        <p className="text-sm text-neutral-600">{m.body}</p>
-      </div>
-      <div className="space-y-2 text-center text-sm">
-        <a
-          className="inline-block rounded-md border border-neutral-300 px-4 py-2 font-medium text-neutral-900 hover:bg-neutral-50"
-          href="/inscription/email"
-        >
-          Recevoir un nouveau lien
-        </a>
+    <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
+      <div className="h-1.5 bg-gradient-to-r from-warning-500 via-primary-500 to-error-500" />
+      <div className="p-8 space-y-6">
+        <div className="space-y-3">
+          <h2 className="text-display-md font-display font-bold text-neutral-900">{m.title}</h2>
+          <p className="text-body-sm text-neutral-600">{m.body}</p>
+        </div>
+        <div className="text-center pt-2 border-t border-neutral-100">
+          <a
+            className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-4 py-2.5 mt-4 text-body-sm font-semibold text-white shadow-md hover:shadow-lg transition-shadow min-h-[44px]"
+            href="/inscription/email"
+          >
+            Recevoir un nouveau lien
+          </a>
+        </div>
       </div>
     </div>
   );
