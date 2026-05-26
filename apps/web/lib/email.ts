@@ -153,20 +153,48 @@ export async function sendParentalConsentEmail(
   }
 }
 
-export async function sendAccountDeletionEmail(input: { to: string }): Promise<SendEmailResult> {
+export async function sendAccountDeletionEmail(input: {
+  to: string;
+  restoreUrl?: string;
+  scheduledFor?: Date;
+  restoreExpiresAt?: Date;
+}): Promise<SendEmailResult> {
   const client = getClient();
+  const scheduled = input.scheduledFor?.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const restoreExpires = input.restoreExpiresAt?.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const restoreBlock =
+    input.restoreUrl && restoreExpires
+      ? `<p>Si c'était une erreur, tu peux annuler cette demande jusqu'au <strong>${restoreExpires}</strong> :</p>
+    <p style="margin:20px 0">
+      <a href="${input.restoreUrl}" style="display:inline-block;background:#1FB87A;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:600">
+        Annuler la suppression
+      </a>
+    </p>`
+      : '<p>Si c\'était une erreur, contacte <a href="mailto:dpo@swipejob.fr">dpo@swipejob.fr</a> dans les 7 jours.</p>';
   const html = `<!doctype html>
 <html lang="fr">
   <body style="font-family:system-ui,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111">
-    <h1 style="font-size:20px;margin:0 0 16px">SwipeJob — Suppression de ton compte</h1>
+    <h1 style="font-size:20px;margin:0 0 16px">SwipeJob — Confirmation de suppression de ton compte</h1>
     <p>Bonjour,</p>
-    <p>Ta demande de suppression a bien été enregistrée. Ton compte est désactivé immédiatement.</p>
-    <p>Conformément au RGPD, l'ensemble de tes données personnelles (CV, profil, candidatures) sera effacé de nos systèmes dans un délai maximum de 30 jours.</p>
-    <p>Si c'était une erreur, contacte <a href="mailto:support@swipejob.fr">support@swipejob.fr</a> dans les 24 heures.</p>
+    <p>Ta demande de suppression a bien été enregistrée. Ton compte est désactivé immédiatement et tes données seront effacées${scheduled ? ` le <strong>${scheduled}</strong>` : ' sous 30 jours maximum'}.</p>
+    ${restoreBlock}
+    <p style="color:#555;font-size:13px">Passé cette date, la suppression sera irréversible (RGPD art. 17).</p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
-    <p style="color:#888;font-size:12px">Merci d'avoir utilisé SwipeJob. À bientôt peut-être.</p>
+    <p style="color:#888;font-size:12px">Merci d'avoir utilisé SwipeJob.</p>
   </body>
 </html>`;
+  const text =
+    input.restoreUrl && restoreExpires
+      ? `Ton compte est désactivé. Suppression définitive${scheduled ? ` le ${scheduled}` : ' sous 30j'}. Rétractation possible jusqu'au ${restoreExpires} : ${input.restoreUrl}`
+      : 'Ton compte SwipeJob est désactivé. Suppression effective sous 30 jours (RGPD).';
   if (!client) {
     logger.warn({ to: input.to }, 'Resend non configuré — deletion email mock');
     return { ok: true, id: null, mock: true };
@@ -177,7 +205,7 @@ export async function sendAccountDeletionEmail(input: { to: string }): Promise<S
       to: input.to,
       subject: 'SwipeJob — Confirmation de suppression de ton compte',
       html,
-      text: 'Ton compte SwipeJob est désactivé. Suppression effective sous 30 jours (RGPD).',
+      text,
     });
     if (res.error) return { ok: false, error: res.error.message };
     return { ok: true, id: res.data?.id ?? 'unknown' };

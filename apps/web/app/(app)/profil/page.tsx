@@ -2,12 +2,12 @@ import Link from 'next/link';
 import { eq } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
 import {
-  AlertTriangle,
   BookOpen,
   ChevronRight,
   FileText,
   Pencil,
   Search,
+  Shield,
   Sparkles,
   Trophy,
   User as UserIcon,
@@ -178,30 +178,27 @@ export default async function ProfilPage() {
         <Row label="Fichier" value={cv?.originalFilename} />
       </Section>
 
-      {/* Zone dangereuse */}
-      <section className="relative rounded-2xl bg-white shadow-sm overflow-hidden border border-error-100">
-        <div className="h-1 bg-gradient-to-r from-error-500 to-warning-500" />
-        <div className="p-6">
-          <div className="flex items-start gap-3 mb-3">
-            <span className="w-10 h-10 rounded-xl bg-error-100 text-error-500 flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <div>
-              <h2 className="text-heading-md font-semibold text-neutral-900">Zone dangereuse</h2>
-              <p className="text-body-sm text-neutral-600 mt-1">
-                Supprimer définitivement ton compte. Tes données seront effacées sous 30 jours
-                conformément au RGPD.
-              </p>
-            </div>
+      {/* Confidentialité hub (Stories 6.2-6.4) */}
+      <Link
+        href="/profil/confidentialite"
+        className="block relative rounded-2xl bg-white shadow-sm overflow-hidden border border-neutral-100 hover:shadow-md transition-shadow"
+      >
+        <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+        <div className="p-5 flex items-center gap-3">
+          <span className="w-11 h-11 rounded-xl bg-info-100 text-info-500 flex items-center justify-center shrink-0">
+            <Shield className="w-5 h-5" aria-hidden="true" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-body-md font-semibold text-neutral-900">
+              Confidentialité &amp; RGPD
+            </p>
+            <p className="text-caption text-neutral-600 mt-0.5">
+              Consentements granulaires, export de tes données, suppression de compte.
+            </p>
           </div>
-          <a
-            href="/profil/supprimer"
-            className="inline-flex items-center justify-center rounded-md border border-error-500 px-4 py-2.5 text-body-sm font-semibold text-error-500 hover:bg-error-100/50 transition-colors min-h-[44px]"
-          >
-            Supprimer mon compte
-          </a>
+          <ChevronRight className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
         </div>
-      </section>
+      </Link>
     </div>
   );
 }

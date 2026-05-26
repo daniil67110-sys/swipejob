@@ -19,6 +19,9 @@ export * from './push-subscriptions.js';
 export * from './notification-events.js';
 export * from './user-badges.js';
 export * from './referrals.js';
+export * from './user-consents.js';
+export * from './rgpd-exports.js';
+export * from './restoration-tokens.js';
 
 import { accounts } from './accounts.js';
 import { applicationEvents, applications, watchlist } from './applications.js';
@@ -35,7 +38,10 @@ import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
 import { pushSubscriptions } from './push-subscriptions.js';
 import { referralCodes, referrals } from './referrals.js';
+import { restorationTokens } from './restoration-tokens.js';
+import { rgpdExports } from './rgpd-exports.js';
 import { userBadges } from './user-badges.js';
+import { userConsents } from './user-consents.js';
 import { schools } from './schools.js';
 import { sessions } from './sessions.js';
 import { swipeEvents } from './swipe-events.js';
@@ -67,6 +73,9 @@ export const schema = {
   userBadges,
   referralCodes,
   referrals,
+  userConsents,
+  rgpdExports,
+  restorationTokens,
 } as const;
 
 export type Schema = typeof schema;

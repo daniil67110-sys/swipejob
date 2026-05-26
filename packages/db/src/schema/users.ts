@@ -54,6 +54,13 @@ export const users = pgTable(
     birthDate: date('birth_date'),
     consentStatus: consentStatus('consent_status').notNull().default('PENDING'),
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'date' }),
+    /**
+     * Story 6.4 — Marqueur d'exécution effective de la purge RGPD.
+     * Après `purgedAt`, la row est anonymisée (email/name/etc. clearés) et
+     * référence uniquement les audit logs hashés. `deletedAt` indique la demande,
+     * `purgedAt` l'exécution physique (30j plus tard ou immédiat post-rétractation expirée).
+     */
+    purgedAt: timestamp('purged_at', { withTimezone: true, mode: 'date' }),
     // Story 2.8 : embedding profil utilisateur pour matching cosine.
     profileEmbedding: vector1024('profile_embedding'),
     embeddingComputedAt: timestamp('embedding_computed_at', { withTimezone: true, mode: 'date' }),

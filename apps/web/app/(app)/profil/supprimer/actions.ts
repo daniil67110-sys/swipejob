@@ -11,6 +11,8 @@ import { sendAccountDeletionEmail } from '@/lib/email';
 import { enqueueRgpdDelete } from '@/lib/queue';
 import { accountDeletionRateLimit } from '@/lib/rate-limit';
 import { serverLogger as logger } from '@/lib/logger.server';
+import { env } from '@/lib/env';
+import { createRestorationToken } from '@/lib/restoration-tokens';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -93,8 +95,8 @@ export async function requestAccountDeletionAction(rawInput: {
       metadata: { method: 'self_service' },
     });
 
-    // Enqueue rgpd.delete (Story 2.1 — délai 30j via job.delay). L'effective
-    // purge des données est implémentée par le worker en Story 6.5.
+    // Enqueue rgpd.delete (délai 30j). Le worker (Story 6.4) purge les PII,
+    // anonymise audit_logs + ia_audit_logs et supprime les fichiers R2.
     const enqueued = await enqueueRgpdDelete({ userId });
     if (!enqueued.ok) {
       logger.warn({ err: enqueued.error, userId }, 'rgpd-delete enqueue failed');
@@ -102,8 +104,18 @@ export async function requestAccountDeletionAction(rawInput: {
       logger.warn({ userId }, 'rgpd-delete enqueued in mock mode (REDIS_URL absent)');
     }
 
-    // Email confirmation (mode mock OK)
-    await sendAccountDeletionEmail({ to: user.email });
+    // Story 6.4 — Token de rétractation 7j envoyé par email.
+    const { plainToken, expiresAt: restoreExpiresAt } = await createRestorationToken(userId);
+    const baseUrl = env.SITE_URL.replace(/\/$/, '');
+    const restoreUrl = `${baseUrl}/rgpd/restaurer/${plainToken}`;
+    const scheduledFor = new Date(Date.now() + 30 * 24 * 3600 * 1000);
+
+    await sendAccountDeletionEmail({
+      to: user.email,
+      restoreUrl,
+      scheduledFor,
+      restoreExpiresAt,
+    });
 
     return { ok: true, data: { redirectTo: '/' } };
   } catch (err) {

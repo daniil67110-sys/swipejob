@@ -70,6 +70,13 @@ const envSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
+
+  // Story 6.4 — HMAC secret pour anonymiser actor_id dans audit_logs après purge RGPD.
+  // En prod : doit être défini (>= 32 chars). En dev : fallback OK.
+  AUDIT_USER_HASH_SECRET: isProduction
+    ? z.string().min(32, 'AUDIT_USER_HASH_SECRET must be ≥32 chars in production').optional()
+    : z.string().optional(),
+  AUTH_SECRET: z.string().optional(),
 });
 
 export type WorkerEnv = z.infer<typeof envSchema>;

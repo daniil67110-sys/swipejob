@@ -3,48 +3,40 @@ import * as Sentry from '@sentry/node';
 import { getRedisConnection } from '../lib/redis.js';
 import { getFailedJobsQueue, QUEUE_NAMES } from '../queues/index.js';
 import logger from '../lib/logger.js';
-import { processRgpdDeleteJob as processPurge } from '../jobs/rgpd-delete.job.js';
+import { processRgpdExportJob } from '../jobs/rgpd-export.job.js';
 
 let worker: Worker | null = null;
 
-/**
- * Worker `rgpd-delete` (Stories 1.10 + 6.4).
- *
- * Reçoit le job posé par requestAccountDeletionAction avec un délai de 30j.
- * Délègue à `processRgpdDeleteJob` qui purge les rows + R2 + anonymise les
- * audit logs, sauf si l'utilisateur a entre-temps annulé via /rgpd/restaurer.
- */
-
 async function handle(job: Job): Promise<{ ok: true; jobId: string; result: unknown }> {
   const userId = job.data?.userId as string | undefined;
-  if (!userId) {
-    throw new Error('rgpd-delete job missing userId in payload');
+  const exportId = job.data?.exportId as string | undefined;
+  if (!userId || !exportId) {
+    throw new Error('rgpd-export job missing userId/exportId');
   }
-  logger.info({ jobId: job.id, userId }, 'rgpd-delete job received');
-  const result = await processPurge(userId);
+  logger.info({ jobId: job.id, userId, exportId }, 'rgpd-export job received');
+  const result = await processRgpdExportJob({ userId, exportId });
   return { ok: true, jobId: job.id ?? 'unknown', result };
 }
 
-export async function startRgpdDeleteWorker(): Promise<Worker | null> {
+export async function startRgpdExportWorker(): Promise<Worker | null> {
   if (worker) return worker;
   const connection = getRedisConnection();
   if (!connection) {
-    logger.warn('REDIS_URL absent — rgpd-delete worker non démarré');
+    logger.warn('REDIS_URL absent — rgpd-export worker non démarré');
     return null;
   }
-
-  worker = new Worker(QUEUE_NAMES.RGPD_DELETE, handle, { connection });
+  worker = new Worker(QUEUE_NAMES.RGPD_EXPORT, handle, { connection });
 
   worker.on('failed', async (job, err) => {
-    logger.error({ jobId: job?.id, err }, 'rgpd-delete job failed');
+    logger.error({ jobId: job?.id, err }, 'rgpd-export job failed');
     if (job && job.attemptsMade >= (job.opts.attempts ?? 3)) {
       Sentry.captureException(err, {
-        tags: { queue: QUEUE_NAMES.RGPD_DELETE, jobName: job.name },
+        tags: { queue: QUEUE_NAMES.RGPD_EXPORT, jobName: job.name },
       });
       const failedQueue = getFailedJobsQueue();
       if (failedQueue) {
         await failedQueue.add('archived', {
-          originalQueue: QUEUE_NAMES.RGPD_DELETE,
+          originalQueue: QUEUE_NAMES.RGPD_EXPORT,
           jobName: job.name,
           payload: job.data,
           errorMessage: err.message,
@@ -55,11 +47,11 @@ export async function startRgpdDeleteWorker(): Promise<Worker | null> {
     }
   });
 
-  logger.info('rgpd-delete worker started');
+  logger.info('rgpd-export worker started');
   return worker;
 }
 
-export async function stopRgpdDeleteWorker(): Promise<void> {
+export async function stopRgpdExportWorker(): Promise<void> {
   if (!worker) return;
   await worker.close();
   worker = null;

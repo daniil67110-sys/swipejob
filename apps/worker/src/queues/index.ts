@@ -24,6 +24,7 @@ export const QUEUE_NAMES = {
   MATCH_COMPUTE: 'match-compute',
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
+  RGPD_EXPORT: 'rgpd-export',
   APPLICATION_PROCESS: 'application-process',
   // Epic 4 — notifications + coach
   NOTIFICATIONS_DIGEST: 'notifications-digest',
@@ -76,6 +77,9 @@ export function getCvParseQueue() {
 }
 export function getRgpdDeleteQueue() {
   return getQueue(QUEUE_NAMES.RGPD_DELETE);
+}
+export function getRgpdExportQueue() {
+  return getQueue(QUEUE_NAMES.RGPD_EXPORT);
 }
 export function getApplicationProcessQueue() {
   return getQueue(QUEUE_NAMES.APPLICATION_PROCESS);
