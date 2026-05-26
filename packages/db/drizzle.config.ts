@@ -29,6 +29,7 @@ export default defineConfig({
     './src/schema/interview-preps.ts',
     './src/schema/push-subscriptions.ts',
     './src/schema/notification-events.ts',
+    './src/schema/user-badges.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

@@ -1,10 +1,21 @@
+import Link from 'next/link';
 import { eq } from 'drizzle-orm';
 import { desc } from 'drizzle-orm';
-import { AlertTriangle, BookOpen, FileText, Pencil, Search, User as UserIcon } from 'lucide-react';
+import {
+  AlertTriangle,
+  BookOpen,
+  ChevronRight,
+  FileText,
+  Pencil,
+  Search,
+  Trophy,
+  User as UserIcon,
+} from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { db, isDatabaseConfigured } from '@/lib/db';
-import { cvs, preferences, profiles, users } from '@swipejob/db/schema';
+import { cvs, preferences, profiles, userBadges, users } from '@swipejob/db/schema';
 import type { LucideIcon } from 'lucide-react';
+import { BADGE_CATALOG } from '@/lib/badges';
 
 export default async function ProfilPage() {
   const session = await requireVerifiedAuth({});
@@ -19,7 +30,7 @@ export default async function ProfilPage() {
     );
   }
 
-  const [userRows, profileRows, prefRows, cvRows] = await Promise.all([
+  const [userRows, profileRows, prefRows, cvRows, badgeRows] = await Promise.all([
     db
       .select({ email: users.email, name: users.name, createdAt: users.createdAt })
       .from(users)
@@ -33,12 +44,18 @@ export default async function ProfilPage() {
       .where(eq(cvs.userId, userId))
       .orderBy(desc(cvs.version))
       .limit(1),
+    db
+      .select({ badgeCode: userBadges.badgeCode })
+      .from(userBadges)
+      .where(eq(userBadges.userId, userId)),
   ]);
 
   const user = userRows[0];
   const profile = profileRows[0];
   const pref = prefRows[0];
   const cv = cvRows[0];
+  const unlockedBadgeCount = badgeRows.length;
+  const totalBadges = BADGE_CATALOG.length;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-24">
@@ -58,6 +75,27 @@ export default async function ProfilPage() {
           Tes informations personnelles et préférences de recherche.
         </p>
       </header>
+
+      {/* Badges shortcut */}
+      <Link
+        href="/profil/badges"
+        className="block relative rounded-2xl overflow-hidden bg-gradient-to-r from-accent-500 via-primary-500 to-info-500 text-white shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div className="p-5 flex items-center gap-4">
+          <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+            <Trophy className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+              Mes badges
+            </p>
+            <p className="text-heading-md font-semibold leading-tight">
+              {unlockedBadgeCount} / {totalBadges} débloqué{unlockedBadgeCount > 1 ? 's' : ''}
+            </p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
+        </div>
+      </Link>
 
       <Section
         title="Identité"

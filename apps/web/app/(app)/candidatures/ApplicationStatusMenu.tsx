@@ -17,6 +17,7 @@ import { updateApplicationStatusAction } from './actions';
 import { ReportSignatureModal } from './ReportSignatureModal';
 import { MANUAL_STATUSES, statusLabel, type ApplicationStatus, type ManualStatus } from './lib';
 import { StatusBadge } from './StatusBadge';
+import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 
 const PICKABLE: ManualStatus[] = MANUAL_STATUSES.filter((s) => s !== 'signed') as ManualStatus[];
 
@@ -28,6 +29,7 @@ export function ApplicationStatusMenu({
   status: ApplicationStatus;
 }) {
   const router = useRouter();
+  const { trigger: triggerBadgeUnlock } = useBadgeUnlock();
   const [isPending, startTransition] = useTransition();
   const [interviewModalOpen, setInterviewModalOpen] = useState(false);
   const [signatureOpen, setSignatureOpen] = useState(false);
@@ -49,6 +51,7 @@ export function ApplicationStatusMenu({
         setError(res.error.message);
         return;
       }
+      if (res.data.unlockedBadges?.length) triggerBadgeUnlock(res.data.unlockedBadges);
       router.refresh();
     });
   };

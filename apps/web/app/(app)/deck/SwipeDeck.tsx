@@ -6,6 +6,7 @@ import { Bookmark, Heart, PartyPopper, Sparkles, X } from 'lucide-react';
 import { SwipeCard, UndoToast, type SwipeCardData } from './SwipeCard';
 import { OfferDetailModal } from './OfferDetailModal';
 import { swipeOfferAction } from './swipe-actions';
+import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 
 export function SwipeDeck({
   offers,
@@ -15,6 +16,7 @@ export function SwipeDeck({
   showExplanation: boolean;
 }) {
   const router = useRouter();
+  const { trigger: triggerBadgeUnlock } = useBadgeUnlock();
   const [index, setIndex] = useState(0);
   const [detailOffer, setDetailOffer] = useState<SwipeCardData | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
@@ -35,6 +37,7 @@ export function SwipeDeck({
         return;
       }
       if (res.data.applicationId) setUndo(res.data.applicationId);
+      if (res.data.unlockedBadges?.length) triggerBadgeUnlock(res.data.unlockedBadges);
       setIndex((i) => Math.min(i + 1, total));
       startTransition(() => router.refresh());
     });

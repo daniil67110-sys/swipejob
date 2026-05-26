@@ -16,6 +16,7 @@ import { captureServer, hashUserId } from '@/lib/analytics';
 import { enqueueApplicationProcess } from '@/lib/queue';
 import { isOverQuota, getDailyQuota } from '@/lib/swipe-quota';
 import { serverLogger as logger } from '@/lib/logger.server';
+import { checkAndUnlockBadges, type BadgeDef } from '@/lib/badges';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -45,6 +46,8 @@ export async function swipeOfferAction(rawInput: {
     direction: 'left' | 'right' | 'up';
     applicationId?: string;
     quotaLeft?: number;
+    /** Story 5.2 — badges débloqués par cette action (à afficher côté client). */
+    unlockedBadges?: BadgeDef[];
   }>
 > {
   const session = await auth();
@@ -87,7 +90,8 @@ export async function swipeOfferAction(rawInput: {
         targetId: offerId,
         metadata: { direction },
       });
-      return { ok: true, data: { direction } };
+      const unlockedBadges = await checkAndUnlockBadges(userId);
+      return { ok: true, data: { direction, unlockedBadges } };
     }
 
     if (direction === 'up') {
@@ -101,7 +105,8 @@ export async function swipeOfferAction(rawInput: {
         targetId: offerId,
         metadata: { direction },
       });
-      return { ok: true, data: { direction } };
+      const unlockedBadges = await checkAndUnlockBadges(userId);
+      return { ok: true, data: { direction, unlockedBadges } };
     }
 
     // direction === 'right' : flow candidature
@@ -172,7 +177,8 @@ export async function swipeOfferAction(rawInput: {
       metadata: { direction, applicationId },
     });
 
-    return { ok: true, data: { direction, applicationId } };
+    const unlockedBadges = await checkAndUnlockBadges(userId);
+    return { ok: true, data: { direction, applicationId, unlockedBadges } };
   } catch (err) {
     logger.error({ err, userId, offerId, direction }, 'swipeOfferAction failed');
     return { ok: false, error: { code: 'INTERNAL_ERROR', message: 'Erreur. Réessaie.' } };
