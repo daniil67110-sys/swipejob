@@ -95,6 +95,8 @@ export async function enqueueMatchComputeFirst(payload: {
 
 export async function enqueueApplicationProcess(payload: {
   applicationId: string;
+  /** Story 3.7 — relance après revue user : skip regen + skip review gate. */
+  skipReview?: boolean;
 }): Promise<EnqueueResult> {
   const q = getQueue(QUEUE_NAMES.APPLICATION_PROCESS);
   if (!q) {

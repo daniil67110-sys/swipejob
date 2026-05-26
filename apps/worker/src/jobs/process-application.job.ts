@@ -19,19 +19,30 @@ export type ProcessApplicationResult =
   | { ok: true; applicationId: string; finalStatus: string }
   | { ok: false; error: string };
 
+export type ProcessApplicationOptions = {
+  /**
+   * Story 3.7 — relance le pipeline pour envoyer une lettre déjà éditée par l'user.
+   * Skip la génération si coverLetterText existe + skip le gate reviewBeforeSend.
+   */
+  skipReview?: boolean;
+};
+
 /**
  * Job complet d'application (Stories 3.5 + 3.6 + 3.7).
  *
  * Lifecycle :
  *  1. Récup application + user + offer + cv + preferences
- *  2. Genère lettre via Mistral (fallback template)
+ *  2. Genère lettre via Mistral (fallback template), sauf si options.skipReview + texte déjà set
  *  3. UPDATE applications.coverLetterText + status
- *  4. Si preferences.reviewBeforeSend → status='pending_review', stop (Story 3.7)
+ *  4. Si preferences.reviewBeforeSend && !options.skipReview → status='pending_review', stop (Story 3.7)
  *  5. Sinon : download CV R2 + send email Resend
  *  6. UPDATE status='sent' + sentAt
  *  7. ia_audit_logs row (Story 3.5 NFR-F2) + application_events
  */
-export async function processApplication(applicationId: string): Promise<ProcessApplicationResult> {
+export async function processApplication(
+  applicationId: string,
+  options: ProcessApplicationOptions = {},
+): Promise<ProcessApplicationResult> {
   if (!isDatabaseConfigured) {
     return { ok: false, error: 'DATABASE_URL absent' };
   }
@@ -42,6 +53,8 @@ export async function processApplication(applicationId: string): Promise<Process
       .select({
         applicationId: applications.id,
         applicationStatus: applications.status,
+        existingCoverLetterText: applications.coverLetterText,
+        existingCoverLetterStatus: applications.coverLetterStatus,
         userId: users.id,
         userEmail: users.email,
         firstName: profiles.firstName,
@@ -77,52 +90,67 @@ export async function processApplication(applicationId: string): Promise<Process
 
     const studentName = [app.firstName, app.lastName].filter(Boolean).join(' ') || app.userEmail;
 
-    // 2. Generate cover letter
-    const letterRes = await generateCoverLetter({
-      studentName,
-      studentSkills: Array.isArray(app.skills) ? app.skills : [],
-      studentHeadline: app.headline,
-      studentSummary: app.summary,
-      jobTitle: app.offerTitle,
-      companyName: app.offerCompany ?? 'l’entreprise',
-      jobDescription: app.offerDescription,
-      jobCity: app.offerCity,
-    });
+    // 2. Generate cover letter — sauf si l'app a déjà un texte (Story 3.7 send après review).
+    let letterText: string;
+    if (options.skipReview && app.existingCoverLetterText) {
+      letterText = app.existingCoverLetterText;
+      logger.info(
+        { applicationId },
+        'Skip regeneration — using user-edited cover letter (Story 3.7 send)',
+      );
+      await db
+        .update(applications)
+        .set({ status: 'letter_generated' })
+        .where(eq(applications.id, applicationId));
+    } else {
+      const letterRes = await generateCoverLetter({
+        studentName,
+        studentSkills: Array.isArray(app.skills) ? app.skills : [],
+        studentHeadline: app.headline,
+        studentSummary: app.summary,
+        jobTitle: app.offerTitle,
+        companyName: app.offerCompany ?? 'l’entreprise',
+        jobDescription: app.offerDescription,
+        jobCity: app.offerCity,
+      });
+      letterText = letterRes.text;
 
-    // 3. Update application + audit log
-    await db
-      .update(applications)
-      .set({
-        coverLetterText: letterRes.text,
-        coverLetterStatus: letterRes.status,
-        status: app.reviewBeforeSend ? 'pending_review' : 'letter_generated',
-      })
-      .where(eq(applications.id, applicationId));
+      // 3. Update application + audit log
+      const shouldReview = app.reviewBeforeSend && !options.skipReview;
+      await db
+        .update(applications)
+        .set({
+          coverLetterText: letterRes.text,
+          coverLetterStatus: letterRes.status,
+          status: shouldReview ? 'pending_review' : 'letter_generated',
+        })
+        .where(eq(applications.id, applicationId));
 
-    await db.insert(applicationEvents).values({
-      applicationId,
-      event: 'letter_generated',
-      metadata: JSON.stringify({ status: letterRes.status, model: letterRes.meta.model }),
-    });
+      await db.insert(applicationEvents).values({
+        applicationId,
+        event: 'letter_generated',
+        metadata: JSON.stringify({ status: letterRes.status, model: letterRes.meta.model }),
+      });
 
-    await db.insert(iaAuditLogs).values({
-      userId: app.userId,
-      model: letterRes.meta.model,
-      provider: letterRes.meta.provider,
-      promptHash: letterRes.meta.promptHash,
-      featureType: 'cover_letter',
-      latencyMs: letterRes.meta.latencyMs,
-      tokensInput: letterRes.meta.tokensInput,
-      tokensOutput: letterRes.meta.tokensOutput,
-      success: letterRes.meta.success,
-      errorCode: letterRes.meta.success ? null : 'mistral_fallback',
-      metadata: { applicationId, jobTitle: app.offerTitle, fallback: !letterRes.meta.success },
-    });
+      await db.insert(iaAuditLogs).values({
+        userId: app.userId,
+        model: letterRes.meta.model,
+        provider: letterRes.meta.provider,
+        promptHash: letterRes.meta.promptHash,
+        featureType: 'cover_letter',
+        latencyMs: letterRes.meta.latencyMs,
+        tokensInput: letterRes.meta.tokensInput,
+        tokensOutput: letterRes.meta.tokensOutput,
+        success: letterRes.meta.success,
+        errorCode: letterRes.meta.success ? null : 'mistral_fallback',
+        metadata: { applicationId, jobTitle: app.offerTitle, fallback: !letterRes.meta.success },
+      });
 
-    // 4. Si reviewBeforeSend → stop (Story 3.7 — user va éditer + envoyer manuellement)
-    if (app.reviewBeforeSend) {
-      logger.info({ applicationId }, 'Application pending review (Story 3.7)');
-      return { ok: true, applicationId, finalStatus: 'pending_review' };
+      // 4. Si reviewBeforeSend && pas skipReview → stop (Story 3.7 — user va éditer + envoyer manuellement)
+      if (shouldReview) {
+        logger.info({ applicationId }, 'Application pending review (Story 3.7)');
+        return { ok: true, applicationId, finalStatus: 'pending_review' };
+      }
     }
 
     // 5. Pas de mail si contactEmail manquant (V1 limitation : Story 3.10b mieux V2)
@@ -158,7 +186,7 @@ export async function processApplication(applicationId: string): Promise<Process
       studentName,
       jobTitle: app.offerTitle,
       companyName: app.offerCompany ?? 'l’entreprise',
-      letterText: letterRes.text,
+      letterText,
       cvBuffer,
       cvFilename,
     });

@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./src/client.ts",
   "exports": {
-    ".": "./src/client.ts"
+    ".": "./src/client.ts",
+    "./cover-letter": "./src/cover-letter.ts"
   },
   "scripts": {
     "lint": "eslint .",

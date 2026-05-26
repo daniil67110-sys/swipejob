@@ -19,6 +19,7 @@
     "@sentry/node": "^10.53.1",
     "@sentry/profiling-node": "^10.53.1",
     "@swipejob/db": "workspace:*",
+    "@swipejob/llm": "workspace:*",
     "@swipejob/types": "workspace:*",
     "bullmq": "^5.53.3",
     "dotenv": "^17.4.2",
