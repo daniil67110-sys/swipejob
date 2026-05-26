@@ -15,6 +15,7 @@ const PROTECTED_PREFIXES = [
   '/profil',
   '/parametres',
   '/coach',
+  '/wrapped',
 ];
 
 /**
