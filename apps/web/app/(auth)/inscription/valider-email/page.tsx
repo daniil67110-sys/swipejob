@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { redirect } from 'next/navigation';
 import { eq, and } from 'drizzle-orm';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { users, verificationTokens } from '@swipejob/db/schema';
 import { createDatabaseSession } from '@/lib/session';
@@ -9,6 +9,11 @@ import { getClientIp, verifyEmailRateLimit } from '@/lib/rate-limit';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { serverLogger as logger } from '@/lib/logger.server';
+import {
+  REFERRAL_COOKIE_NAME,
+  attributeReferralAtSignup,
+  sanitizeReferralCode,
+} from '@/lib/referrals';
 
 type Outcome = 'invalid' | 'expired' | 'rate_limited' | 'not_configured';
 
@@ -158,6 +163,15 @@ export default async function ValiderEmailPage(props: {
     targetId: userRow.id,
     metadata: { method: 'magic_link' },
   });
+
+  // Story 5.3 — attribution parrainage si cookie présent
+  const jar = await cookies();
+  const refCookie = jar.get(REFERRAL_COOKIE_NAME);
+  const code = sanitizeReferralCode(refCookie?.value);
+  if (code) {
+    await attributeReferralAtSignup({ refereeUserId: userRow.id, code });
+    jar.delete(REFERRAL_COOKIE_NAME);
+  }
 
   redirect('/etape-1-cv');
 }

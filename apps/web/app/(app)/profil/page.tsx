@@ -8,6 +8,7 @@ import {
   FileText,
   Pencil,
   Search,
+  Sparkles,
   Trophy,
   User as UserIcon,
 } from 'lucide-react';
@@ -76,26 +77,46 @@ export default async function ProfilPage() {
         </p>
       </header>
 
-      {/* Badges shortcut */}
-      <Link
-        href="/profil/badges"
-        className="block relative rounded-2xl overflow-hidden bg-gradient-to-r from-accent-500 via-primary-500 to-info-500 text-white shadow-md hover:shadow-lg transition-shadow"
-      >
-        <div className="p-5 flex items-center gap-4">
-          <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-            <Trophy className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
-              Mes badges
-            </p>
-            <p className="text-heading-md font-semibold leading-tight">
-              {unlockedBadgeCount} / {totalBadges} débloqué{unlockedBadgeCount > 1 ? 's' : ''}
-            </p>
+      {/* Engagement shortcuts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link
+          href="/profil/badges"
+          className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-accent-500 via-primary-500 to-info-500 text-white shadow-md hover:shadow-lg transition-shadow"
+        >
+          <div className="p-5 flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+              <Trophy className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+                Mes badges
+              </p>
+              <p className="text-heading-md font-semibold leading-tight">
+                {unlockedBadgeCount} / {totalBadges} débloqué{unlockedBadgeCount > 1 ? 's' : ''}
+              </p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
           </div>
-          <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
-        </div>
-      </Link>
+        </Link>
+
+        <Link
+          href="/profil/parrainage"
+          className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-info-500 via-primary-500 to-success-500 text-white shadow-md hover:shadow-lg transition-shadow"
+        >
+          <div className="p-5 flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+              <Sparkles className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+                Parrainage
+              </p>
+              <p className="text-heading-md font-semibold leading-tight">Inviter mes amis</p>
+            </div>
+            <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
+          </div>
+        </Link>
+      </div>
 
       <Section
         title="Identité"
