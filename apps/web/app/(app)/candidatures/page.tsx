@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { Briefcase, Calendar, Inbox, MapPin, PartyPopper, Send } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { CompanyLogo } from '@/components/shared/CompanyLogo';
-import { listApplicationsAction } from './actions';
+import { listApplicationsAction, listPendingReviewAction } from './actions';
 import { ApplicationsFilters } from './ApplicationsFilters';
 import { ApplicationStatusMenu } from './ApplicationStatusMenu';
 import { InterviewPrepCard } from './InterviewPrepCard';
+import { PendingReviewSection } from './PendingReviewSection';
 import { StatusBadge } from './StatusBadge';
 import { formatDateFr, type ApplicationStatus } from './lib';
 
@@ -26,7 +27,10 @@ export default async function CandidaturesPage({
       ? params.sort
       : 'last_activity_desc';
 
-  const res = await listApplicationsAction({ statuses, sort });
+  const [res, pendingRes] = await Promise.all([
+    listApplicationsAction({ statuses, sort }),
+    listPendingReviewAction(),
+  ]);
   if (!res.ok) {
     return (
       <div className="mx-auto max-w-3xl p-8">
@@ -35,6 +39,7 @@ export default async function CandidaturesPage({
     );
   }
   const { items, total } = res.data;
+  const pendingReviewItems = pendingRes.ok ? pendingRes.data.items : [];
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 p-6">
@@ -74,6 +79,8 @@ export default async function CandidaturesPage({
           </div>
         </div>
       ) : null}
+
+      <PendingReviewSection items={pendingReviewItems} />
 
       <ApplicationsFilters />
 

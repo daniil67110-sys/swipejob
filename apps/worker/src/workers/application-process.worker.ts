@@ -10,8 +10,9 @@ let worker: Worker | null = null;
 async function handle(job: Job): Promise<{ ok: true; jobId: string; result: unknown }> {
   logger.info({ jobId: job.id, name: job.name }, 'application-process job received');
   const applicationId = job.data?.applicationId as string | undefined;
+  const skipReview = Boolean(job.data?.skipReview);
   if (!applicationId) throw new Error('application-process job missing applicationId');
-  const result = await processApplication(applicationId);
+  const result = await processApplication(applicationId, { skipReview });
   return { ok: true, jobId: job.id ?? 'unknown', result };
 }
 

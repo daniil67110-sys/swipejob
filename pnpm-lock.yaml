@@ -107,6 +107,9 @@ importers:
       '@swipejob/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@swipejob/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@swipejob/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -258,6 +261,9 @@ importers:
       '@swipejob/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@swipejob/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@swipejob/types':
         specifier: workspace:*
         version: link:../../packages/types

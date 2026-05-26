@@ -108,9 +108,13 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
       <fieldset className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-0 p-4">
         <legend className="px-1 text-sm font-semibold">Candidatures</legend>
         <Row>
-          <Label htmlFor="reviewBeforeSend" className="flex-1">
-            Relire ma lettre avant envoi (Story 3.7)
-          </Label>
+          <div className="flex-1 space-y-0.5">
+            <Label htmlFor="reviewBeforeSend">Relire ma lettre avant envoi</Label>
+            <p className="text-xs text-neutral-500">
+              Tu pourras éditer ou régénérer chaque lettre IA avant qu&apos;elle parte. Sinon, swipe
+              = envoi direct.
+            </p>
+          </div>
           <Switch
             id="reviewBeforeSend"
             checked={state.reviewBeforeSend}
