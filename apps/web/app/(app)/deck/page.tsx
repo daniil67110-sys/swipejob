@@ -1,5 +1,6 @@
 import { Lightbulb, Sparkles, Target } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
+import { env } from '@/lib/env';
 import { getDailyDeck } from './actions';
 import { SwipeDeck } from './SwipeDeck';
 import { DailyStreak } from '@/components/engagement/DailyStreak';
@@ -58,7 +59,7 @@ export default async function DeckPage() {
         </div>
       ) : null}
 
-      <SwipeDeck offers={deck.offers} showExplanation={!deck.fallback} />
+      <SwipeDeck offers={deck.offers} showExplanation={!deck.fallback} siteUrl={env.SITE_URL} />
     </div>
   );
 }

@@ -84,6 +84,8 @@ export const offers = pgTable(
     // Story 2.6 : status enum. is_active gardé pour rétrocompat — sync par le job.
     status: offerStatus('status').notNull().default('active'),
     isActive: boolean('is_active').notNull().default(true),
+    // Story 5.4 : compteur anonyme de partages (incrément server-side).
+    shareCount: integer('share_count').notNull().default(0),
     ...timestamps,
   },
   (table) => [
