@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1048.0",
+    "@aws-sdk/s3-request-presigner": "^3.1048.0",
     "@axiomhq/pino": "^1.6.1",
     "@hono/node-server": "^1.14.2",
     "@mistralai/mistralai": "^2.2.1",
@@ -26,6 +27,7 @@
     "drizzle-orm": "^0.41.0",
     "hono": "^4.7.10",
     "ioredis": "^5.6.1",
+    "pdfkit": "^0.15.0",
     "pino": "^9.6.0",
     "resend": "^6.12.3",
     "tsx": "^4.19.4",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@swipejob/config": "workspace:*",
     "@types/node": "^22.15.3",
+    "@types/pdfkit": "^0.13.4",
     "@types/web-push": "^3.6.4",
     "eslint": "^9.27.0",
     "pino-pretty": "^13.0.0",

@@ -73,6 +73,10 @@ export const accountDeletionRateLimit: Limiter = redis
   ? makeLimiter(redis, 1, 3600, 'sj:rl:account-deletion')
   : makeNoop();
 
+export const rgpdExportRateLimit: Limiter = redis
+  ? makeLimiter(redis, 1, 24 * 3600, 'sj:rl:rgpd-export')
+  : makeNoop();
+
 export const schoolsSearchRateLimit: Limiter = redis
   ? makeLimiter(redis, 30, 60, 'sj:rl:schools-search')
   : makeNoop();

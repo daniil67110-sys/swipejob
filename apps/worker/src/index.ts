@@ -23,6 +23,7 @@ import {
 import { startMatchComputeWorker, stopMatchComputeWorker } from './workers/match-compute.worker.js';
 import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker.js';
 import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
+import { startRgpdExportWorker, stopRgpdExportWorker } from './workers/rgpd-export.worker.js';
 import {
   startApplicationProcessWorker,
   stopApplicationProcessWorker,
@@ -105,6 +106,7 @@ try {
       startMatchComputeWorker(),
       startCvParseWorker(),
       startRgpdDeleteWorker(),
+      startRgpdExportWorker(),
       startApplicationProcessWorker(),
       startNotificationsDigestWorker(),
       startNotificationsPushWorker(),
@@ -141,6 +143,7 @@ function shutdown(signal: string) {
     stopMatchComputeWorker(),
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
+    stopRgpdExportWorker(),
     stopApplicationProcessWorker(),
     stopNotificationsDigestWorker(),
     stopNotificationsPushWorker(),

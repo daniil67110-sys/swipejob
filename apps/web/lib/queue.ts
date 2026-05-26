@@ -15,6 +15,7 @@ import { serverLogger as logger } from './logger.server';
 export const QUEUE_NAMES = {
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
+  RGPD_EXPORT: 'rgpd-export',
   OFFER_INGEST: 'offer-ingest',
   MATCH_COMPUTE: 'match-compute',
   APPLICATION_PROCESS: 'application-process',
@@ -108,6 +109,24 @@ export async function enqueueApplicationProcess(payload: {
     return { ok: true, jobId: job.id ?? 'unknown' };
   } catch (err) {
     logger.error({ err, payload }, 'application-process enqueue failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
+export async function enqueueRgpdExport(payload: {
+  userId: string;
+  exportId: string;
+}): Promise<EnqueueResult> {
+  const q = getQueue(QUEUE_NAMES.RGPD_EXPORT);
+  if (!q) {
+    logger.warn({ ...payload }, 'rgpd-export enqueue mock (REDIS_URL absent)');
+    return { ok: true, jobId: null, mock: true };
+  }
+  try {
+    const job = await q.add('export', payload, { priority: 4 });
+    return { ok: true, jobId: job.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, payload }, 'rgpd-export enqueue failed');
     return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
   }
 }
