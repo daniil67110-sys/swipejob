@@ -11,9 +11,11 @@ import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 export function SwipeDeck({
   offers,
   showExplanation,
+  siteUrl,
 }: {
   offers: SwipeCardData[];
   showExplanation: boolean;
+  siteUrl: string;
 }) {
   const router = useRouter();
   const { trigger: triggerBadgeUnlock } = useBadgeUnlock();
@@ -187,7 +189,11 @@ export function SwipeDeck({
       </div>
 
       {detailOffer ? (
-        <OfferDetailModal offer={detailOffer} onClose={() => setDetailOffer(null)} />
+        <OfferDetailModal
+          offer={detailOffer}
+          siteUrl={siteUrl}
+          onClose={() => setDetailOffer(null)}
+        />
       ) : null}
       {undo ? <UndoToast applicationId={undo} onDismiss={() => setUndo(null)} /> : null}
     </>
