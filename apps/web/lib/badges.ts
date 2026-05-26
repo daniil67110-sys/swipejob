@@ -1,7 +1,7 @@
 import 'server-only';
 import { and, count, eq, inArray, sql } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from '@/lib/db';
-import { applications, swipeEvents, userBadges } from '@swipejob/db/schema';
+import { applications, referrals, swipeEvents, userBadges } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
 import { captureServer, hashUserId } from '@/lib/analytics';
 import { computeUserStreak } from '@/lib/streaks';
@@ -14,7 +14,7 @@ import { computeUserStreak } from '@/lib/streaks';
  * empêche les doublons et le created_at reflète le moment d'origine).
  */
 
-export type BadgeCategory = 'milestone' | 'streak' | 'volume';
+export type BadgeCategory = 'milestone' | 'streak' | 'volume' | 'social';
 
 export type BadgeDef = {
   code: string;
@@ -99,6 +99,14 @@ export const BADGE_CATALOG: readonly BadgeDef[] = [
     category: 'volume',
     color: 'success',
   },
+  {
+    code: 'first_referral',
+    title: 'Premier parrainage',
+    description: 'Un de tes potes a rejoint SwipeJob grâce à toi.',
+    emoji: '🤝',
+    category: 'social',
+    color: 'accent',
+  },
 ] as const;
 
 export type BadgeCode = (typeof BADGE_CATALOG)[number]['code'];
@@ -162,6 +170,15 @@ export async function checkAndUnlockBadges(userId: string): Promise<BadgeDef[]> 
   const streakNeeded = ['streak_7', 'streak_30'].some((c) => !acquired.has(c));
   const streak = streakNeeded ? await computeUserStreak(userId) : { current: 0, longest: 0 };
 
+  let validatedReferrals = 0;
+  if (!acquired.has('first_referral')) {
+    const [refStats] = await db
+      .select({ n: count() })
+      .from(referrals)
+      .where(and(eq(referrals.referrerUserId, userId), sql`${referrals.validatedAt} IS NOT NULL`));
+    validatedReferrals = Number(refStats?.n ?? 0);
+  }
+
   // 3. Évalue chaque badge
   const toUnlock: BadgeDef[] = [];
   const consider = (code: BadgeCode, condition: boolean) => {
@@ -180,6 +197,7 @@ export async function checkAndUnlockBadges(userId: string): Promise<BadgeDef[]> 
   consider('streak_30', streak.longest >= 30);
   consider('apps_10', totalApplications >= 10);
   consider('apps_50', totalApplications >= 50);
+  consider('first_referral', validatedReferrals >= 1);
 
   if (toUnlock.length === 0) return [];
 

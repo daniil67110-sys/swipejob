@@ -30,6 +30,7 @@ export default defineConfig({
     './src/schema/push-subscriptions.ts',
     './src/schema/notification-events.ts',
     './src/schema/user-badges.ts',
+    './src/schema/referrals.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

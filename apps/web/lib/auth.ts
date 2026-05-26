@@ -2,6 +2,7 @@ import 'server-only';
 import NextAuth, { type NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from '@swipejob/db';
@@ -10,6 +11,7 @@ import { captureServer, hashUserId } from './analytics';
 import { auditLog } from './audit';
 import { env, isAuthConfigured } from './env';
 import { serverLogger as logger } from './logger.server';
+import { REFERRAL_COOKIE_NAME, attributeReferralAtSignup, sanitizeReferralCode } from './referrals';
 
 const isAuthFullyConfigured = isAuthConfigured && isDatabaseConfigured;
 
@@ -130,6 +132,15 @@ const authConfig: NextAuthConfig = {
           targetId: user.id,
           metadata: { method: 'google' },
         });
+
+        // Story 5.3 — attribution parrainage si cookie présent
+        const jar = await cookies();
+        const refCookie = jar.get(REFERRAL_COOKIE_NAME);
+        const code = sanitizeReferralCode(refCookie?.value);
+        if (code) {
+          await attributeReferralAtSignup({ refereeUserId: user.id, code });
+          jar.delete(REFERRAL_COOKIE_NAME);
+        }
       } catch (err) {
         logger.error({ err, userId: user.id }, 'createUser event handler failed');
       }

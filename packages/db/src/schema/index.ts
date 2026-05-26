@@ -18,6 +18,7 @@ export * from './interview-preps.js';
 export * from './push-subscriptions.js';
 export * from './notification-events.js';
 export * from './user-badges.js';
+export * from './referrals.js';
 
 import { accounts } from './accounts.js';
 import { applicationEvents, applications, watchlist } from './applications.js';
@@ -33,6 +34,7 @@ import { parentalConsents } from './parental-consents.js';
 import { preferences } from './preferences.js';
 import { profiles } from './profiles.js';
 import { pushSubscriptions } from './push-subscriptions.js';
+import { referralCodes, referrals } from './referrals.js';
 import { userBadges } from './user-badges.js';
 import { schools } from './schools.js';
 import { sessions } from './sessions.js';
@@ -63,6 +65,8 @@ export const schema = {
   pushSubscriptions,
   notificationEvents,
   userBadges,
+  referralCodes,
+  referrals,
 } as const;
 
 export type Schema = typeof schema;

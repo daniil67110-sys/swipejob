@@ -17,6 +17,7 @@ import { enqueueApplicationProcess } from '@/lib/queue';
 import { isOverQuota, getDailyQuota } from '@/lib/swipe-quota';
 import { serverLogger as logger } from '@/lib/logger.server';
 import { checkAndUnlockBadges, type BadgeDef } from '@/lib/badges';
+import { validateReferralOnFirstSwipe } from '@/lib/referrals';
 
 export type ActionResult<T> =
   | { ok: true; data: T }
@@ -79,6 +80,17 @@ export async function swipeOfferAction(rawInput: {
   try {
     // Insert swipe_event (idempotent via UNIQUE constraint).
     await db.insert(swipeEvents).values({ userId, offerId, direction }).onConflictDoNothing();
+
+    // Story 5.3 — Valider l'attribution de parrainage au premier swipe (idempotent).
+    // Si un parrain vient d'être validé, on lui déclenche un check de badges en
+    // tâche de fond (il ne verra pas le toast, mais il aura le badge à sa prochaine visite).
+    const referralValidation = await validateReferralOnFirstSwipe(userId);
+    if (referralValidation.validatedReferrerUserId) {
+      const referrerId = referralValidation.validatedReferrerUserId;
+      void checkAndUnlockBadges(referrerId).catch((err) => {
+        logger.error({ err, referrerId }, 'badge check for referrer failed');
+      });
+    }
 
     if (direction === 'left') {
       captureServer('swipe.performed', hashUserId(userId), { direction });
