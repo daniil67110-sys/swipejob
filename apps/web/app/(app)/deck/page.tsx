@@ -2,14 +2,20 @@ import { Lightbulb, Sparkles, Target } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { getDailyDeck } from './actions';
 import { SwipeDeck } from './SwipeDeck';
+import { DailyStreak } from '@/components/engagement/DailyStreak';
+import { computeUserStreak } from '@/lib/streaks';
 
 export default async function DeckPage() {
-  await requireVerifiedAuth({});
-  const deck = await getDailyDeck();
+  const session = await requireVerifiedAuth({});
+  const userId = session.user?.id;
+  const [deck, streak] = await Promise.all([
+    getDailyDeck(),
+    userId ? computeUserStreak(userId) : Promise.resolve(null),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
-      <header>
+      <header className="flex items-center justify-between gap-3">
         {deck.fallback ? (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
             <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
@@ -21,6 +27,7 @@ export default async function DeckPage() {
             Matching personnalisé
           </span>
         )}
+        <DailyStreak initial={streak} />
       </header>
 
       {deck.scarcityHint ? (

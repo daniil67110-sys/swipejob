@@ -24,6 +24,7 @@ import { captureServer, hashUserId } from '@/lib/analytics';
 import { serverLogger as logger } from '@/lib/logger.server';
 import { env } from '@/lib/env';
 import { enqueueApplicationProcess } from '@/lib/queue';
+import { checkAndUnlockBadges, type BadgeDef } from '@/lib/badges';
 import { MANUAL_STATUSES, type ApplicationStatus, type ManualStatus } from './lib';
 
 export type ActionResult<T> =
@@ -183,7 +184,9 @@ export async function updateApplicationStatusAction(rawInput: {
   applicationId: string;
   status: ManualStatus;
   interviewAt?: string;
-}): Promise<ActionResult<{ status: ManualStatus; lastStatusAt: Date }>> {
+}): Promise<
+  ActionResult<{ status: ManualStatus; lastStatusAt: Date; unlockedBadges?: BadgeDef[] }>
+> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: { code: 'UNAUTHENTICATED', message: 'Non authentifié.' } };
@@ -287,7 +290,8 @@ export async function updateApplicationStatusAction(rawInput: {
     to: status,
   });
 
-  return { ok: true, data: { status, lastStatusAt: now } };
+  const unlockedBadges = await checkAndUnlockBadges(userId);
+  return { ok: true, data: { status, lastStatusAt: now, unlockedBadges } };
 }
 
 const reportSignatureSchema = z.object({
@@ -302,7 +306,7 @@ const reportSignatureSchema = z.object({
 export async function reportSignatureAction(rawInput: {
   applicationId: string;
   salaryAnnualCents?: number;
-}): Promise<ActionResult<{ applicationId: string; signedAt: Date }>> {
+}): Promise<ActionResult<{ applicationId: string; signedAt: Date; unlockedBadges?: BadgeDef[] }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: { code: 'UNAUTHENTICATED', message: 'Non authentifié.' } };
@@ -384,7 +388,8 @@ export async function reportSignatureAction(rawInput: {
 
   logger.info({ applicationId, userId }, '🎉 signature reported');
 
-  return { ok: true, data: { applicationId, signedAt: now } };
+  const unlockedBadges = await checkAndUnlockBadges(userId);
+  return { ok: true, data: { applicationId, signedAt: now, unlockedBadges } };
 }
 
 // ============================================================================

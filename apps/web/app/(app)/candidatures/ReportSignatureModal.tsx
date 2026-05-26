@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { reportSignatureAction } from './actions';
+import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 
 /**
  * Story 4.3 — Modal "Reporter ma signature 🎉".
@@ -24,6 +25,7 @@ export function ReportSignatureModal({
   onOpenChange: (open: boolean) => void;
 }) {
   const router = useRouter();
+  const { trigger: triggerBadgeUnlock } = useBadgeUnlock();
   const [salary, setSalary] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [confetti, setConfetti] = useState(false);
@@ -43,6 +45,7 @@ export function ReportSignatureModal({
         setError(res.error.message);
         return;
       }
+      if (res.data.unlockedBadges?.length) triggerBadgeUnlock(res.data.unlockedBadges);
       setConfetti(true);
       window.setTimeout(() => {
         onOpenChange(false);
