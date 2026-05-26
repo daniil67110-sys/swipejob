@@ -10,10 +10,9 @@ import { reportSignatureAction } from './actions';
 import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 
 /**
- * Story 4.3 — Modal "Reporter ma signature 🎉".
+ * Story 4.3 + 5.5 — Modal "Reporter ma signature 🎉".
  *
- * V1 : confettis = emoji burst CSS (Story 5.2 ConfettiBurst V2).
- * Wrapped redirect : Story 5.5 reportée → on redirige juste vers /candidatures avec ?signed=1.
+ * Au succès → redirige vers /wrapped/[applicationId] (Story 5.5).
  */
 export function ReportSignatureModal({
   applicationId,
@@ -50,7 +49,7 @@ export function ReportSignatureModal({
       window.setTimeout(() => {
         onOpenChange(false);
         setConfetti(false);
-        router.push('/candidatures?signed=1');
+        router.push(`/wrapped/${applicationId}`);
         router.refresh();
       }, 1500);
     });
