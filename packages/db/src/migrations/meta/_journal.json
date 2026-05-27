@@ -113,6 +113,34 @@
       "when": 1779314400000,
       "tag": "0015_preferences_cities_geo",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1779800000000,
+      "tag": "0016_user_badges",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1779820000000,
+      "tag": "0017_referrals",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1779840000000,
+      "tag": "0018_offer_share_count",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1779860000000,
+      "tag": "0019_rgpd_self_service",
+      "breakpoints": true
     }
   ]
 }
