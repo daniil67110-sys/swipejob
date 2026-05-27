@@ -3,7 +3,8 @@ import * as Sentry from '@sentry/nextjs';
 import { headers } from 'next/headers';
 import { db, isDatabaseConfigured } from '@swipejob/db';
 import { auditLogs } from '@swipejob/db/schema';
-import { redactPII } from '@swipejob/types';
+import { hashAuditValue, redactPII } from '@swipejob/types';
+import { env } from './env';
 import { serverLogger as logger } from './logger.server';
 
 export type ActorType = 'USER' | 'SYSTEM' | 'ADMIN';
@@ -18,13 +19,15 @@ export type AuditLogInput = {
 };
 
 /**
- * Insert an audit log row (RGPD trail, append-only).
+ * Insert an audit log row (RGPD trail, append-only — Story 6.5).
  *
  * - `metadata` is passed through `redactPII()` to ensure no email/password/cv text in clear.
- * - `ipAddress` and `userAgent` are extracted from the current request headers.
+ * - `ip` and `userAgent` are extracted from the current request headers, then HMAC-hashed
+ *   via `AUDIT_USER_HASH_SECRET` (fallback dev secret if missing — never in prod).
  * - If `DATABASE_URL` is not configured (dev), logs a warn and returns silently.
  *
- * Architecture.md ligne 639 : "Toujours logger les actions sensibles dans audit_log".
+ * Append-only est enforcé au niveau Postgres par un trigger (migration 0020) :
+ * tout UPDATE/DELETE sur la table échoue sauf bypass session-scoped explicite (purge RGPD).
  */
 export async function auditLog(input: AuditLogInput): Promise<void> {
   if (!isDatabaseConfigured) {
@@ -32,19 +35,22 @@ export async function auditLog(input: AuditLogInput): Promise<void> {
     return;
   }
 
-  let ipAddress: string | null = null;
-  let userAgent: string | null = null;
+  let rawIp: string | null = null;
+  let rawUa: string | null = null;
 
   try {
     const hdrs = await headers();
     const forwarded = hdrs.get('x-forwarded-for');
-    ipAddress = forwarded ? (forwarded.split(',')[0]?.trim() ?? null) : hdrs.get('x-real-ip');
-    userAgent = hdrs.get('user-agent');
+    rawIp = forwarded ? (forwarded.split(',')[0]?.trim() ?? null) : hdrs.get('x-real-ip');
+    rawUa = hdrs.get('user-agent');
   } catch {
     // headers() can throw outside of a request scope (e.g. background jobs).
     // Acceptable : audit log still inserted without IP/UA.
   }
 
+  const secret = env.AUDIT_USER_HASH_SECRET ?? '';
+  const ipHashed = hashAuditValue(rawIp, secret);
+  const userAgentHashed = hashAuditValue(rawUa, secret);
   const safeMetadata = input.metadata ? redactPII(input.metadata) : null;
 
   try {
@@ -55,8 +61,8 @@ export async function auditLog(input: AuditLogInput): Promise<void> {
       targetType: input.targetType ?? null,
       targetId: input.targetId ?? null,
       metadata: safeMetadata,
-      ipAddress,
-      userAgent,
+      ipHashed,
+      userAgentHashed,
     });
   } catch (err) {
     // Audit log failures must never block the user-facing action — log + Sentry.

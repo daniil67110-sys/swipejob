@@ -71,6 +71,13 @@ const envSchema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET_NAME: z.string().optional(),
 
+  // Story 6.5 — archive mensuelle audit_logs. Bucket dédié (recommandé) avec
+  // object lock COMPLIANCE 13 mois, ou fallback sur R2_BUCKET_NAME (préfixe audit-archive/).
+  R2_AUDIT_BUCKET: z.string().optional(),
+  R2_AUDIT_ACCESS_KEY_ID: z.string().optional(),
+  R2_AUDIT_SECRET_ACCESS_KEY: z.string().optional(),
+  R2_AUDIT_ENDPOINT: z.string().url().optional(),
+
   // Story 6.4 — HMAC secret pour anonymiser actor_id dans audit_logs après purge RGPD.
   // En prod : doit être défini (>= 32 chars). En dev : fallback OK.
   AUDIT_USER_HASH_SECRET: isProduction
@@ -119,4 +126,12 @@ export const isWebPushConfigured = Boolean(
 
 export const isR2Configured = Boolean(
   env.R2_ACCOUNT_ID && env.R2_ACCESS_KEY_ID && env.R2_SECRET_ACCESS_KEY && env.R2_BUCKET_NAME,
+);
+
+// Si bucket dédié audit configuré → on l'utilise ; sinon, fallback sur le bucket principal
+// avec préfixe `audit-archive/` (V1.5). En V2 (prod régulière), prévoir un bucket séparé
+// avec object lock COMPLIANCE 13 mois — cf. docs/runbooks/audit-export.md.
+export const isR2AuditConfigured = Boolean(
+  isR2Configured ||
+  (env.R2_AUDIT_BUCKET && env.R2_AUDIT_ACCESS_KEY_ID && env.R2_AUDIT_SECRET_ACCESS_KEY),
 );

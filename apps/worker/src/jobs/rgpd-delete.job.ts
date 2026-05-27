@@ -126,6 +126,8 @@ export async function processRgpdDeleteJob(userId: string): Promise<RgpdDeleteRe
       await tx.delete(restorationTokens).where(eq(restorationTokens.userId, userId));
 
       // 2. Anonymise audit_logs (CNIL 13 mois) — keep rows, hash actor_id/target_id.
+      // Story 6.5 — table append-only via trigger PG, opt-in scoped à cette transaction.
+      await tx.execute(sql`SELECT set_config('audit_logs.allow_modify', 'true', true)`);
       await tx.update(auditLogs).set({ actorId: anonId }).where(eq(auditLogs.actorId, userId));
       await tx.update(iaAuditLogs).set({ userId: null }).where(eq(iaAuditLogs.userId, userId));
 
