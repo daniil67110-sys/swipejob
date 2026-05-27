@@ -1,0 +1,2 @@
+CREATE INDEX "idx_users_anonymized_at" ON "users" USING btree ("anonymized_at");--> statement-breakpoint
+CREATE INDEX "idx_users_inactivity_notified_at" ON "users" USING btree ("inactivity_notified_at");

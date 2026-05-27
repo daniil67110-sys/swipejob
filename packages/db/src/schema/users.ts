@@ -61,6 +61,23 @@ export const users = pgTable(
      * `purgedAt` l'exécution physique (30j plus tard ou immédiat post-rétractation expirée).
      */
     purgedAt: timestamp('purged_at', { withTimezone: true, mode: 'date' }),
+    /**
+     * Story 6.6 — Marqueur d'anonymisation pour inactivité > 24 mois.
+     * Distinct de `purgedAt` (Story 6.4, demande user) : ici le user n'a
+     * pas demandé suppression mais les données PII sont retirées par obligation
+     * RGPD (durée conservation proportionnée).
+     * Stats agrégées (swipes count, applications count) restent pour analyse produit.
+     */
+    anonymizedAt: timestamp('anonymized_at', { withTimezone: true, mode: 'date' }),
+    /**
+     * Story 6.6 — Date d'envoi de l'email "votre compte sera anonymisé dans 30j".
+     * NULL si pas encore notifié. Le job d'anonymisation ne procède que si
+     * `inactivityNotifiedAt < now() - 30 days`.
+     */
+    inactivityNotifiedAt: timestamp('inactivity_notified_at', {
+      withTimezone: true,
+      mode: 'date',
+    }),
     // Story 2.8 : embedding profil utilisateur pour matching cosine.
     profileEmbedding: vector1024('profile_embedding'),
     embeddingComputedAt: timestamp('embedding_computed_at', { withTimezone: true, mode: 'date' }),
@@ -68,7 +85,13 @@ export const users = pgTable(
   },
   // Pas d'index explicite sur `email` : la contrainte UNIQUE crée déjà un index unique
   // utilisé par Postgres pour les lookups. Doublon évité (F-003).
-  (table) => [index('idx_users_deleted_at').on(table.deletedAt)],
+  (table) => [
+    index('idx_users_deleted_at').on(table.deletedAt),
+    // Story 6.6 — accélère les scans du job rgpd-anonymize-inactive (filtres
+    // `anonymizedAt IS NULL` et `inactivityNotifiedAt < threshold`).
+    index('idx_users_anonymized_at').on(table.anonymizedAt),
+    index('idx_users_inactivity_notified_at').on(table.inactivityNotifiedAt),
+  ],
 );
 
 export type User = typeof users.$inferSelect;
