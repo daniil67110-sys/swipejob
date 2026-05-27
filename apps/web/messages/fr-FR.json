@@ -1,0 +1,52 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "continue": "Continuer",
+    "back": "Retour",
+    "next": "Suivant",
+    "submit": "Valider",
+    "close": "Fermer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "error": "Une erreur est survenue",
+    "search": "Rechercher",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "nav": {
+    "deck": "Découvrir",
+    "applications": "Candidatures",
+    "interviews": "Entretiens",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "createAccount": "Créer un compte",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "continueWithGoogle": "Continuer avec Google",
+    "magicLinkSent": "Un lien de connexion vous a été envoyé par email."
+  },
+  "footer": {
+    "tagline": "SwipeJob — la recherche d'alternance et de stage en un swipe.",
+    "legal": "Mentions légales",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions générales d'utilisation",
+    "cookies": "Cookies",
+    "accessibility": "Déclaration d'accessibilité",
+    "copyright": "© {year} SwipeJob. Tous droits réservés."
+  },
+  "rgpd": {
+    "exportRequest": "Télécharger mes données",
+    "deleteAccount": "Supprimer mon compte",
+    "consentManagement": "Gérer mes consentements"
+  }
+}
