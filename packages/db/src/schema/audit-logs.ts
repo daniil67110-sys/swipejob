@@ -1,14 +1,17 @@
 /**
- * audit_logs — RGPD audit trail, APPEND-ONLY.
+ * audit_logs — RGPD audit trail, APPEND-ONLY (Story 6.5).
  *
- * Convention : aucune opération UPDATE/DELETE autorisée (enforced par convention
- * dans le code via helpers `auditLog()` qui n'exposent que insert).
- * V2 : ajout d'un trigger Postgres + role read-only séparé.
+ * Append-only enforcé au niveau Postgres via trigger (migration 0020) :
+ * - UPDATE bloqué sauf si la session a `set_config('audit_logs.allow_modify','true',true)`
+ *   (utilisé uniquement par le job RGPD pour anonymiser actor_id après purge).
+ * - DELETE bloqué pour rows < 13 mois (rétention CNIL NFR-S7).
  *
- * IMPORTANT : `metadata` ne doit JAMAIS contenir de PII en clair —
- * passer par `redactPII()` de `@swipejob/types` avant insert.
+ * Aucune PII en clair :
+ * - `actor_id` est l'ID interne (anonymisé à `anon_<hmac16>` après purge RGPD).
+ * - `ip_hashed` / `user_agent_hashed` sont des HMAC SHA-256 16 chars (clé AUDIT_USER_HASH_SECRET).
+ * - `metadata` passe par `redactPII()` côté `auditLog()` helper.
  */
-import { index, inet, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { createId } from '../lib/id.js';
 import { users } from './users.js';
 
@@ -21,16 +24,16 @@ export const auditLogs = pgTable(
       .primaryKey()
       .$defaultFn(() => createId()),
     actorId: text('actor_id').references(() => users.id, { onDelete: 'set null' }),
-    // F-009 : pas de default — callers DOIVENT spécifier explicitement le type d'acteur
-    // (évite que des events SYSTEM soient mal tagués USER).
+    // F-009 : pas de default — callers DOIVENT spécifier explicitement le type d'acteur.
     actorType: actorType('actor_type').notNull(),
     event: text('event').notNull(),
     targetType: text('target_type'),
     targetId: text('target_id'),
     // F-021 : pas de default {} — null est plus expressif pour les events sans metadata.
     metadata: jsonb('metadata').$type<Record<string, unknown>>(),
-    ipAddress: inet('ip_address'),
-    userAgent: text('user_agent'),
+    // Story 6.5 — IP et UA stockés en HMAC SHA-256 (16 hex chars) pour conformité CNIL.
+    ipHashed: text('ip_hashed'),
+    userAgentHashed: text('user_agent_hashed'),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
   },
   (table) => [

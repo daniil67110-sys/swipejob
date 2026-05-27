@@ -24,6 +24,12 @@ const envSchema = z.object({
     ? z.string().min(16, 'PII_EMAIL_HASH_SECRET must be ≥16 chars in production').optional()
     : z.string().optional(),
 
+  // Story 6.5 — HMAC secret pour hash IP/UA dans audit_logs (CNIL).
+  // Doit matcher la valeur utilisée par le worker (cohérence cross-process).
+  AUDIT_USER_HASH_SECRET: isProduction
+    ? z.string().min(32, 'AUDIT_USER_HASH_SECRET must be ≥32 chars in production').optional()
+    : z.string().optional(),
+
   NEXT_PUBLIC_APP_VERSION: z.string().optional(),
 
   AXIOM_TOKEN: z.string().optional(),

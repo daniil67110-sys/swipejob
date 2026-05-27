@@ -6,6 +6,7 @@
 export * from './action-result.js';
 export * from './errors.js';
 export * from './pii.js';
+export * from './audit-hash.js';
 export * from './cv.js';
 export * from './jobs/audit-export.js';
 
