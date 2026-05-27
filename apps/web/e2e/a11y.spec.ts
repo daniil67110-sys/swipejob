@@ -5,6 +5,8 @@ const routes = [
   { path: '/', name: 'landing' },
   { path: '/inscription', name: 'inscription' },
   { path: '/connexion', name: 'connexion' },
+  // Story 6.8 — la déclaration d'accessibilité elle-même doit être exemplaire.
+  { path: '/declaration-accessibilite', name: 'declaration-accessibilite' },
 ];
 
 for (const { path, name } of routes) {

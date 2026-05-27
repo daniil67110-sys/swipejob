@@ -22,7 +22,9 @@ export * from './referrals.js';
 export * from './user-consents.js';
 export * from './rgpd-exports.js';
 export * from './restoration-tokens.js';
+export * from './accessibility-reports.js';
 
+import { accessibilityReports } from './accessibility-reports.js';
 import { accounts } from './accounts.js';
 import { applicationEvents, applications, watchlist } from './applications.js';
 import { auditLogs } from './audit-logs.js';
@@ -76,6 +78,7 @@ export const schema = {
   userConsents,
   rgpdExports,
   restorationTokens,
+  accessibilityReports,
 } as const;
 
 export type Schema = typeof schema;

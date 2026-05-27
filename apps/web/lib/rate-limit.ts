@@ -85,6 +85,11 @@ export const parentalConsentRateLimit: Limiter = redis
   ? makeLimiter(redis, 3, 3600, 'sj:rl:parental')
   : makeNoop();
 
+// Story 6.8 — formulaire public, anti-spam : 5 signalements / heure / IP.
+export const accessibilityReportRateLimit: Limiter = redis
+  ? makeLimiter(redis, 5, 3600, 'sj:rl:accessibility-report')
+  : makeNoop();
+
 export function getClientIp(hdrs: Headers): string {
   const xff = hdrs.get('x-forwarded-for');
   if (xff) {

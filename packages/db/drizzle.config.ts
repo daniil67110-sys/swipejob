@@ -34,6 +34,7 @@ export default defineConfig({
     './src/schema/user-consents.ts',
     './src/schema/rgpd-exports.ts',
     './src/schema/restoration-tokens.ts',
+    './src/schema/accessibility-reports.ts',
   ],
   out: './src/migrations',
   dialect: 'postgresql',

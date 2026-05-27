@@ -5,6 +5,7 @@ const LEGAL_LINKS: Array<{ href: string; label: string }> = [
   { href: '/cgu', label: 'CGU' },
   { href: '/politique-confidentialite', label: 'Confidentialité' },
   { href: '/cookies', label: 'Cookies' },
+  { href: '/declaration-accessibilite', label: 'Accessibilité' },
 ];
 
 const SUPPORT_LINKS: Array<{ href: string; label: string }> = [
