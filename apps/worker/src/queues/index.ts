@@ -25,6 +25,8 @@ export const QUEUE_NAMES = {
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
   RGPD_EXPORT: 'rgpd-export',
+  // Story 6.6 — anonymisation pour inactivité > 24 mois (job mensuel scheduler).
+  RGPD_ANONYMIZE_INACTIVE: 'rgpd-anonymize-inactive',
   APPLICATION_PROCESS: 'application-process',
   // Epic 4 — notifications + coach
   NOTIFICATIONS_DIGEST: 'notifications-digest',
@@ -80,6 +82,9 @@ export function getRgpdDeleteQueue() {
 }
 export function getRgpdExportQueue() {
   return getQueue(QUEUE_NAMES.RGPD_EXPORT);
+}
+export function getRgpdAnonymizeInactiveQueue() {
+  return getQueue(QUEUE_NAMES.RGPD_ANONYMIZE_INACTIVE);
 }
 export function getApplicationProcessQueue() {
   return getQueue(QUEUE_NAMES.APPLICATION_PROCESS);

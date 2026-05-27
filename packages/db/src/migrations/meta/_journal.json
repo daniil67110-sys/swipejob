@@ -162,6 +162,20 @@
       "when": 1779891972845,
       "tag": "0022_audit_logs_append_only_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1779892558954,
+      "tag": "0023_users_anonymization_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1779892583934,
+      "tag": "0024_users_anonymization_indexes",
+      "breakpoints": true
     }
   ]
 }

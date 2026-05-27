@@ -25,6 +25,10 @@ import { startCvParseWorker, stopCvParseWorker } from './workers/cv-parse.worker
 import { startRgpdDeleteWorker, stopRgpdDeleteWorker } from './workers/rgpd-delete.worker.js';
 import { startRgpdExportWorker, stopRgpdExportWorker } from './workers/rgpd-export.worker.js';
 import {
+  startRgpdAnonymizeInactiveWorker,
+  stopRgpdAnonymizeInactiveWorker,
+} from './workers/rgpd-anonymize-inactive.worker.js';
+import {
   startApplicationProcessWorker,
   stopApplicationProcessWorker,
 } from './workers/application-process.worker.js';
@@ -107,6 +111,7 @@ try {
       startCvParseWorker(),
       startRgpdDeleteWorker(),
       startRgpdExportWorker(),
+      startRgpdAnonymizeInactiveWorker(),
       startApplicationProcessWorker(),
       startNotificationsDigestWorker(),
       startNotificationsPushWorker(),
@@ -144,6 +149,7 @@ function shutdown(signal: string) {
     stopCvParseWorker(),
     stopRgpdDeleteWorker(),
     stopRgpdExportWorker(),
+    stopRgpdAnonymizeInactiveWorker(),
     stopApplicationProcessWorker(),
     stopNotificationsDigestWorker(),
     stopNotificationsPushWorker(),

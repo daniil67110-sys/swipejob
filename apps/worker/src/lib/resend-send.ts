@@ -146,3 +146,129 @@ export async function sendRgpdExportReadyEmail(input: {
     return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
   }
 }
+
+/**
+ * Story 6.6 — email J-30 : prévient l'utilisateur que son compte va être
+ * anonymisé pour cause d'inactivité prolongée. Une simple connexion à
+ * SwipeJob suffit à annuler le processus.
+ */
+export async function sendInactivityWarningEmail(input: {
+  to: string;
+  firstName: string | null;
+  lastActivityAt: Date;
+  scheduledAnonymizationAt: Date;
+  loginUrl: string;
+}): Promise<SendResult> {
+  const c = client();
+  const greeting = input.firstName ? `Bonjour ${input.firstName},` : 'Bonjour,';
+  const lastSeen = input.lastActivityAt.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const scheduledOn = input.scheduledAnonymizationAt.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const html = `<!doctype html>
+<html lang="fr">
+  <body style="font-family:system-ui,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111">
+    <h1 style="font-size:20px;margin:0 0 16px">Ton compte SwipeJob va être anonymisé</h1>
+    <p>${escapeHtml(greeting)}</p>
+    <p>Ta dernière connexion remonte au <strong>${escapeHtml(lastSeen)}</strong>.</p>
+    <p>
+      Conformément au RGPD (principe de proportionnalité de la conservation), nous
+      anonymiserons tes données personnelles le <strong>${escapeHtml(scheduledOn)}</strong>.
+    </p>
+    <p>
+      Concrètement : ton CV, ton profil, ton email et ta lettre de motivation seront
+      supprimés. Tes statistiques anonymisées (nombre de candidatures, swipes) seront
+      conservées pour notre analyse produit.
+    </p>
+    <p style="margin:24px 0">
+      <a href="${input.loginUrl}" style="display:inline-block;background:#4F5BFF;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:600">
+        Me reconnecter à SwipeJob
+      </a>
+    </p>
+    <p style="color:#555;font-size:13px">Une simple connexion suffit à annuler le processus.</p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+    <p style="color:#888;font-size:12px">
+      Pour exporter tes données avant cette date :
+      <a href="mailto:dpo@swipejob.fr" style="color:#4F5BFF">dpo@swipejob.fr</a>.
+    </p>
+  </body>
+</html>`;
+  const text = `${greeting}\n\nTa dernière connexion remonte au ${lastSeen}. Conformément au RGPD, nous anonymiserons tes données le ${scheduledOn} sauf si tu te reconnectes avant : ${input.loginUrl}\n\nPour exporter avant : dpo@swipejob.fr`;
+  if (!c) {
+    logger.warn({ to: redact(input.to) }, 'Resend non configuré — inactivity warning mock');
+    return { ok: true, id: null, mock: true };
+  }
+  try {
+    const res = await c.emails.send({
+      from: env.RESEND_FROM,
+      to: input.to,
+      subject: 'SwipeJob — Ton compte sera anonymisé dans 30 jours',
+      html,
+      text,
+    });
+    if (res.error) return { ok: false, error: res.error.message };
+    return { ok: true, id: res.data?.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, to: redact(input.to) }, 'Inactivity warning email failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
+/**
+ * Story 6.6 — email post-anonymisation : confirme à l'utilisateur que ses
+ * données ont été anonymisées. Cet email part vers la dernière adresse connue
+ * AVANT le clear pour la traçabilité.
+ */
+export async function sendAccountAnonymizedEmail(input: {
+  to: string;
+  firstName: string | null;
+}): Promise<SendResult> {
+  const c = client();
+  const greeting = input.firstName ? `Bonjour ${input.firstName},` : 'Bonjour,';
+  const html = `<!doctype html>
+<html lang="fr">
+  <body style="font-family:system-ui,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111">
+    <h1 style="font-size:20px;margin:0 0 16px">Ton compte SwipeJob a été anonymisé</h1>
+    <p>${escapeHtml(greeting)}</p>
+    <p>
+      Comme annoncé il y a 30 jours, ton compte vient d'être anonymisé conformément
+      au RGPD pour inactivité prolongée (≥ 24 mois).
+    </p>
+    <p>
+      Ton profil, ton CV, ton email et toutes tes lettres de motivation ont été
+      supprimés définitivement. Tu peux te réinscrire à tout moment si tu souhaites
+      relancer ta recherche d'alternance ou de stage.
+    </p>
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+    <p style="color:#888;font-size:12px">
+      Pour toute question RGPD :
+      <a href="mailto:dpo@swipejob.fr" style="color:#4F5BFF">dpo@swipejob.fr</a>.
+    </p>
+  </body>
+</html>`;
+  const text = `${greeting}\n\nComme annoncé il y a 30 jours, ton compte SwipeJob a été anonymisé pour inactivité ≥ 24 mois (RGPD). Ton profil, CV et lettres ont été supprimés. Tu peux te réinscrire à tout moment.\n\nDPO : dpo@swipejob.fr`;
+  if (!c) {
+    logger.warn({ to: redact(input.to) }, 'Resend non configuré — anonymized email mock');
+    return { ok: true, id: null, mock: true };
+  }
+  try {
+    const res = await c.emails.send({
+      from: env.RESEND_FROM,
+      to: input.to,
+      subject: 'SwipeJob — Ton compte a été anonymisé',
+      html,
+      text,
+    });
+    if (res.error) return { ok: false, error: res.error.message };
+    return { ok: true, id: res.data?.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, to: redact(input.to) }, 'Anonymized email failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
