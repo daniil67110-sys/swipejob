@@ -11,6 +11,11 @@ allowBuilds:
   msgpackr-extract: true
   protobufjs: false
   sharp: true
+  # Story 6.7 — apportés transitivement par next-intl@4.12.0.
+  # `@parcel/watcher` = file watcher dev only (pas requis en build/runtime prod).
+  # `@swc/core` = compilation TS, Next.js gère son propre SWC, doublon inutile.
+  "@parcel/watcher": false
+  "@swc/core": false
 onlyBuiltDependencies:
   - lefthook
   - esbuild
