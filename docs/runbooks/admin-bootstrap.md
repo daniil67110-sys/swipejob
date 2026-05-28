@@ -14,14 +14,15 @@ Aucun utilisateur n'a le rôle `ADMIN` par défaut. Pour bootstrapper le premier
 ## Procédure
 
 ```bash
-# Depuis la racine du monorepo, avec DATABASE_URL pointant sur la base cible
-pnpm db:grant-admin oksana.opanasenko12@gmail.com
+# Depuis la racine du monorepo. DATABASE_URL est lu automatiquement
+# depuis .env.local (Node --env-file-if-exists, voir packages/db/package.json).
+pnpm db:grant-admin daniil67110@gmail.com
 ```
 
 Sortie attendue :
 
 ```
-[grant-admin] ✓ user "oksana.opanasenko12@gmail.com" : role USER → ADMIN
+[grant-admin] ✓ user "daniil67110@gmail.com" : role USER → ADMIN
 ```
 
 Idempotent : si le user est déjà admin, le script affiche `No-op` et ne touche pas à la base.

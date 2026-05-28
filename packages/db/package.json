@@ -18,7 +18,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/seed/dev.ts",
-    "db:grant-admin": "tsx src/seed/grant-admin.ts"
+    "db:grant-admin": "tsx --env-file-if-exists=../../.env.local --env-file-if-exists=../../.env src/seed/grant-admin.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",

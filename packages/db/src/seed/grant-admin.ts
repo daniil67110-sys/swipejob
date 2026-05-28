@@ -14,6 +14,10 @@
  *   `pnpm db:grant-admin <email> --role USER`
  */
 /* eslint-disable no-console -- CLI script */
+// Note : le chargement de .env.local/.env est délégué à Node via les flags
+// --env-file-if-exists déclarés dans packages/db/package.json (script
+// db:grant-admin). Cette approche évite le piège des imports ES hoistés
+// (loadEnv() serait appelé APRÈS l'évaluation de ../lib/env.js).
 import { eq } from 'drizzle-orm';
 import { closeDb, db } from '../client.js';
 import { isDatabaseConfigured } from '../lib/env.js';
