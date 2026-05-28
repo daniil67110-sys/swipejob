@@ -3,7 +3,7 @@ import NextAuth, { type NextAuthConfig } from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { db, isDatabaseConfigured } from '@swipejob/db';
 import * as schema from '@swipejob/db/schema';
@@ -104,6 +104,11 @@ const authConfig: NextAuthConfig = {
     async session({ session, user }) {
       if (session.user && user?.id) {
         session.user.id = user.id;
+        // Story 8.1 — Propage le rôle depuis la table users vers la session.
+        // `user` ici est l'objet DB complet (strategy 'database'), mais le typage
+        // adapter ne l'expose pas → cast contrôlé.
+        const role = (user as { role?: 'USER' | 'ADMIN' }).role;
+        session.user.role = role === 'ADMIN' ? 'ADMIN' : 'USER';
       }
       return session;
     },
@@ -262,4 +267,35 @@ export async function requireVerifiedAuth(
 
 export async function getOptionalAuth() {
   return auth();
+}
+
+/**
+ * Story 8.1 — Garde le back-office /admin.
+ *
+ * Sécurité : on renvoie `notFound()` (404) plutôt qu'un 403 quand l'utilisateur
+ * est authentifié mais pas admin. Objectif : ne pas révéler l'existence du
+ * back-office aux utilisateurs lambda (réduit la surface d'attaque par énumération).
+ *
+ * Defense in depth : le rôle est en DB (table users.role), pas dans le JWT
+ * (strategy 'database') — on relit la valeur fraîche à chaque requête, donc
+ * une révocation prend effet immédiatement.
+ */
+export async function requireAdmin(nextPath?: string) {
+  const session = await requireAuth(nextPath);
+  if (!isDatabaseConfigured) {
+    // Pas de DB → on ne peut pas vérifier le rôle. En dev sans DB, fail-safe → 404.
+    notFound();
+  }
+  const userId = session.user?.id;
+  if (!userId) notFound();
+  const rows = await db
+    .select({ role: schema.users.role, deletedAt: schema.users.deletedAt })
+    .from(schema.users)
+    .where(eq(schema.users.id, userId))
+    .limit(1);
+  const row = rows[0];
+  if (!row || row.deletedAt || row.role !== 'ADMIN') {
+    notFound();
+  }
+  return session;
 }
