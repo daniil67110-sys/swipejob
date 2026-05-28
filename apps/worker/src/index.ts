@@ -29,6 +29,10 @@ import {
   stopRgpdAnonymizeInactiveWorker,
 } from './workers/rgpd-anonymize-inactive.worker.js';
 import {
+  startRgpdAnonymizeManualWorker,
+  stopRgpdAnonymizeManualWorker,
+} from './workers/rgpd-anonymize-manual.worker.js';
+import {
   startApplicationProcessWorker,
   stopApplicationProcessWorker,
 } from './workers/application-process.worker.js';
@@ -112,6 +116,7 @@ try {
       startRgpdDeleteWorker(),
       startRgpdExportWorker(),
       startRgpdAnonymizeInactiveWorker(),
+      startRgpdAnonymizeManualWorker(),
       startApplicationProcessWorker(),
       startNotificationsDigestWorker(),
       startNotificationsPushWorker(),
@@ -150,6 +155,7 @@ function shutdown(signal: string) {
     stopRgpdDeleteWorker(),
     stopRgpdExportWorker(),
     stopRgpdAnonymizeInactiveWorker(),
+    stopRgpdAnonymizeManualWorker(),
     stopApplicationProcessWorker(),
     stopNotificationsDigestWorker(),
     stopNotificationsPushWorker(),
