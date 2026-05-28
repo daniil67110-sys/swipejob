@@ -158,8 +158,7 @@ export default async function AdminHomePage() {
       <footer className="pt-4 border-t border-neutral-200">
         <p className="text-caption text-neutral-500 flex items-center gap-2">
           <Archive className="w-3.5 h-3.5" aria-hidden="true" />
-          Les modules de modération (utilisateurs, signalements, audit logs) arriveront dans les
-          Stories 8.3 à 8.6.
+          Les modules signalements a11y et audit logs arriveront dans les Stories 8.5 à 8.6.
         </p>
       </footer>
     </div>
