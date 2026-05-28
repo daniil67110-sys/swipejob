@@ -88,7 +88,11 @@ export async function listUsers(input: UsersListInput): Promise<UsersListResult>
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
 
-  const rows = await db
+  // Note Drizzle : un `sql<Date>` raw subquery renvoie une STRING ISO non-castée
+  // (postgres-js ne coerce pas, et le type hint TS est juste un hint). On
+  // re-parse explicitement après la query pour éviter `RangeError: Invalid
+  // time value` quand `Intl.DateTimeFormat.format(string)` est appelé en UI.
+  const rawRows = await db
     .select({
       id: users.id,
       email: users.email,
@@ -99,7 +103,7 @@ export async function listUsers(input: UsersListInput): Promise<UsersListResult>
       anonymizedAt: users.anonymizedAt,
       purgedAt: users.purgedAt,
       // Dernière activité = max(sessions.lastSeenAt) — null si jamais connecté
-      lastSeenAt: sql<Date | null>`(
+      lastSeenAt: sql<string | null>`(
         SELECT MAX(${sessions.lastSeenAt})
         FROM ${sessions}
         WHERE ${sessions.userId} = ${users.id}
@@ -110,6 +114,11 @@ export async function listUsers(input: UsersListInput): Promise<UsersListResult>
     .orderBy(desc(users.createdAt))
     .limit(PAGE_SIZE)
     .offset((safePage - 1) * PAGE_SIZE);
+
+  const rows: UserRow[] = rawRows.map((r) => ({
+    ...r,
+    lastSeenAt: r.lastSeenAt ? new Date(r.lastSeenAt) : null,
+  }));
 
   return {
     rows,

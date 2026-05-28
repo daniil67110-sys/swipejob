@@ -183,19 +183,23 @@ async function loadActivity(userId: string): Promise<UserDetailActivity> {
       .select({ n: sql<number>`count(*)::int` })
       .from(rgpdExports)
       .where(eq(rgpdExports.userId, userId)),
+    // Drizzle ne convertit pas le résultat des `sql` raw : les timestamps
+    // reviennent en STRING ISO. On force `string | null` ici et on re-parse
+    // explicitement en Date avant de renvoyer (sinon RangeError côté UI).
     db
-      .select({ at: sql<Date | null>`max(${sessions.lastSeenAt})` })
+      .select({ at: sql<string | null>`max(${sessions.lastSeenAt})` })
       .from(sessions)
       .where(eq(sessions.userId, userId)),
     db
-      .select({ at: sql<Date | null>`max(${swipeEvents.swipedAt})` })
+      .select({ at: sql<string | null>`max(${swipeEvents.swipedAt})` })
       .from(swipeEvents)
       .where(eq(swipeEvents.userId, userId)),
     db
-      .select({ at: sql<Date | null>`max(${applications.sentAt})` })
+      .select({ at: sql<string | null>`max(${applications.sentAt})` })
       .from(applications)
       .where(eq(applications.userId, userId)),
   ]);
+  const toDate = (v: string | null | undefined): Date | null => (v ? new Date(v) : null);
   return {
     activeSessions: sessionsRow?.n ?? 0,
     totalSwipes: swipesRow?.n ?? 0,
@@ -203,9 +207,9 @@ async function loadActivity(userId: string): Promise<UserDetailActivity> {
     applicationsSent: applicationsSentRow?.n ?? 0,
     cvCount: cvsRow?.n ?? 0,
     rgpdExportsCount: exportsRow?.n ?? 0,
-    lastSeenAt: lastSeenRow?.at ?? null,
-    lastSwipeAt: lastSwipeRow?.at ?? null,
-    lastApplicationAt: lastApplicationRow?.at ?? null,
+    lastSeenAt: toDate(lastSeenRow?.at),
+    lastSwipeAt: toDate(lastSwipeRow?.at),
+    lastApplicationAt: toDate(lastApplicationRow?.at),
   };
 }
 
