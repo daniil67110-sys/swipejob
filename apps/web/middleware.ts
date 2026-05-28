@@ -16,6 +16,11 @@ const PROTECTED_PREFIXES = [
   '/parametres',
   '/coach',
   '/wrapped',
+  // Story 8.1 — back-office admin. Le rôle (ADMIN) n'est pas vérifié ici
+  // (Edge ne peut pas lire la DB) : le layout admin appelle requireAdmin()
+  // qui renvoie 404 si role !== ADMIN. Middleware ne fait que court-circuiter
+  // le RSC pour les anonymes via une redirection vers /inscription.
+  '/admin',
 ];
 
 /**
