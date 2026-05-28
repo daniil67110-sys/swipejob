@@ -14,7 +14,7 @@ type AdminNavItem = {
 
 const ADMIN_NAV: AdminNavItem[] = [
   { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
-  { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users, comingSoon: true },
+  { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users },
   {
     href: '/admin/signalements',
     label: 'Signalements a11y',
