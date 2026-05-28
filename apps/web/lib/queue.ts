@@ -16,6 +16,8 @@ export const QUEUE_NAMES = {
   CV_PARSE: 'cv-parse',
   RGPD_DELETE: 'rgpd-delete',
   RGPD_EXPORT: 'rgpd-export',
+  // Story 8.4 — anonymisation manuelle déclenchée par l'admin (BO).
+  RGPD_ANONYMIZE_MANUAL: 'rgpd-anonymize-manual',
   OFFER_INGEST: 'offer-ingest',
   MATCH_COMPUTE: 'match-compute',
   APPLICATION_PROCESS: 'application-process',
@@ -127,6 +129,24 @@ export async function enqueueRgpdExport(payload: {
     return { ok: true, jobId: job.id ?? 'unknown' };
   } catch (err) {
     logger.error({ err, payload }, 'rgpd-export enqueue failed');
+    return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
+  }
+}
+
+export async function enqueueAdminAnonymize(payload: {
+  userId: string;
+  triggeredByAdminId: string;
+}): Promise<EnqueueResult> {
+  const q = getQueue(QUEUE_NAMES.RGPD_ANONYMIZE_MANUAL);
+  if (!q) {
+    logger.warn({ ...payload }, 'rgpd-anonymize-manual enqueue mock (REDIS_URL absent)');
+    return { ok: true, jobId: null, mock: true };
+  }
+  try {
+    const job = await q.add('manual-anonymize', payload, { priority: 2 });
+    return { ok: true, jobId: job.id ?? 'unknown' };
+  } catch (err) {
+    logger.error({ err, payload }, 'rgpd-anonymize-manual enqueue failed');
     return { ok: false, error: err instanceof Error ? err.message : 'unknown' };
   }
 }
