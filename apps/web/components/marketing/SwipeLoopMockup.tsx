@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Briefcase, Heart, MapPin, Sparkles } from 'lucide-react';
+import { Briefcase, Heart, MapPin, Sparkles, X } from 'lucide-react';
 
 type DemoOffer = {
   id: string;
@@ -12,59 +12,80 @@ type DemoOffer = {
   contract: string;
   match: number;
   accent: string;
+  logo: string;
 };
 
 const OFFERS: DemoOffer[] = [
   {
-    id: 'a',
+    id: 'doctolib',
     title: 'Développeur fullstack',
     company: 'Doctolib',
     city: 'Paris',
     contract: 'Alternance',
     match: 94,
-    accent: 'from-primary-400 to-primary-600',
+    accent: 'from-[#0072FF] to-[#0048b3]',
+    logo: '/logos/doctolib.png',
   },
   {
-    id: 'b',
+    id: 'blablacar',
     title: 'Data analyst junior',
     company: 'BlaBlaCar',
     city: 'Paris',
     contract: 'Stage 6 mois',
     match: 88,
-    accent: 'from-info-400 to-info-600',
+    accent: 'from-[#00aff5] to-[#0073a8]',
+    logo: '/logos/blablacar.png',
   },
   {
-    id: 'c',
+    id: 'alan',
     title: 'Product designer',
     company: 'Alan',
     city: 'Lyon',
     contract: 'Alternance',
     match: 91,
-    accent: 'from-success-400 to-success-600',
+    accent: 'from-[#7b6bff] to-[#5040cc]',
+    logo: '/logos/alan.png',
   },
   {
-    id: 'd',
+    id: 'backmarket',
     title: 'Chargé marketing',
     company: 'Back Market',
     city: 'Paris',
     contract: 'Alternance',
     match: 86,
-    accent: 'from-primary-500 to-info-500',
+    accent: 'from-[#76d59b] to-[#3aa66e]',
+    logo: '/logos/backmarket.png',
+  },
+  {
+    id: 'qonto',
+    title: 'Customer Success Officer',
+    company: 'Qonto',
+    city: 'Paris',
+    contract: 'CDI Junior',
+    match: 89,
+    accent: 'from-neutral-700 to-neutral-900',
+    logo: '/logos/qonto.png',
   },
 ];
 
-const ROTATE_MS = 3200;
+const ROTATE_MS = 3400;
+
+type SwipeDir = 'right' | 'left';
 
 export function SwipeLoopMockup() {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
-  const [showMatch, setShowMatch] = useState(false);
+  const [dir, setDir] = useState<SwipeDir>('right');
+  const [stampVisible, setStampVisible] = useState(false);
 
   useEffect(() => {
     if (reduce) return;
     const tick = setInterval(() => {
-      setShowMatch(true);
-      setTimeout(() => setShowMatch(false), 700);
+      // Match 75% of the time → mostly LIKE (right), occasional NOPE (left)
+      const nextDir: SwipeDir = Math.random() < 0.75 ? 'right' : 'left';
+      setDir(nextDir);
+      setStampVisible(true);
+      setTimeout(() => setStampVisible(false), 800);
       setIndex((i) => (i + 1) % OFFERS.length);
     }, ROTATE_MS);
     return () => clearInterval(tick);
@@ -105,35 +126,69 @@ export function SwipeLoopMockup() {
               {visibleCards.map(({ offer, offset }) => {
                 const isTop = offset === 0;
                 const z = 10 - offset;
-                const scale = 1 - offset * 0.05;
-                const y = offset * 10;
+                const targetScale = 1 - offset * 0.05;
+                const targetY = offset * 10;
+
+                const exitX = dir === 'right' ? 360 : -360;
+                const exitRotate = dir === 'right' ? 25 : -25;
 
                 return (
                   <motion.div
                     key={`${offer.id}-${index}-${offset}`}
-                    initial={isTop ? { x: 0, rotate: 0, opacity: 1 } : { y: y + 10, opacity: 0 }}
-                    animate={{ y, scale, opacity: 1, x: 0, rotate: 0 }}
+                    initial={
+                      isTop
+                        ? { x: 0, rotate: 0, opacity: 1 }
+                        : { y: targetY + 12, scale: targetScale - 0.03, opacity: 0 }
+                    }
+                    animate={{
+                      y: targetY,
+                      scale: targetScale,
+                      opacity: 1,
+                      x: 0,
+                      rotate: 0,
+                    }}
                     exit={
                       isTop
                         ? {
-                            x: 320,
-                            rotate: 18,
+                            x: exitX,
+                            rotate: exitRotate,
                             opacity: 0,
-                            transition: { duration: 0.55, ease: [0.5, 0, 0.75, 0] },
+                            transition: {
+                              duration: 0.6,
+                              ease: [0.5, 0, 0.75, 0],
+                            },
                           }
                         : undefined
                     }
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    transition={
+                      isTop
+                        ? { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                        : {
+                            type: 'spring',
+                            stiffness: 240,
+                            damping: 22,
+                            mass: 0.7,
+                          }
+                    }
                     style={{ zIndex: z }}
-                    className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgb(0,0,0,0.08)] ring-1 ring-neutral-100"
+                    className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgb(0,0,0,0.10)] ring-1 ring-neutral-100"
                   >
                     {/* Top visual band */}
                     <div className={`relative h-20 bg-gradient-to-br ${offer.accent}`}>
                       <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[9px] font-bold text-neutral-900">
                         {offer.match}% match
                       </div>
-                      <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[11px] font-bold text-neutral-900 shadow-sm ring-1 ring-neutral-100">
-                        {offer.company[0]}
+                      <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-neutral-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={offer.logo}
+                          alt={`${offer.company} logo`}
+                          width={36}
+                          height={36}
+                          className="h-9 w-9 object-contain"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </div>
                     </div>
                     <div className="flex-1 p-3 pt-7">
@@ -165,17 +220,31 @@ export function SwipeLoopMockup() {
               })}
             </AnimatePresence>
 
-            {/* Match badge overlay */}
+            {/* Big LIKE / NOPE stamp à la Tinder */}
             <AnimatePresence>
-              {showMatch && (
+              {stampVisible && (
                 <motion.div
-                  initial={{ scale: 0.5, opacity: 0, rotate: -12 }}
-                  animate={{ scale: 1, opacity: 1, rotate: -12 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
-                  className="pointer-events-none absolute right-3 top-12 z-20 rounded-xl border-2 border-success-500 bg-white px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-success-600 shadow-md"
+                  key={`stamp-${index}-${dir}`}
+                  initial={{ scale: 0.4, opacity: 0, rotate: dir === 'right' ? -25 : 25 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 1.2, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'backOut' }}
+                  className={`pointer-events-none absolute top-8 z-30 -translate-y-1 ${
+                    dir === 'right' ? 'left-3' : 'right-3'
+                  }`}
                 >
-                  Match
+                  <div
+                    className={`rounded-xl border-[3px] px-3 py-1 font-[family-name:var(--font-fraunces)] text-[22px] font-extrabold italic uppercase tracking-wider ${
+                      dir === 'right'
+                        ? 'border-success-500 text-success-600'
+                        : 'border-red-500 text-red-600'
+                    }`}
+                    style={{
+                      transform: `rotate(${dir === 'right' ? -18 : 18}deg)`,
+                    }}
+                  >
+                    {dir === 'right' ? 'Match' : 'Nope'}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -183,22 +252,34 @@ export function SwipeLoopMockup() {
 
           {/* Action bar */}
           <div className="absolute inset-x-0 bottom-5 flex items-center justify-center gap-4">
-            <button
+            <motion.button
               type="button"
               aria-hidden="true"
               tabIndex={-1}
+              animate={
+                stampVisible && dir === 'left'
+                  ? { scale: [1, 1.25, 1], boxShadow: '0 6px 20px rgba(239,68,68,0.4)' }
+                  : { scale: 1 }
+              }
+              transition={{ duration: 0.45 }}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-neutral-100"
             >
-              <span className="text-base font-bold text-neutral-400">×</span>
-            </button>
-            <button
+              <X className="h-4 w-4 text-neutral-400" strokeWidth={2.5} />
+            </motion.button>
+            <motion.button
               type="button"
               aria-hidden="true"
               tabIndex={-1}
+              animate={
+                stampVisible && dir === 'right'
+                  ? { scale: [1, 1.18, 1], boxShadow: '0 8px 24px rgba(251,146,60,0.5)' }
+                  : { scale: 1 }
+              }
+              transition={{ duration: 0.5 }}
               className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg ring-1 ring-primary-700/30"
             >
               <Heart className="h-5 w-5 fill-white text-white" />
-            </button>
+            </motion.button>
             <button
               type="button"
               aria-hidden="true"
