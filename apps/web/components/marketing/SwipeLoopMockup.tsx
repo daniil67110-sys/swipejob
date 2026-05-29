@@ -241,38 +241,9 @@ export function SwipeLoopMockup() {
                 );
               })}
             </AnimatePresence>
-
-            {/* Big LIKE / NOPE stamp à la Tinder */}
-            <AnimatePresence>
-              {stampVisible && (
-                <motion.div
-                  key={`stamp-${index}-${dir}`}
-                  initial={{ scale: 0.3, opacity: 0, rotate: dir === 'right' ? -30 : 30 }}
-                  animate={{ scale: [0.3, 1.18, 1], opacity: 1 }}
-                  exit={{ scale: 1.3, opacity: 0 }}
-                  transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
-                  className={`pointer-events-none absolute top-8 z-30 -translate-y-1 ${
-                    dir === 'right' ? 'left-3' : 'right-3'
-                  }`}
-                >
-                  <div
-                    className={`rounded-xl border-[3px] px-3 py-1 font-[family-name:var(--font-fraunces)] text-[22px] font-extrabold italic uppercase tracking-wider ${
-                      dir === 'right'
-                        ? 'border-success-500 text-success-600'
-                        : 'border-red-500 text-red-600'
-                    }`}
-                    style={{
-                      transform: `rotate(${dir === 'right' ? -18 : 18}deg)`,
-                    }}
-                  >
-                    {dir === 'right' ? 'Match' : 'Nope'}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
-          {/* Action bar */}
+          {/* Action bar — boutons qui grossissent + couleur d'action au swipe */}
           <div className="absolute inset-x-0 bottom-5 flex items-center justify-center gap-4">
             <motion.button
               type="button"
@@ -280,13 +251,23 @@ export function SwipeLoopMockup() {
               tabIndex={-1}
               animate={
                 stampVisible && dir === 'left'
-                  ? { scale: [1, 1.25, 1], boxShadow: '0 6px 20px rgba(239,68,68,0.4)' }
-                  : { scale: 1 }
+                  ? {
+                      scale: 1.55,
+                      backgroundColor: '#ef4444',
+                      color: '#ffffff',
+                      boxShadow: '0 16px 36px -6px rgba(239,68,68,0.65)',
+                    }
+                  : {
+                      scale: 1,
+                      backgroundColor: '#ffffff',
+                      color: '#a3a3a3',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                    }
               }
-              transition={{ duration: 0.45 }}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md ring-1 ring-neutral-100"
+              transition={{ type: 'spring', stiffness: 360, damping: 22, mass: 0.7 }}
+              className="flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-neutral-200"
             >
-              <X className="h-4 w-4 text-neutral-400" strokeWidth={2.5} />
+              <X className="h-4 w-4" strokeWidth={2.8} />
             </motion.button>
             <motion.button
               type="button"
@@ -294,11 +275,19 @@ export function SwipeLoopMockup() {
               tabIndex={-1}
               animate={
                 stampVisible && dir === 'right'
-                  ? { scale: [1, 1.18, 1], boxShadow: '0 8px 24px rgba(251,146,60,0.5)' }
-                  : { scale: 1 }
+                  ? {
+                      scale: 1.55,
+                      backgroundColor: '#22c55e',
+                      boxShadow: '0 18px 40px -6px rgba(34,197,94,0.65)',
+                    }
+                  : {
+                      scale: 1,
+                      backgroundColor: '#fb923c',
+                      boxShadow: '0 8px 20px -4px rgba(251,146,60,0.55)',
+                    }
               }
-              transition={{ duration: 0.5 }}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg ring-1 ring-primary-700/30"
+              transition={{ type: 'spring', stiffness: 360, damping: 22, mass: 0.7 }}
+              className="flex h-12 w-12 items-center justify-center rounded-full ring-1 ring-white/20"
             >
               <Heart className="h-5 w-5 fill-white text-white" />
             </motion.button>
