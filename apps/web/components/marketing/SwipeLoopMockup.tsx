@@ -13,6 +13,7 @@ type DemoOffer = {
   match: number;
   accent: string;
   logo: string;
+  banner: string;
 };
 
 const OFFERS: DemoOffer[] = [
@@ -25,6 +26,7 @@ const OFFERS: DemoOffer[] = [
     match: 94,
     accent: 'from-[#0072FF] to-[#0048b3]',
     logo: '/logos/doctolib.png',
+    banner: '/banners/doctolib.jpg',
   },
   {
     id: 'blablacar',
@@ -35,6 +37,7 @@ const OFFERS: DemoOffer[] = [
     match: 88,
     accent: 'from-[#00aff5] to-[#0073a8]',
     logo: '/logos/blablacar.png',
+    banner: '/banners/blablacar.jpg',
   },
   {
     id: 'alan',
@@ -45,6 +48,7 @@ const OFFERS: DemoOffer[] = [
     match: 91,
     accent: 'from-[#7b6bff] to-[#5040cc]',
     logo: '/logos/alan.png',
+    banner: '/banners/alan.jpg',
   },
   {
     id: 'backmarket',
@@ -55,6 +59,7 @@ const OFFERS: DemoOffer[] = [
     match: 86,
     accent: 'from-[#76d59b] to-[#3aa66e]',
     logo: '/logos/backmarket.png',
+    banner: '/banners/backmarket.jpg',
   },
   {
     id: 'qonto',
@@ -65,6 +70,7 @@ const OFFERS: DemoOffer[] = [
     match: 89,
     accent: 'from-neutral-700 to-neutral-900',
     logo: '/logos/qonto.png',
+    banner: '/banners/qonto.jpg',
   },
 ];
 
@@ -138,7 +144,7 @@ export function SwipeLoopMockup() {
                     initial={
                       isTop
                         ? { x: 0, rotate: 0, opacity: 1 }
-                        : { y: targetY + 12, scale: targetScale - 0.03, opacity: 0 }
+                        : { y: targetY + 14, scale: targetScale - 0.04, opacity: 0 }
                     }
                     animate={{
                       y: targetY,
@@ -151,34 +157,59 @@ export function SwipeLoopMockup() {
                       isTop
                         ? {
                             x: exitX,
+                            y: 70,
                             rotate: exitRotate,
                             opacity: 0,
                             transition: {
-                              duration: 0.6,
-                              ease: [0.5, 0, 0.75, 0],
+                              duration: 0.65,
+                              ease: [0.45, 0, 0.7, 0],
                             },
                           }
                         : undefined
                     }
                     transition={
                       isTop
-                        ? { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
+                        ? {
+                            type: 'spring',
+                            stiffness: 200,
+                            damping: 18,
+                            mass: 0.8,
+                          }
                         : {
                             type: 'spring',
-                            stiffness: 240,
-                            damping: 22,
-                            mass: 0.7,
+                            stiffness: 220,
+                            damping: 24,
+                            mass: 0.75,
                           }
                     }
                     style={{ zIndex: z }}
                     className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgb(0,0,0,0.10)] ring-1 ring-neutral-100"
                   >
-                    {/* Top visual band */}
-                    <div className={`relative h-20 bg-gradient-to-br ${offer.accent}`}>
-                      <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[9px] font-bold text-neutral-900">
+                    {/* Top visual band — banner photo + tinted gradient overlay */}
+                    <div className="relative h-20 overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={offer.banner}
+                        alt=""
+                        aria-hidden="true"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      {/* Subtle brand-color tint to keep contrast on Match badge */}
+                      <div
+                        aria-hidden="true"
+                        className={`absolute inset-0 bg-gradient-to-br ${offer.accent} mix-blend-multiply opacity-30`}
+                      />
+                      {/* Darken bottom-right for badge readability */}
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-gradient-to-bl from-black/30 via-transparent to-transparent"
+                      />
+                      <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm backdrop-blur-sm">
                         {offer.match}% match
                       </div>
-                      <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-neutral-100">
+                      <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-neutral-100">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={offer.logo}
@@ -225,10 +256,10 @@ export function SwipeLoopMockup() {
               {stampVisible && (
                 <motion.div
                   key={`stamp-${index}-${dir}`}
-                  initial={{ scale: 0.4, opacity: 0, rotate: dir === 'right' ? -25 : 25 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.2, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'backOut' }}
+                  initial={{ scale: 0.3, opacity: 0, rotate: dir === 'right' ? -30 : 30 }}
+                  animate={{ scale: [0.3, 1.18, 1], opacity: 1 }}
+                  exit={{ scale: 1.3, opacity: 0 }}
+                  transition={{ duration: 0.42, ease: [0.34, 1.56, 0.64, 1] }}
                   className={`pointer-events-none absolute top-8 z-30 -translate-y-1 ${
                     dir === 'right' ? 'left-3' : 'right-3'
                   }`}
