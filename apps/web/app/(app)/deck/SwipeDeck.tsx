@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Bookmark, Heart, PartyPopper, Sparkles, X } from 'lucide-react';
 import { SwipeCard, UndoToast, type SwipeCardData } from './SwipeCard';
 import { OfferDetailModal } from './OfferDetailModal';
 import { swipeOfferAction } from './swipe-actions';
+import { MatchCelebration } from './MatchCelebration';
 import { useBadgeUnlock } from '@/components/engagement/BadgeUnlockProvider';
 
 export function SwipeDeck({
@@ -22,6 +24,7 @@ export function SwipeDeck({
   const [index, setIndex] = useState(0);
   const [detailOffer, setDetailOffer] = useState<SwipeCardData | null>(null);
   const [undo, setUndo] = useState<string | null>(null);
+  const [celebrationKey, setCelebrationKey] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -32,10 +35,15 @@ export function SwipeDeck({
   const handleSwipe = (direction: 'left' | 'right' | 'up') => {
     if (!current) return;
     setError(null);
+    if (direction === 'right') {
+      setCelebrationKey(Date.now());
+      setTimeout(() => setCelebrationKey(null), 1400);
+    }
     startTransition(async () => {
       const res = await swipeOfferAction({ offerId: current.id, direction });
       if (!res.ok) {
         setError(res.error.message);
+        setCelebrationKey(null);
         return;
       }
       if (res.data.applicationId) setUndo(res.data.applicationId);
@@ -70,35 +78,55 @@ export function SwipeDeck({
 
   if (total === 0 || !current) {
     return (
-      <div className="rounded-2xl border border-neutral-100 bg-white p-12 text-center shadow-md">
-        <Sparkles
-          className="w-10 h-10 text-neutral-300 mx-auto mb-4"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <p className="text-body-md font-semibold text-neutral-900 mb-1">
-          Pas d&apos;offre pour le moment
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="rounded-3xl border border-neutral-200 bg-white p-14 text-center shadow-sm"
+      >
+        <motion.div
+          animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-400"
+        >
+          <Sparkles className="h-7 w-7" strokeWidth={1.6} aria-hidden="true" />
+        </motion.div>
+        <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-tight text-neutral-900">
+          Pas d&apos;offre <span className="italic text-neutral-400">pour le moment</span>
         </p>
-        <p className="text-body-sm text-neutral-500">
+        <p className="mt-3 text-body-sm text-neutral-500">
           Reviens dans quelques heures pour découvrir de nouvelles opportunités.
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   if (isFinished) {
     return (
-      <div className="rounded-2xl border border-success-100 bg-success-100/30 p-12 text-center shadow-md">
-        <PartyPopper
-          className="w-10 h-10 text-success-500 mx-auto mb-4"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <p className="text-body-md font-semibold text-neutral-900 mb-1">Deck du jour terminé</p>
-        <p className="text-body-sm text-neutral-700">
-          Bravo, tu as parcouru toutes tes offres. Reviens demain pour de nouvelles opportunités.
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-gradient-to-br from-white via-[#f7f5f1] to-orange-50 p-14 text-center shadow-sm"
+      >
+        <motion.div
+          animate={{
+            rotate: [0, 14, -8, 12, 0],
+            scale: [1, 1.15, 1, 1.08, 1],
+          }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+          className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-lg"
+        >
+          <PartyPopper className="h-8 w-8" strokeWidth={2.2} aria-hidden="true" />
+        </motion.div>
+        <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-tight text-neutral-900 sm:text-4xl">
+          Deck du jour <span className="italic text-neutral-400">terminé</span>
         </p>
-      </div>
+        <p className="mx-auto mt-4 max-w-md text-body-md leading-relaxed text-neutral-600">
+          Bravo, tu as parcouru toutes tes offres. Reviens demain pour de nouvelles opportunités —
+          ton deck personnalisé t&apos;attend chaque matin.
+        </p>
+      </motion.div>
     );
   }
 
@@ -107,12 +135,13 @@ export function SwipeDeck({
 
   return (
     <>
-      <div className="space-y-4 pb-32">
-        {/* Progress bar */}
+      <MatchCelebration triggerKey={celebrationKey} />
+      <div className="space-y-5 pb-32">
+        {/* Progress bar éditoriale */}
         <div className="space-y-2" aria-live="polite">
           <div className="flex items-center justify-between text-caption font-semibold">
-            <span className="tracking-wider text-neutral-600 uppercase">
-              Carte {index + 1} sur {total}
+            <span className="uppercase tracking-[0.18em] text-neutral-700">
+              Carte {index + 1} <span className="text-neutral-400">sur {total}</span>
             </span>
             <span className="text-neutral-400">
               {remaining > 0
@@ -120,10 +149,12 @@ export function SwipeDeck({
                 : 'Dernière carte'}
             </span>
           </div>
-          <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-info-500 via-primary-500 to-success-500 transition-all duration-500 ease-out rounded-full"
-              style={{ width: `${progressPct}%` }}
+          <div className="h-1.5 overflow-hidden rounded-full bg-neutral-200">
+            <motion.div
+              initial={false}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full rounded-full bg-gradient-to-r from-neutral-900 via-neutral-800 to-primary-500"
               role="progressbar"
               aria-valuenow={index + 1}
               aria-valuemin={1}
@@ -133,58 +164,68 @@ export function SwipeDeck({
           </div>
         </div>
 
-        <SwipeCard
-          key={current.id}
-          offer={current}
-          showExplanation={showExplanation}
-          onSwipe={handleSwipe}
-          onShowDetail={() => setDetailOffer(current)}
-        />
+        <AnimatePresence mode="wait">
+          <SwipeCard
+            key={current.id}
+            offer={current}
+            showExplanation={showExplanation}
+            onSwipe={handleSwipe}
+            onShowDetail={() => setDetailOffer(current)}
+          />
+        </AnimatePresence>
 
         {error ? (
-          <p role="alert" aria-live="polite" className="text-caption text-error-500 text-center">
+          <p role="alert" aria-live="polite" className="text-center text-caption text-red-500">
             {error}
           </p>
         ) : null}
       </div>
 
-      {/* Boutons d'actions flottants style Tinder */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-64 z-30 pointer-events-none">
-        {/* Fade gradient pour cacher le contenu sous les boutons */}
-        <div className="h-32 bg-gradient-to-t from-neutral-50 via-neutral-50/80 to-transparent" />
+      {/* Boutons d'actions flottants */}
+      <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-30 lg:left-64">
+        <div className="h-32 bg-gradient-to-t from-[#f7f5f1] via-[#f7f5f1]/80 to-transparent" />
         <div className="absolute inset-x-0 bottom-6 flex items-center justify-center gap-5 px-6">
-          {/* Passer — small left */}
-          <button
+          {/* Passer */}
+          <motion.button
             type="button"
             onClick={() => handleSwipe('left')}
             disabled={isPending}
             aria-label="Passer cette offre"
-            className="pointer-events-auto w-14 h-14 rounded-full bg-white text-error-500 flex items-center justify-center shadow-[0_8px_24px_rgba(255,71,87,0.35)] ring-2 ring-error-100 hover:scale-110 hover:shadow-[0_12px_32px_rgba(255,71,87,0.5)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.12, rotate: -6 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+            className="pointer-events-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-neutral-900 shadow-[0_10px_30px_-8px_rgba(0,0,0,0.25)] ring-2 ring-neutral-200 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <X className="w-7 h-7" strokeWidth={3} aria-hidden="true" />
-          </button>
+            <X className="h-6 w-6" strokeWidth={2.8} aria-hidden="true" />
+          </motion.button>
 
-          {/* Favoris — small middle */}
-          <button
+          {/* Favoris */}
+          <motion.button
             type="button"
             onClick={() => handleSwipe('up')}
             disabled={isPending}
             aria-label="Ajouter aux favoris"
-            className="pointer-events-auto w-12 h-12 rounded-full bg-white text-info-500 flex items-center justify-center shadow-[0_8px_24px_rgba(57,152,255,0.35)] ring-2 ring-info-100 hover:scale-110 hover:shadow-[0_12px_32px_rgba(57,152,255,0.5)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.12, y: -3 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+            className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-white text-neutral-900 shadow-[0_8px_24px_-6px_rgba(0,0,0,0.18)] ring-2 ring-neutral-200 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Bookmark className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
-          </button>
+            <Bookmark className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
+          </motion.button>
 
-          {/* Candidater — big right (primary action) */}
-          <button
+          {/* Candidater — primary */}
+          <motion.button
             type="button"
             onClick={() => handleSwipe('right')}
             disabled={isPending}
             aria-label="Candidater"
-            className="pointer-events-auto w-16 h-16 rounded-full bg-gradient-to-br from-success-500 to-info-500 text-white flex items-center justify-center shadow-[0_8px_28px_rgba(31,184,122,0.5)] hover:scale-110 hover:shadow-[0_12px_36px_rgba(31,184,122,0.65)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.12, rotate: 6 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+            className="pointer-events-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-[0_12px_36px_-8px_rgba(251,146,60,0.6)] ring-2 ring-primary-300 transition-shadow hover:shadow-[0_16px_44px_-8px_rgba(251,146,60,0.8)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Heart className="w-7 h-7" fill="currentColor" aria-hidden="true" />
-          </button>
+            <Heart className="h-7 w-7" fill="currentColor" aria-hidden="true" />
+          </motion.button>
         </div>
       </div>
 
@@ -195,7 +236,9 @@ export function SwipeDeck({
           onClose={() => setDetailOffer(null)}
         />
       ) : null}
-      {undo ? <UndoToast applicationId={undo} onDismiss={() => setUndo(null)} /> : null}
+      <AnimatePresence>
+        {undo ? <UndoToast applicationId={undo} onDismiss={() => setUndo(null)} /> : null}
+      </AnimatePresence>
     </>
   );
 }
