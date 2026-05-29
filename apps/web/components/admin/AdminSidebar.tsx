@@ -16,7 +16,7 @@ const ADMIN_NAV: AdminNavItem[] = [
   { href: '/admin', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/admin/utilisateurs', label: 'Utilisateurs', icon: Users },
   { href: '/admin/signalements', label: 'Signalements a11y', icon: Accessibility },
-  { href: '/admin/audit', label: 'Journal audit', icon: ScrollText, comingSoon: true },
+  { href: '/admin/audit', label: 'Journal audit', icon: ScrollText },
   { href: '/admin/rgpd', label: 'Exports RGPD', icon: FileText, comingSoon: true },
 ];
 
