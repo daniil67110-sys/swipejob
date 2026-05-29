@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Briefcase, Heart, MapPin, Sparkles, X } from 'lucide-react';
 
+type SwipeDir = 'right' | 'left';
+
 type DemoOffer = {
   id: string;
   title: string;
@@ -14,6 +16,9 @@ type DemoOffer = {
   accent: string;
   logo: string;
   banner: string;
+  // outcome est déterministe par offre : évite le décalage de state
+  // entre dir (UI buttons) et exit direction de la card
+  outcome: SwipeDir;
 };
 
 const OFFERS: DemoOffer[] = [
@@ -27,6 +32,7 @@ const OFFERS: DemoOffer[] = [
     accent: 'from-[#0072FF] to-[#0048b3]',
     logo: '/logos/doctolib.png',
     banner: '/banners/doctolib.jpg',
+    outcome: 'right',
   },
   {
     id: 'blablacar',
@@ -38,6 +44,7 @@ const OFFERS: DemoOffer[] = [
     accent: 'from-[#00aff5] to-[#0073a8]',
     logo: '/logos/blablacar.png',
     banner: '/banners/blablacar.jpg',
+    outcome: 'left',
   },
   {
     id: 'alan',
@@ -49,6 +56,7 @@ const OFFERS: DemoOffer[] = [
     accent: 'from-[#7b6bff] to-[#5040cc]',
     logo: '/logos/alan.png',
     banner: '/banners/alan.jpg',
+    outcome: 'right',
   },
   {
     id: 'backmarket',
@@ -60,6 +68,7 @@ const OFFERS: DemoOffer[] = [
     accent: 'from-[#76d59b] to-[#3aa66e]',
     logo: '/logos/backmarket.png',
     banner: '/banners/backmarket.jpg',
+    outcome: 'right',
   },
   {
     id: 'qonto',
@@ -71,31 +80,33 @@ const OFFERS: DemoOffer[] = [
     accent: 'from-neutral-700 to-neutral-900',
     logo: '/logos/qonto.png',
     banner: '/banners/qonto.jpg',
+    outcome: 'left',
   },
 ];
 
 const ROTATE_MS = 3400;
 
-type SwipeDir = 'right' | 'left';
-
 export function SwipeLoopMockup() {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
-  const [dir, setDir] = useState<SwipeDir>('right');
+  // lastSwipedDir = direction de la card qui vient de partir
+  // (utilisée par les boutons pour afficher la bonne couleur)
+  const [lastSwipedDir, setLastSwipedDir] = useState<SwipeDir>('right');
   const [stampVisible, setStampVisible] = useState(false);
 
   useEffect(() => {
     if (reduce) return;
-    const tick = setInterval(() => {
-      // Match 75% of the time → mostly LIKE (right), occasional NOPE (left)
-      const nextDir: SwipeDir = Math.random() < 0.75 ? 'right' : 'left';
-      setDir(nextDir);
+    // setTimeout + dépendance sur index : chaque tick re-arme le suivant
+    // (assure que lastSwipedDir reflète bien le outcome de la card qui sort)
+    const tick = setTimeout(() => {
+      const outcome = OFFERS[index % OFFERS.length]!.outcome;
+      setLastSwipedDir(outcome);
       setStampVisible(true);
       setTimeout(() => setStampVisible(false), 1200);
       setIndex((i) => (i + 1) % OFFERS.length);
     }, ROTATE_MS);
-    return () => clearInterval(tick);
-  }, [reduce]);
+    return () => clearTimeout(tick);
+  }, [reduce, index]);
 
   // Comme le vrai deck : UNE card visible à la fois
   const offer = OFFERS[index % OFFERS.length]!;
@@ -132,10 +143,12 @@ export function SwipeLoopMockup() {
                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1, x: 0, rotate: 0 }}
                 exit={{
-                  // Reproduit la courbe du deck : x [-300,0,300] → rotate [-22,0,22]
-                  // À x=±420 → rotate ≈ ±30°, slide-out tween fluide
-                  x: dir === 'right' ? 420 : -420,
-                  rotate: dir === 'right' ? 30 : -30,
+                  // L'outcome est dans l'offre : la card qui sort utilise
+                  // SON propre outcome (capturé par AnimatePresence au moment
+                  // du démontage). Match → droite, Skip → gauche, sans
+                  // décalage de state possible.
+                  x: offer.outcome === 'right' ? 420 : -420,
+                  rotate: offer.outcome === 'right' ? 30 : -30,
                   opacity: 0,
                   transition: {
                     duration: 0.5,
@@ -219,7 +232,7 @@ export function SwipeLoopMockup() {
               aria-hidden="true"
               tabIndex={-1}
               animate={
-                stampVisible && dir === 'left'
+                stampVisible && lastSwipedDir === 'left'
                   ? {
                       scale: 1.9,
                       backgroundColor: '#dc2626',
@@ -244,7 +257,7 @@ export function SwipeLoopMockup() {
               aria-hidden="true"
               tabIndex={-1}
               animate={
-                stampVisible && dir === 'right'
+                stampVisible && lastSwipedDir === 'right'
                   ? {
                       scale: 1.9,
                       backgroundColor: '#16a34a',
