@@ -14,7 +14,10 @@ import { Footer } from '@/components/shared/Footer';
 import { FaqAccordion } from '@/components/marketing/FaqAccordion';
 import { LandingPageView } from '@/components/marketing/LandingPageView';
 import { LandingHero } from '@/components/marketing/LandingHero';
+import { Marquee } from '@/components/marketing/Marquee';
+import { ScrollProgressBar } from '@/components/marketing/ScrollProgressBar';
 import { ScrollReveal } from '@/components/marketing/ScrollReveal';
+import { SpringNumber } from '@/components/marketing/SpringNumber';
 
 export const metadata = {
   title: 'SwipeJob — Trouve ton job en swipant',
@@ -169,6 +172,7 @@ export default function MarketingHomePage() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#f7f5f1] text-neutral-900">
+      <ScrollProgressBar />
       <LandingPageView />
       <script
         type="application/ld+json"
@@ -289,9 +293,12 @@ export default function MarketingHomePage() {
                   return (
                     <ScrollReveal key={step.title} delay={0.15 + i * 0.1}>
                       <li className="group relative flex gap-5 rounded-2xl border border-neutral-200/70 bg-white p-6 transition-all duration-300 hover:border-neutral-300 hover:shadow-[0_10px_30px_-15px_rgb(0,0,0,0.15)]">
-                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-neutral-900 font-[family-name:var(--font-fraunces)] text-xl font-bold text-white">
+                        <SpringNumber
+                          delay={0.2 + i * 0.1}
+                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-neutral-900 font-[family-name:var(--font-fraunces)] text-xl font-bold text-white"
+                        >
                           {i + 1}
-                        </span>
+                        </SpringNumber>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <h3 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-neutral-900">
@@ -365,27 +372,48 @@ export default function MarketingHomePage() {
           </div>
         </section>
 
-        {/* Sources d'offres */}
+        {/* Sources d'offres — marquee infini */}
         <section className="py-14">
           <div className="mx-auto max-w-7xl px-6">
             <ScrollReveal>
               <div className="rounded-3xl border border-neutral-200 bg-white p-8 lg:p-12">
-                <p className="text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                <p className="mb-6 text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
                   Offres agrégées depuis
                 </p>
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-                  <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
-                    France Travail
-                  </span>
-                  <span className="text-neutral-300">·</span>
-                  <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
-                    Adzuna
-                  </span>
-                  <span className="text-neutral-300">·</span>
-                  <span className="text-body-md text-neutral-500">
-                    plus de 5 000 offres actives
-                  </span>
-                </div>
+                <Marquee
+                  durationSec={32}
+                  items={[
+                    <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
+                      France Travail
+                    </span>,
+                    <span aria-hidden="true" className="text-neutral-300">
+                      ✦
+                    </span>,
+                    <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
+                      Adzuna
+                    </span>,
+                    <span aria-hidden="true" className="text-neutral-300">
+                      ✦
+                    </span>,
+                    <span className="text-body-md text-neutral-500">
+                      Plus de 5 000 offres actives
+                    </span>,
+                    <span aria-hidden="true" className="text-neutral-300">
+                      ✦
+                    </span>,
+                    <span className="text-body-md text-neutral-500">Hébergé en UE</span>,
+                    <span aria-hidden="true" className="text-neutral-300">
+                      ✦
+                    </span>,
+                    <span className="text-body-md text-neutral-500">
+                      Mises à jour quotidiennes
+                    </span>,
+                    <span aria-hidden="true" className="text-neutral-300">
+                      ✦
+                    </span>,
+                    <span className="text-body-md text-neutral-500">RGPD conforme</span>,
+                  ]}
+                />
               </div>
             </ScrollReveal>
           </div>
