@@ -91,13 +91,13 @@ export function SwipeLoopMockup() {
       const nextDir: SwipeDir = Math.random() < 0.75 ? 'right' : 'left';
       setDir(nextDir);
       setStampVisible(true);
-      setTimeout(() => setStampVisible(false), 800);
+      setTimeout(() => setStampVisible(false), 1200);
       setIndex((i) => (i + 1) % OFFERS.length);
     }, ROTATE_MS);
     return () => clearInterval(tick);
   }, [reduce]);
 
-  const visibleCards = [0, 1, 2].map((offset) => {
+  const visibleCards = [0, 1].map((offset) => {
     const offer = OFFERS[(index + offset) % OFFERS.length]!;
     return { offer, offset };
   });
@@ -197,9 +197,6 @@ export function SwipeLoopMockup() {
                         aria-hidden="true"
                         className="absolute inset-0 bg-gradient-to-bl from-black/30 via-transparent to-transparent"
                       />
-                      <div className="absolute right-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[9px] font-bold text-neutral-900 shadow-sm backdrop-blur-sm">
-                        {offer.match}% match
-                      </div>
                       <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-neutral-100">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -252,22 +249,23 @@ export function SwipeLoopMockup() {
               animate={
                 stampVisible && dir === 'left'
                   ? {
-                      scale: 1.55,
-                      backgroundColor: '#ef4444',
+                      scale: 1.9,
+                      backgroundColor: '#dc2626',
                       color: '#ffffff',
-                      boxShadow: '0 16px 36px -6px rgba(239,68,68,0.65)',
+                      boxShadow:
+                        '0 0 0 6px rgba(220,38,38,0.25), 0 20px 50px -8px rgba(220,38,38,0.9)',
                     }
                   : {
                       scale: 1,
                       backgroundColor: '#ffffff',
-                      color: '#a3a3a3',
+                      color: '#737373',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                     }
               }
-              transition={{ type: 'spring', stiffness: 360, damping: 22, mass: 0.7 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 18, mass: 0.55 }}
               className="flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-neutral-200"
             >
-              <X className="h-4 w-4" strokeWidth={2.8} />
+              <X className="h-4 w-4" strokeWidth={3.2} />
             </motion.button>
             <motion.button
               type="button"
@@ -276,9 +274,10 @@ export function SwipeLoopMockup() {
               animate={
                 stampVisible && dir === 'right'
                   ? {
-                      scale: 1.55,
-                      backgroundColor: '#22c55e',
-                      boxShadow: '0 18px 40px -6px rgba(34,197,94,0.65)',
+                      scale: 1.9,
+                      backgroundColor: '#16a34a',
+                      boxShadow:
+                        '0 0 0 6px rgba(22,163,74,0.25), 0 22px 56px -8px rgba(22,163,74,0.9)',
                     }
                   : {
                       scale: 1,
@@ -286,7 +285,7 @@ export function SwipeLoopMockup() {
                       boxShadow: '0 8px 20px -4px rgba(251,146,60,0.55)',
                     }
               }
-              transition={{ type: 'spring', stiffness: 360, damping: 22, mass: 0.7 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 18, mass: 0.55 }}
               className="flex h-12 w-12 items-center justify-center rounded-full ring-1 ring-white/20"
             >
               <Heart className="h-5 w-5 fill-white text-white" />
