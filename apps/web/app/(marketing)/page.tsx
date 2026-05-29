@@ -4,18 +4,17 @@ import {
   Brain,
   CheckCircle2,
   FileText,
-  Heart,
   Layers,
   Lock,
   PenLine,
   Send,
-  Shield,
-  Sparkles,
   Zap,
 } from 'lucide-react';
 import { Footer } from '@/components/shared/Footer';
 import { FaqAccordion } from '@/components/marketing/FaqAccordion';
 import { LandingPageView } from '@/components/marketing/LandingPageView';
+import { LandingHero } from '@/components/marketing/LandingHero';
+import { ScrollReveal } from '@/components/marketing/ScrollReveal';
 
 export const metadata = {
   title: 'SwipeJob — Trouve ton job en swipant',
@@ -43,24 +42,18 @@ export const metadata = {
 const FEATURES = [
   {
     icon: Zap,
-    iconBg: 'bg-info-100',
-    iconColor: 'text-info-500',
     title: 'Swipe rapide',
     description:
       'Une carte par offre, 3 gestes simples : passer, sauver, candidater. Comme tu sais déjà faire.',
   },
   {
     icon: Brain,
-    iconBg: 'bg-primary-100',
-    iconColor: 'text-primary-500',
     title: 'Matching IA',
     description:
       'Notre algo compare ton profil à des milliers d’offres pour te proposer le top 15 chaque jour.',
   },
   {
     icon: PenLine,
-    iconBg: 'bg-success-100',
-    iconColor: 'text-success-500',
     title: 'Lettre auto',
     description:
       "L'IA rédige une lettre de motivation personnalisée pour chaque candidature. Tu valides, on envoie.",
@@ -95,7 +88,6 @@ const TESTIMONIALS = [
     quote:
       "J'avais postulé à 40 offres en 3 mois sans réponse. Sur SwipeJob j'ai trouvé une alternance en 2 semaines. Les offres collent vraiment à mon profil.",
     initial: 'L',
-    gradient: 'from-info-500 to-primary-500',
   },
   {
     name: 'Tom, 23 ans',
@@ -103,7 +95,6 @@ const TESTIMONIALS = [
     quote:
       "Le swipe c'est addictif au bon sens. Je me force plus à chercher chaque soir, l'app me pousse mon deck. Et la lettre IA est mieux que ce que j'aurais écrit.",
     initial: 'T',
-    gradient: 'from-primary-500 to-success-500',
   },
   {
     name: 'Yasmine, 24 ans',
@@ -111,7 +102,6 @@ const TESTIMONIALS = [
     quote:
       "J'avais peur que l'IA standardise mes candidatures. En fait elle adapte vraiment au profil de chaque entreprise. J'ai eu 4 entretiens en 3 semaines.",
     initial: 'Y',
-    gradient: 'from-success-500 to-info-500',
   },
 ];
 
@@ -178,7 +168,7 @@ export default function MarketingHomePage() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col bg-neutral-50">
+    <div className="flex min-h-dvh flex-col bg-[#f7f5f1] text-neutral-900">
       <LandingPageView />
       <script
         type="application/ld+json"
@@ -186,280 +176,300 @@ export default function MarketingHomePage() {
       />
 
       {/* Top nav */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-lg border-b border-neutral-100">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-info-500 via-primary-500 to-success-500 flex items-center justify-center text-white font-display font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-              S
-            </span>
-            <span className="text-heading-md font-display font-bold text-neutral-900">
+      <header className="sticky top-0 z-40 border-b border-neutral-200/60 bg-[#f7f5f1]/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+          <Link href="/" className="group flex items-center gap-2">
+            <span className="font-[family-name:var(--font-fraunces)] text-2xl font-bold italic text-neutral-900">
               SwipeJob
             </span>
           </Link>
-          <nav className="flex items-center gap-3 sm:gap-4">
+          <nav className="flex items-center gap-3 sm:gap-5">
             <Link
               href="/connexion"
-              className="hidden sm:inline text-body-sm font-medium text-neutral-600 hover:text-primary-500"
+              className="hidden text-body-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:inline"
             >
               Se connecter
             </Link>
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-4 py-2 text-body-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-4 py-2 text-body-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               S&apos;inscrire
+              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </nav>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden">
-          <div
-            className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-info-500/10 blur-3xl pointer-events-none"
-            aria-hidden="true"
-          />
-          <div
-            className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-success-500/10 blur-3xl pointer-events-none"
-            aria-hidden="true"
-          />
-          <div className="relative mx-auto max-w-6xl px-6 pt-16 pb-20 lg:pt-24 lg:pb-32 text-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide mb-6">
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              Beta privée ouverte
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-neutral-900 leading-[1.05] mb-6 max-w-3xl mx-auto">
-              Trouve ton job en{' '}
-              <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-                swipant
-              </span>
-            </h1>
-            <p className="text-body-lg sm:text-xl text-neutral-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-              La recherche d&apos;emploi pour la Gen Z. Upload ton CV, swipe les offres qui te
-              plaisent, candidate en 1 geste. L&apos;IA fait le matching, toi tu te concentres sur
-              ce qui compte.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
-              <Link
-                href="/inscription"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-info-500 via-primary-500 to-success-500 px-6 py-3.5 text-body-md font-semibold text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all min-h-[52px]"
-              >
-                S&apos;inscrire gratuitement
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </Link>
-              <Link
-                href="/connexion"
-                className="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-6 py-3.5 text-body-md font-semibold text-neutral-700 hover:bg-neutral-50 min-h-[52px]"
-              >
-                J&apos;ai déjà un compte
-              </Link>
-            </div>
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-caption text-neutral-500">
-              <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-success-500" aria-hidden="true" />
-                100 % gratuit
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-info-500" aria-hidden="true" />
-                Données en UE · RGPD
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-primary-500" aria-hidden="true" />
-                Sans CB, sans CV public
-              </span>
-            </div>
-          </div>
-        </section>
+        {/* Hero animé */}
+        <LandingHero />
 
-        {/* Features */}
-        <section className="py-16 lg:py-24 bg-white border-y border-neutral-100">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-12">
-              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+        {/* Features — Bento style */}
+        <section className="border-y border-neutral-200/60 bg-white py-20 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6">
+            <ScrollReveal>
+              <p className="text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
                 Pourquoi SwipeJob ?
               </p>
-              <h2 className="text-display-lg font-display font-bold text-neutral-900 max-w-2xl mx-auto leading-tight">
-                La recherche d&apos;emploi qui{' '}
-                <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-                  swipe avec toi
-                </span>
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <h2 className="mx-auto mt-4 max-w-3xl text-center font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                <span className="font-semibold">La recherche d&apos;emploi</span>{' '}
+                <span className="font-light italic text-neutral-400">qui swipe avec toi</span>
               </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {FEATURES.map((f) => {
+            </ScrollReveal>
+
+            <div className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-3">
+              {FEATURES.map((f, i) => {
                 const Icon = f.icon;
                 return (
-                  <div
-                    key={f.title}
-                    className="relative rounded-2xl bg-white shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
-                    <div className="p-6">
-                      <div
-                        className={`w-12 h-12 rounded-xl ${f.iconBg} ${f.iconColor} flex items-center justify-center mb-4`}
-                      >
-                        <Icon className="w-6 h-6" aria-hidden="true" />
+                  <ScrollReveal key={f.title} delay={0.1 + i * 0.1}>
+                    <article className="group relative h-full overflow-hidden rounded-3xl border border-neutral-200 bg-[#f7f5f1] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-neutral-300 hover:shadow-[0_20px_50px_-20px_rgb(0,0,0,0.15)]">
+                      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-900 text-white shadow-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <Icon className="h-6 w-6" aria-hidden="true" strokeWidth={2.25} />
                       </div>
-                      <h3 className="text-heading-md font-semibold text-neutral-900 mb-2">
+                      <h3 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-neutral-900">
                         {f.title}
                       </h3>
-                      <p className="text-body-sm text-neutral-600 leading-relaxed">
+                      <p className="mt-2 text-body-md leading-relaxed text-neutral-600">
                         {f.description}
                       </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Comment ça marche */}
-        <section className="py-16 lg:py-24">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-12">
-              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
-                Comment ça marche
-              </p>
-              <h2 className="text-display-lg font-display font-bold text-neutral-900 max-w-2xl mx-auto leading-tight">
-                3 étapes,{' '}
-                <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-                  5 minutes par jour
-                </span>
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {STEPS.map((step, i) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.title} className="relative text-center md:text-left">
-                    <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-                      <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-info-500 to-primary-500 text-white font-display font-bold flex items-center justify-center shadow-sm">
-                        {i + 1}
+                      <span
+                        aria-hidden="true"
+                        className="absolute right-5 top-5 text-7xl font-[family-name:var(--font-fraunces)] font-light italic text-neutral-200/70"
+                      >
+                        0{i + 1}
                       </span>
-                      <Icon className="w-6 h-6 text-neutral-400" aria-hidden="true" />
-                    </div>
-                    <h3 className="text-heading-md font-semibold text-neutral-900 mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-body-sm text-neutral-600 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
+                    </article>
+                  </ScrollReveal>
                 );
               })}
             </div>
           </div>
         </section>
 
-        {/* Témoignages personas */}
-        <section className="py-16 lg:py-24 bg-white border-y border-neutral-100">
-          <div className="mx-auto max-w-6xl px-6">
-            <div className="text-center mb-12">
-              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+        {/* Comment ça marche — editorial vertical */}
+        <section className="py-20 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+              <div className="lg:col-span-5">
+                <ScrollReveal>
+                  <p className="text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                    Comment ça marche
+                  </p>
+                </ScrollReveal>
+                <ScrollReveal delay={0.1}>
+                  <h2 className="mt-4 font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                    <span className="font-semibold">3 étapes,</span>
+                    <br />
+                    <span className="font-light italic text-neutral-400">5 minutes par jour</span>
+                  </h2>
+                </ScrollReveal>
+                <ScrollReveal delay={0.2}>
+                  <p className="mt-6 max-w-md text-body-lg leading-relaxed text-neutral-600">
+                    Pas besoin de passer ta soirée à éplucher LinkedIn. On condense ta recherche
+                    quotidienne en quelques swipes.
+                  </p>
+                </ScrollReveal>
+                <ScrollReveal delay={0.3}>
+                  <Link
+                    href="/inscription"
+                    className="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-body-md font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                  >
+                    Commencer maintenant
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </ScrollReveal>
+              </div>
+
+              <ol className="space-y-4 lg:col-span-7">
+                {STEPS.map((step, i) => {
+                  const Icon = step.icon;
+                  return (
+                    <ScrollReveal key={step.title} delay={0.15 + i * 0.1}>
+                      <li className="group relative flex gap-5 rounded-2xl border border-neutral-200/70 bg-white p-6 transition-all duration-300 hover:border-neutral-300 hover:shadow-[0_10px_30px_-15px_rgb(0,0,0,0.15)]">
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-neutral-900 font-[family-name:var(--font-fraunces)] text-xl font-bold text-white">
+                          {i + 1}
+                        </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-neutral-900">
+                              {step.title}
+                            </h3>
+                            <Icon
+                              className="h-5 w-5 text-neutral-400 transition-colors group-hover:text-primary-500"
+                              aria-hidden="true"
+                              strokeWidth={2}
+                            />
+                          </div>
+                          <p className="mt-2 text-body-md leading-relaxed text-neutral-600">
+                            {step.description}
+                          </p>
+                        </div>
+                      </li>
+                    </ScrollReveal>
+                  );
+                })}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* Personas */}
+        <section className="border-y border-neutral-200/60 bg-white py-20 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6">
+            <ScrollReveal>
+              <p className="text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
                 Ils ont swipé leur job
               </p>
-              <h2 className="text-display-lg font-display font-bold text-neutral-900 max-w-2xl mx-auto leading-tight">
-                Pensé pour{' '}
-                <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-                  les jeunes
-                </span>
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <h2 className="mx-auto mt-4 max-w-3xl text-center font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                <span className="font-semibold">Pensé pour</span>{' '}
+                <span className="font-light italic text-neutral-400">les jeunes</span>
               </h2>
-              <p className="text-body-md text-neutral-500 mt-4 max-w-xl mx-auto italic">
+            </ScrollReveal>
+            <ScrollReveal delay={0.2}>
+              <p className="mx-auto mt-4 max-w-xl text-center text-body-md italic text-neutral-500">
                 Personas inspirées de nos utilisateurs cibles — beta privée en cours.
               </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t) => (
-                <figure
-                  key={t.name}
-                  className="rounded-2xl bg-white shadow-sm border border-neutral-100 p-6 flex flex-col"
-                >
-                  <Heart
-                    className="w-6 h-6 text-success-500 mb-3"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  />
-                  <blockquote className="flex-1 text-body-md text-neutral-700 leading-relaxed mb-5">
-                    « {t.quote} »
-                  </blockquote>
-                  <figcaption className="flex items-center gap-3 pt-4 border-t border-neutral-100">
+            </ScrollReveal>
+
+            <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
+              {TESTIMONIALS.map((t, i) => (
+                <ScrollReveal key={t.name} delay={0.1 + i * 0.1}>
+                  <figure className="flex h-full flex-col rounded-3xl border border-neutral-200 bg-[#f7f5f1] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_-20px_rgb(0,0,0,0.12)]">
                     <span
-                      className={`w-11 h-11 rounded-full bg-gradient-to-br ${t.gradient} text-white font-display font-bold flex items-center justify-center shadow-sm`}
+                      aria-hidden="true"
+                      className="mb-3 font-[family-name:var(--font-fraunces)] text-6xl font-light italic leading-none text-neutral-300"
                     >
-                      {t.initial}
+                      “
                     </span>
-                    <div>
-                      <p className="text-body-sm font-semibold text-neutral-900">{t.name}</p>
-                      <p className="text-caption text-neutral-500">{t.role}</p>
-                    </div>
-                  </figcaption>
-                </figure>
+                    <blockquote className="flex-1 text-body-md leading-relaxed text-neutral-700">
+                      {t.quote}
+                    </blockquote>
+                    <figcaption className="mt-6 flex items-center gap-3 border-t border-neutral-200 pt-5">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-neutral-900 font-[family-name:var(--font-fraunces)] font-bold text-white">
+                        {t.initial}
+                      </span>
+                      <div>
+                        <p className="text-body-sm font-semibold text-neutral-900">{t.name}</p>
+                        <p className="text-caption text-neutral-500">{t.role}</p>
+                      </div>
+                    </figcaption>
+                  </figure>
+                </ScrollReveal>
               ))}
             </div>
           </div>
         </section>
 
         {/* Sources d'offres */}
-        <section className="py-12 bg-neutral-50">
-          <div className="mx-auto max-w-6xl px-6 text-center">
-            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-6">
-              Offres agrégées depuis
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-              <span className="text-heading-lg font-display font-bold text-neutral-500">
-                France Travail
-              </span>
-              <span className="text-heading-lg font-display font-bold text-neutral-500">
-                Adzuna
-              </span>
-              <span className="text-body-sm text-neutral-400 italic">
-                · plus de 5000 offres actives en permanence
-              </span>
-            </div>
+        <section className="py-14">
+          <div className="mx-auto max-w-7xl px-6">
+            <ScrollReveal>
+              <div className="rounded-3xl border border-neutral-200 bg-white p-8 lg:p-12">
+                <p className="text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  Offres agrégées depuis
+                </p>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+                  <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
+                    France Travail
+                  </span>
+                  <span className="text-neutral-300">·</span>
+                  <span className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold italic text-neutral-700">
+                    Adzuna
+                  </span>
+                  <span className="text-neutral-300">·</span>
+                  <span className="text-body-md text-neutral-500">
+                    plus de 5 000 offres actives
+                  </span>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* FAQ */}
-        <section className="py-16 lg:py-24 bg-white border-t border-neutral-100">
+        <section className="border-t border-neutral-200/60 bg-white py-20 lg:py-32">
           <div className="mx-auto max-w-3xl px-6">
-            <div className="text-center mb-10">
-              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+            <ScrollReveal>
+              <p className="text-center text-caption font-semibold uppercase tracking-[0.2em] text-neutral-500">
                 FAQ
               </p>
-              <h2 className="text-display-lg font-display font-bold text-neutral-900 leading-tight">
-                Tu te demandes...
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <h2 className="mt-4 text-center font-[family-name:var(--font-fraunces)] text-4xl leading-[1.05] tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl">
+                <span className="font-semibold">Tu te</span>{' '}
+                <span className="font-light italic text-neutral-400">demandes...</span>
               </h2>
-            </div>
-            <FaqAccordion items={FAQ} />
+            </ScrollReveal>
+            <ScrollReveal delay={0.2}>
+              <div className="mt-12">
+                <FaqAccordion items={FAQ} />
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
-        {/* CTA final */}
-        <section className="py-16 lg:py-24 bg-gradient-to-br from-info-500 via-primary-500 to-success-500 text-white">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <h2 className="text-display-lg sm:text-display-xl font-display font-bold leading-tight mb-4">
-              Prêt à swiper ton job ?
-            </h2>
-            <p className="text-body-lg text-white/90 max-w-xl mx-auto mb-8">
-              Crée ton compte en 30 secondes. Pas de carte bancaire, pas d&apos;engagement, juste
-              ton CV.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/inscription"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 text-body-md font-semibold text-primary-600 shadow-lg hover:shadow-xl hover:scale-105 transition-all min-h-[52px]"
-              >
-                S&apos;inscrire gratuitement
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </Link>
-            </div>
-            <p className="text-caption text-white/70 mt-6 flex items-center justify-center gap-1.5">
-              <Lock className="w-3.5 h-3.5" aria-hidden="true" />
-              Données stockées en UE · Conforme RGPD
-            </p>
+        {/* CTA final — éditorial dark */}
+        <section className="relative overflow-hidden bg-neutral-950 py-24 lg:py-36 text-white">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(251,146,60,0.18),transparent_55%),radial-gradient(circle_at_70%_70%,rgba(99,102,241,0.12),transparent_55%)]"
+          />
+          <div className="relative mx-auto max-w-4xl px-6 text-center">
+            <ScrollReveal>
+              <p className="text-caption font-semibold uppercase tracking-[0.25em] text-neutral-400">
+                Prêt à swiper ton job ?
+              </p>
+            </ScrollReveal>
+            <ScrollReveal delay={0.1}>
+              <h2 className="mt-6 font-[family-name:var(--font-fraunces)] text-5xl leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+                <span className="font-semibold">Ton job idéal</span>
+                <br />
+                <span className="font-light italic text-neutral-400">est à un swipe.</span>
+              </h2>
+            </ScrollReveal>
+            <ScrollReveal delay={0.2}>
+              <p className="mx-auto mt-6 max-w-xl text-body-lg leading-relaxed text-neutral-300">
+                Crée ton compte en 30 secondes. Pas de carte bancaire, pas d&apos;engagement, juste
+                ton CV.
+              </p>
+            </ScrollReveal>
+            <ScrollReveal delay={0.3}>
+              <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/inscription"
+                  className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-body-md font-semibold text-neutral-900 transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-15px_rgba(255,255,255,0.4)]"
+                >
+                  S&apos;inscrire gratuitement
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </Link>
+                <Link
+                  href="/connexion"
+                  className="inline-flex min-h-[56px] items-center justify-center rounded-full border border-neutral-700 bg-transparent px-7 py-4 text-body-md font-semibold text-white transition-colors hover:bg-white/5"
+                >
+                  J&apos;ai déjà un compte
+                </Link>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={0.4}>
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-caption text-neutral-400">
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-success-500" aria-hidden="true" />
+                  100 % gratuit
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+                  Données UE · RGPD
+                </span>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
       </main>

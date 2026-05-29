@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Sora } from 'next/font/google';
+import { Fraunces, Inter, Sora } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { Analytics } from '@vercel/analytics/next';
@@ -7,10 +7,6 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PosthogProvider } from '@/components/shared/PosthogProvider';
 import './globals.css';
 
-/**
- * Fonts — Inter pour le corps de texte, Sora comme display font.
- * Décision: Cabinet Grotesk (licence commerciale requise) → fallback Sora (Google Fonts, libre).
- */
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -21,6 +17,13 @@ const sora = Sora({
   subsets: ['latin'],
   variable: '--font-sora',
   display: 'swap',
+});
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  display: 'swap',
+  axes: ['opsz', 'SOFT'],
 });
 
 export const metadata: Metadata = {
@@ -53,7 +56,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${sora.variable}`}>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${inter.variable} ${sora.variable} ${fraunces.variable}`}
+    >
       <body className="font-sans antialiased bg-neutral-50 text-neutral-900">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Paris">
           <PosthogProvider posthogKey={posthogKey} posthogHost={posthogHost}>
