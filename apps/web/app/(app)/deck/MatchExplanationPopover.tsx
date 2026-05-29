@@ -48,10 +48,10 @@ export function MatchExplanationPopover({
 
   const gradientClass =
     score >= 75
-      ? 'bg-gradient-to-r from-accent-500 to-primary-500 text-white shadow-md'
+      ? 'bg-neutral-900 text-white shadow-md ring-1 ring-primary-300/40'
       : score >= 50
-        ? 'bg-gradient-to-r from-info-500 to-primary-500 text-white shadow-sm'
-        : 'bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-600';
+        ? 'border border-neutral-300 bg-white text-neutral-800 shadow-sm'
+        : 'bg-neutral-100 text-neutral-600';
 
   return (
     <div ref={ref} className="relative inline-block">

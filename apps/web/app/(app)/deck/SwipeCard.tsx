@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Briefcase,
@@ -20,6 +20,7 @@ import {
   motion,
   useMotionValue,
   useReducedMotion,
+  useSpring,
   useTransform,
   type PanInfo,
 } from 'framer-motion';
@@ -105,16 +106,45 @@ export function SwipeCard({
   onShowDetail: () => void;
 }) {
   const prefersReducedMotion = useReducedMotion();
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotate = useTransform(x, [-300, 0, 300], [-18, 0, 18]);
+  const rotate = useTransform(x, [-300, 0, 300], [-22, 0, 22]);
+
+  // 3D tilt suit le curseur (désactivé pendant le drag)
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const sTiltX = useSpring(tiltX, { stiffness: 180, damping: 18 });
+  const sTiltY = useSpring(tiltY, { stiffness: 180, damping: 18 });
+  const [isDragging, setIsDragging] = useState(false);
 
   const passOpacity = useTransform(x, [-160, -40, 0], [1, 0, 0]);
   const applyOpacity = useTransform(x, [0, 40, 160], [0, 0, 1]);
   const saveOpacity = useTransform(y, [-160, -40, 0], [1, 0, 0]);
 
+  const cardScale = useTransform(x, [-200, 0, 200], [1.02, 1, 1.02]);
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (prefersReducedMotion || isDragging) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    tiltY.set(dx * 6);
+    tiltX.set(-dy * 6);
+  }
+
+  function handleMouseLeave() {
+    tiltX.set(0);
+    tiltY.set(0);
+  }
+
   const handleDragEnd = (_: unknown, info: PanInfo) => {
+    setIsDragging(false);
     const { offset, velocity } = info;
     const swipedUp = offset.y < -SWIPE_THRESHOLD || velocity.y < -VELOCITY_THRESHOLD;
     const swipedLeft = offset.x < -SWIPE_THRESHOLD || velocity.x < -VELOCITY_THRESHOLD;
@@ -147,65 +177,85 @@ export function SwipeCard({
 
   return (
     <motion.article
+      ref={cardRef}
       role="article"
       aria-label={`Offre ${offer.title} chez ${offer.companyName ?? 'entreprise non précisée'}`}
-      className="relative rounded-2xl bg-white shadow-lg overflow-hidden border border-neutral-100 touch-pan-y select-none"
+      className="relative select-none touch-pan-y overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)]"
       drag={prefersReducedMotion ? false : true}
       dragSnapToOrigin
       dragElastic={0.7}
-      style={{ x, y, rotate }}
+      onDragStart={() => setIsDragging(true)}
+      style={{
+        x,
+        y,
+        rotate,
+        rotateX: prefersReducedMotion ? 0 : sTiltX,
+        rotateY: prefersReducedMotion ? 0 : sTiltY,
+        scale: cardScale,
+        transformPerspective: 1200,
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       onDragEnd={handleDragEnd}
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 220, damping: 24, mass: 0.8 }}
       whileTap={prefersReducedMotion ? undefined : { cursor: 'grabbing' }}
       whileDrag={{ cursor: 'grabbing' }}
     >
-      {/* Bandeau gradient top */}
-      <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+      {/* Bandeau accent top — sobre noir */}
+      <div className="h-1 bg-neutral-900" />
 
-      {/* Overlays de feedback geste */}
+      {/* Stamps géants à la Tinder */}
       <motion.div
         style={{ opacity: passOpacity }}
-        className="absolute inset-0 z-20 flex items-center justify-center bg-error-500/15 pointer-events-none"
+        className="pointer-events-none absolute inset-0 z-20 flex items-start justify-end p-8"
         aria-hidden="true"
       >
-        <div className="rounded-2xl border-4 border-error-500 bg-white/95 px-6 py-3 -rotate-12 shadow-xl">
-          <span className="text-display-md font-display font-bold text-error-500 tracking-wider">
-            PASSER
-          </span>
+        <div
+          className="rounded-2xl border-[4px] border-red-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-red-500 shadow-xl"
+          style={{ transform: 'rotate(18deg)' }}
+        >
+          Nope
         </div>
       </motion.div>
       <motion.div
         style={{ opacity: applyOpacity }}
-        className="absolute inset-0 z-20 flex items-center justify-center bg-success-500/15 pointer-events-none"
+        className="pointer-events-none absolute inset-0 z-20 flex items-start justify-start p-8"
         aria-hidden="true"
       >
-        <div className="rounded-2xl border-4 border-success-500 bg-white/95 px-6 py-3 rotate-12 shadow-xl">
-          <span className="text-display-md font-display font-bold text-success-500 tracking-wider">
-            CANDIDATER
-          </span>
+        <div
+          className="rounded-2xl border-[4px] border-success-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-success-600 shadow-xl"
+          style={{ transform: 'rotate(-18deg)' }}
+        >
+          Match
         </div>
       </motion.div>
       <motion.div
         style={{ opacity: saveOpacity }}
-        className="absolute inset-0 z-20 flex items-start justify-center pt-12 bg-info-500/15 pointer-events-none"
+        className="pointer-events-none absolute inset-0 z-20 flex items-start justify-center p-8"
         aria-hidden="true"
       >
-        <div className="rounded-2xl border-4 border-info-500 bg-white/95 px-6 py-3 shadow-xl">
-          <span className="text-display-md font-display font-bold text-info-500 tracking-wider">
-            FAVORIS
-          </span>
+        <div
+          className="rounded-2xl border-[4px] border-primary-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-primary-600 shadow-xl"
+          style={{ transform: 'rotate(-4deg)' }}
+        >
+          Favori
         </div>
       </motion.div>
 
       <div className="p-7">
         {/* En-tête : avatar + entreprise + score */}
-        <div className="flex items-start justify-between gap-3 mb-5">
-          <div className="flex items-center gap-3 min-w-0">
-            <CompanyLogo name={offer.companyName} logoUrl={offer.companyLogoUrl} size="md" />
+        <div className="mb-6 flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="ring-2 ring-neutral-900 ring-offset-2 ring-offset-white rounded-full">
+              <CompanyLogo name={offer.companyName} logoUrl={offer.companyLogoUrl} size="md" />
+            </div>
             <div className="min-w-0">
-              <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold">
+              <p className="text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
                 Entreprise
               </p>
-              <p className="text-body-md font-semibold text-neutral-900 truncate">
+              <p className="truncate text-body-md font-semibold text-neutral-900">
                 {offer.companyName ?? 'Non précisée'}
               </p>
             </div>
@@ -214,76 +264,79 @@ export function SwipeCard({
             <MatchExplanationPopover score={offer.matchScore} reasons={offer.matchReasons} />
           ) : hasScore ? (
             <div
-              className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-semibold text-caption ${
-                isStrongMatch ? 'bg-success-100 text-success-500' : 'bg-info-100 text-info-500'
+              className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-caption font-semibold ${
+                isStrongMatch
+                  ? 'bg-neutral-900 text-white'
+                  : 'border border-neutral-300 bg-white text-neutral-700'
               }`}
               aria-label={`Score de matching : ${scorePct} pourcent`}
             >
               {isStrongMatch ? (
-                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+                <Sparkles className="h-3.5 w-3.5 text-primary-400" aria-hidden="true" />
               ) : (
-                <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
+                <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
               )}
               {scorePct}% match
             </div>
           ) : (
-            <div className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 font-semibold text-caption">
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />À découvrir
+            <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-3 py-1.5 text-caption font-semibold text-primary-700">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />À découvrir
             </div>
           )}
         </div>
 
-        <h2 className="text-display-md font-display font-bold text-neutral-900 leading-tight mb-2">
+        <h2 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-[1.1] tracking-tight text-neutral-900">
           {offer.title}
         </h2>
         {publishedAgo ? (
-          <p className="text-caption text-neutral-400 mb-5 inline-flex items-center gap-1.5">
-            <Clock className="w-3 h-3" aria-hidden="true" />
+          <p className="mt-2 mb-5 inline-flex items-center gap-1.5 text-caption text-neutral-500">
+            <Clock className="h-3 w-3" aria-hidden="true" />
             {publishedAgo}
           </p>
         ) : (
-          <div className="mb-5" />
+          <div className="mb-5 mt-2" />
         )}
 
-        <div className="flex flex-wrap gap-2 mb-5">
+        {/* Chips : palette neutre + accent orange sur contrat */}
+        <div className="mb-6 flex flex-wrap gap-2">
           {offer.locationCity ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-info-100 text-info-500 text-body-sm font-semibold">
-              <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-body-sm font-medium text-neutral-700">
+              <MapPin className="h-3.5 w-3.5 text-neutral-500" aria-hidden="true" />
               {offer.locationCity}
             </span>
           ) : null}
           {remoteLabel ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-info-100 text-info-500 text-body-sm font-semibold">
-              <Laptop className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-body-sm font-medium text-neutral-700">
+              <Laptop className="h-3.5 w-3.5 text-neutral-500" aria-hidden="true" />
               {remoteLabel}
             </span>
           ) : null}
           {salary ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success-100 text-success-500 text-body-sm font-semibold">
-              <Euro className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-body-sm font-medium text-neutral-700">
+              <Euro className="h-3.5 w-3.5 text-neutral-500" aria-hidden="true" />
               {salary}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-500 text-body-sm font-medium">
-              <Euro className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-neutral-200 bg-white/60 px-3 py-1.5 text-body-sm font-medium text-neutral-400">
+              <Euro className="h-3.5 w-3.5" aria-hidden="true" />
               Salaire non communiqué
             </span>
           )}
           {offer.contractType ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-100 text-primary-500 text-body-sm font-semibold">
-              <Briefcase className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-3 py-1.5 text-body-sm font-semibold text-primary-700 ring-1 ring-primary-200">
+              <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
               {offer.contractType}
             </span>
           ) : null}
           {offer.duration ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-100 text-warning-500 text-body-sm font-semibold">
-              <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-body-sm font-medium text-neutral-700">
+              <Clock className="h-3.5 w-3.5 text-neutral-500" aria-hidden="true" />
               {offer.duration}
             </span>
           ) : null}
           {startDate ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-100 text-warning-500 text-body-sm font-semibold">
-              <CalendarDays className="w-3.5 h-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-body-sm font-medium text-neutral-700">
+              <CalendarDays className="h-3.5 w-3.5 text-neutral-500" aria-hidden="true" />
               Démarre le {startDate}
             </span>
           ) : null}
@@ -291,15 +344,15 @@ export function SwipeCard({
 
         {skills.length > 0 ? (
           <div className="mb-5">
-            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
-              <Hammer className="w-3 h-3" aria-hidden="true" />
+            <p className="mb-2 inline-flex items-center gap-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
+              <Hammer className="h-3 w-3" aria-hidden="true" />
               Compétences
             </p>
             <div className="flex flex-wrap gap-1.5">
               {skills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-700 text-caption font-medium"
+                  className="inline-flex items-center rounded-md bg-neutral-100 px-2.5 py-1 text-caption font-medium text-neutral-700"
                 >
                   {skill}
                 </span>
@@ -312,22 +365,22 @@ export function SwipeCard({
           <div className="mb-5 grid grid-cols-2 gap-4">
             {educationLevels.length > 0 ? (
               <div>
-                <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
-                  <GraduationCap className="w-3 h-3" aria-hidden="true" />
+                <p className="mb-2 inline-flex items-center gap-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                  <GraduationCap className="h-3 w-3" aria-hidden="true" />
                   Niveau
                 </p>
-                <p className="text-body-sm text-neutral-700 font-medium">
+                <p className="text-body-sm font-medium text-neutral-700">
                   {educationLevels.join(' · ')}
                 </p>
               </div>
             ) : null}
             {languages.length > 0 ? (
               <div>
-                <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2 inline-flex items-center gap-1.5">
-                  <Languages className="w-3 h-3" aria-hidden="true" />
+                <p className="mb-2 inline-flex items-center gap-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
+                  <Languages className="h-3 w-3" aria-hidden="true" />
                   Langues
                 </p>
-                <p className="text-body-sm text-neutral-700 font-medium">{languages.join(' · ')}</p>
+                <p className="text-body-sm font-medium text-neutral-700">{languages.join(' · ')}</p>
               </div>
             ) : null}
           </div>
@@ -335,16 +388,16 @@ export function SwipeCard({
 
         {offer.description ? (
           <div>
-            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-2">
+            <p className="mb-2 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
               Description
             </p>
-            <p className="text-body-sm text-neutral-700 leading-relaxed line-clamp-4">
+            <p className="line-clamp-4 text-body-sm leading-relaxed text-neutral-700">
               {offer.description}
             </p>
             <button
               type="button"
               onClick={onShowDetail}
-              className="text-body-sm font-semibold text-primary-500 hover:text-primary-600 hover:underline mt-2 block"
+              className="mt-2 inline-flex items-center gap-1 text-body-sm font-semibold text-neutral-900 underline-offset-4 transition-colors hover:underline"
             >
               Voir l&apos;offre complète →
             </button>
@@ -353,7 +406,7 @@ export function SwipeCard({
           <button
             type="button"
             onClick={onShowDetail}
-            className="text-body-sm font-semibold text-primary-500 hover:text-primary-600 hover:underline block"
+            className="inline-flex items-center gap-1 text-body-sm font-semibold text-neutral-900 underline-offset-4 transition-colors hover:underline"
           >
             Voir l&apos;offre complète →
           </button>
@@ -394,23 +447,27 @@ export function UndoToast({
   };
 
   return (
-    <div
+    <motion.div
       role="status"
       aria-live="polite"
-      className="fixed bottom-28 left-1/2 -translate-x-1/2 lg:left-[calc(50%+128px)] rounded-xl bg-neutral-900 text-white px-5 py-3.5 shadow-xl flex items-center gap-4 z-50"
+      initial={{ y: 100, opacity: 0, scale: 0.9 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      exit={{ y: 100, opacity: 0, scale: 0.9 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+      className="fixed bottom-28 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-2xl bg-neutral-900 px-5 py-3.5 text-white shadow-2xl lg:left-[calc(50%+128px)]"
     >
-      <span className="w-7 h-7 rounded-full bg-gradient-to-br from-success-500 to-info-500 flex items-center justify-center shrink-0">
-        <Heart className="w-3.5 h-3.5 text-white" fill="currentColor" aria-hidden="true" />
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600">
+        <Heart className="h-3.5 w-3.5 text-white" fill="currentColor" aria-hidden="true" />
       </span>
       <span className="text-body-sm">Candidature envoyée · annulable ({secondsLeft}s)</span>
       <button
         type="button"
         onClick={handleUndo}
         disabled={isPending}
-        className="text-caption font-semibold text-info-100 hover:text-white hover:underline disabled:opacity-50 ml-2"
+        className="ml-2 text-caption font-semibold text-primary-300 underline-offset-2 hover:text-white hover:underline disabled:opacity-50"
       >
         Annuler
       </button>
-    </div>
+    </motion.div>
   );
 }

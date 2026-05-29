@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   await requireVerifiedAuth({});
   return (
     <BadgeUnlockProvider>
-      <div className="min-h-dvh bg-neutral-50">
+      <div className="min-h-dvh bg-[#f7f5f1]">
         <Sidebar />
         <TopMenuButton />
         <div className="lg:pl-64">{children}</div>
