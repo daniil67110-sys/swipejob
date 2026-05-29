@@ -88,20 +88,21 @@ export async function listUsers(input: UsersListInput): Promise<UsersListResult>
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
 
-  // Note Drizzle : un `sql<Date>` raw subquery renvoie une STRING ISO non-castée
-  // (postgres-js ne coerce pas, et le type hint TS est juste un hint). On
-  // re-parse explicitement après la query pour éviter `RangeError: Invalid
-  // time value` quand `Intl.DateTimeFormat.format(string)` est appelé en UI.
+  // Note Drizzle : dès qu'une `select` contient un `sql` raw subquery, le
+  // mapper de colonnes peut renvoyer TOUTES les colonnes timestamp en STRING
+  // ISO (postgres-js ne coerce pas, le type hint TS est un hint). On type tout
+  // en `string | null` et on re-parse explicitement pour éviter
+  // `RangeError: Invalid time value` au `Intl.DateTimeFormat.format(...)` UI.
   const rawRows = await db
     .select({
       id: users.id,
       email: users.email,
       name: users.name,
       role: users.role,
-      createdAt: users.createdAt,
-      deletedAt: users.deletedAt,
-      anonymizedAt: users.anonymizedAt,
-      purgedAt: users.purgedAt,
+      createdAt: sql<string>`${users.createdAt}`,
+      deletedAt: sql<string | null>`${users.deletedAt}`,
+      anonymizedAt: sql<string | null>`${users.anonymizedAt}`,
+      purgedAt: sql<string | null>`${users.purgedAt}`,
       // Dernière activité = max(sessions.lastSeenAt) — null si jamais connecté
       lastSeenAt: sql<string | null>`(
         SELECT MAX(${sessions.lastSeenAt})
@@ -115,9 +116,18 @@ export async function listUsers(input: UsersListInput): Promise<UsersListResult>
     .limit(PAGE_SIZE)
     .offset((safePage - 1) * PAGE_SIZE);
 
+  const toDate = (v: string | null | undefined): Date | null => (v ? new Date(v) : null);
+
   const rows: UserRow[] = rawRows.map((r) => ({
-    ...r,
-    lastSeenAt: r.lastSeenAt ? new Date(r.lastSeenAt) : null,
+    id: r.id,
+    email: r.email,
+    name: r.name,
+    role: r.role,
+    createdAt: new Date(r.createdAt),
+    deletedAt: toDate(r.deletedAt),
+    anonymizedAt: toDate(r.anonymizedAt),
+    purgedAt: toDate(r.purgedAt),
+    lastSeenAt: toDate(r.lastSeenAt),
   }));
 
   return {
