@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, FileText, Shield, Sparkles, TrendingUp } from 'lucide-react';
 import { AnimatedWords } from './AnimatedWords';
+import { CountUp } from './CountUp';
+import { CursorBlob } from './CursorBlob';
 import { FloatingBadge } from './FloatingBadge';
+import { MagneticButton } from './MagneticButton';
 import { SwipeLoopMockup } from './SwipeLoopMockup';
 
 export function LandingHero() {
@@ -12,6 +15,7 @@ export function LandingHero() {
 
   return (
     <section className="relative overflow-hidden bg-[#f7f5f1] pt-10 pb-20 lg:pt-16 lg:pb-32">
+      <CursorBlob />
       {/* Soft background glow */}
       <div
         aria-hidden="true"
@@ -96,7 +100,9 @@ export function LandingHero() {
                   <span className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 ring-2 ring-white" />
                 </div>
                 <div>
-                  <p className="text-body-sm font-semibold text-neutral-900">+1 200 jeunes</p>
+                  <p className="text-body-sm font-semibold text-neutral-900">
+                    +<CountUp to={1200} /> jeunes
+                  </p>
                   <p className="text-caption text-neutral-500">déjà sur la beta</p>
                 </div>
               </div>
@@ -114,7 +120,9 @@ export function LandingHero() {
                   <TrendingUp className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-display-md font-bold leading-none text-neutral-900">5 000+</p>
+                  <p className="text-display-md font-bold leading-none text-neutral-900">
+                    <CountUp to={5000} suffix="+" />
+                  </p>
                   <p className="text-caption text-neutral-500">offres actives</p>
                 </div>
               </div>
@@ -148,16 +156,18 @@ export function LandingHero() {
           className="relative z-10 mt-14 flex flex-col items-center gap-4"
         >
           <div className="flex flex-col items-center gap-3 sm:flex-row">
-            <Link
-              href="/inscription"
-              className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-neutral-900 px-7 py-3.5 text-body-md font-semibold text-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:shadow-[0_12px_36px_-8px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
-            >
-              S&apos;inscrire gratuitement
-              <ArrowRight
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                aria-hidden="true"
-              />
-            </Link>
+            <MagneticButton>
+              <Link
+                href="/inscription"
+                className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-neutral-900 px-7 py-3.5 text-body-md font-semibold text-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.4)] transition-all duration-200 hover:shadow-[0_12px_36px_-8px_rgba(0,0,0,0.5)]"
+              >
+                S&apos;inscrire gratuitement
+                <ArrowRight
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </Link>
+            </MagneticButton>
             <Link
               href="/connexion"
               className="inline-flex min-h-[52px] items-center justify-center rounded-full border border-neutral-300 bg-white/70 px-6 py-3.5 text-body-md font-semibold text-neutral-800 backdrop-blur-sm transition-colors hover:bg-white"
