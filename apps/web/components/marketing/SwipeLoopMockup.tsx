@@ -126,7 +126,7 @@ export function SwipeLoopMockup() {
             <span className="text-[9px] font-medium text-neutral-500">12 / 15</span>
           </div>
 
-          {/* Card stack */}
+          {/* Card stack — keys stables par offer.id pour transitions fluides */}
           <div className="relative mx-3 mt-2 h-[68%]">
             <AnimatePresence initial={false}>
               {visibleCards.map(({ offer, offset }) => {
@@ -136,16 +136,16 @@ export function SwipeLoopMockup() {
                 const targetY = offset * 10;
 
                 const exitX = dir === 'right' ? 360 : -360;
-                const exitRotate = dir === 'right' ? 25 : -25;
+                const exitRotate = dir === 'right' ? 22 : -22;
 
                 return (
                   <motion.div
-                    key={`${offer.id}-${index}-${offset}`}
-                    initial={
-                      isTop
-                        ? { x: 0, rotate: 0, opacity: 1 }
-                        : { y: targetY + 14, scale: targetScale - 0.04, opacity: 0 }
-                    }
+                    key={offer.id}
+                    initial={{
+                      y: 28,
+                      scale: 0.88,
+                      opacity: 0,
+                    }}
                     animate={{
                       y: targetY,
                       scale: targetScale,
@@ -153,37 +153,28 @@ export function SwipeLoopMockup() {
                       x: 0,
                       rotate: 0,
                     }}
-                    exit={
-                      isTop
-                        ? {
-                            x: exitX,
-                            y: 70,
-                            rotate: exitRotate,
-                            opacity: 0,
-                            transition: {
-                              duration: 0.65,
-                              ease: [0.45, 0, 0.7, 0],
-                            },
-                          }
-                        : undefined
-                    }
-                    transition={
-                      isTop
-                        ? {
-                            type: 'spring',
-                            stiffness: 200,
-                            damping: 18,
-                            mass: 0.8,
-                          }
-                        : {
-                            type: 'spring',
-                            stiffness: 220,
-                            damping: 24,
-                            mass: 0.75,
-                          }
-                    }
+                    exit={{
+                      x: exitX,
+                      y: 40,
+                      rotate: exitRotate,
+                      opacity: 0,
+                      transition: {
+                        duration: 0.55,
+                        ease: [0.32, 0, 0.67, 0],
+                      },
+                    }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 28,
+                      mass: 0.6,
+                    }}
                     style={{ zIndex: z }}
-                    className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_10px_30px_rgb(0,0,0,0.10)] ring-1 ring-neutral-100"
+                    className={`absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-100 ${
+                      isTop
+                        ? 'shadow-[0_14px_36px_rgb(0,0,0,0.14)]'
+                        : 'shadow-[0_6px_18px_rgb(0,0,0,0.06)]'
+                    }`}
                   >
                     {/* Top visual band — banner photo + tinted gradient overlay */}
                     <div className="relative h-20 overflow-hidden">
