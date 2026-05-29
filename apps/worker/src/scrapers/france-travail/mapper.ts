@@ -69,6 +69,16 @@ export function mapFranceTravailToOffer(
 
   const salary = parseSalaryLibelle(raw.salaire?.libelle);
 
+  // FT renvoie `dateCreation` au format ISO 8601. Le deck filtre
+  // `WHERE publishedAt IS NOT NULL` (fallback path) → sans ça les offres FT
+  // restent invisibles dans le deck. `new Date(invalid)` → Invalid Date donc
+  // on valide avant.
+  let publishedAt: Date | null = null;
+  if (raw.dateCreation) {
+    const d = new Date(raw.dateCreation);
+    if (!Number.isNaN(d.getTime())) publishedAt = d;
+  }
+
   return {
     sourceId,
     externalId: raw.id,
@@ -85,6 +95,7 @@ export function mapFranceTravailToOffer(
     salaryMaxMonthly: salary.max,
     startDate: null,
     duration: raw.dureeTravailLibelle ?? null,
+    publishedAt,
     requirements: {
       skills: raw.competences?.map((c) => c.libelle).filter(Boolean) ?? [],
       educationLevels:
