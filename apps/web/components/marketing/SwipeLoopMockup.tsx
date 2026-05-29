@@ -97,10 +97,8 @@ export function SwipeLoopMockup() {
     return () => clearInterval(tick);
   }, [reduce]);
 
-  const visibleCards = [0, 1].map((offset) => {
-    const offer = OFFERS[(index + offset) % OFFERS.length]!;
-    return { offer, offset };
-  });
+  // Comme le vrai deck : UNE card visible à la fois
+  const offer = OFFERS[index % OFFERS.length]!;
 
   return (
     <div className="relative mx-auto w-[260px] sm:w-[280px]">
@@ -126,117 +124,91 @@ export function SwipeLoopMockup() {
             <span className="text-[9px] font-medium text-neutral-500">12 / 15</span>
           </div>
 
-          {/* Card stack — keys stables par offer.id pour transitions fluides */}
+          {/* Card unique — calque le vrai deck : spring 220/24/0.8 + slide-out */}
           <div className="relative mx-3 mt-2 h-[68%]">
-            <AnimatePresence initial={false}>
-              {visibleCards.map(({ offer, offset }) => {
-                const isTop = offset === 0;
-                const z = 10 - offset;
-                const targetScale = 1 - offset * 0.05;
-                const targetY = offset * 10;
-
-                const exitX = dir === 'right' ? 360 : -360;
-                const exitRotate = dir === 'right' ? 22 : -22;
-
-                return (
-                  <motion.div
-                    key={offer.id}
-                    initial={{
-                      y: 28,
-                      scale: 0.88,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      y: targetY,
-                      scale: targetScale,
-                      opacity: 1,
-                      x: 0,
-                      rotate: 0,
-                    }}
-                    exit={{
-                      x: exitX,
-                      y: 40,
-                      rotate: exitRotate,
-                      opacity: 0,
-                      transition: {
-                        duration: 0.55,
-                        ease: [0.32, 0, 0.67, 0],
-                      },
-                    }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 260,
-                      damping: 28,
-                      mass: 0.6,
-                    }}
-                    style={{ zIndex: z }}
-                    className={`absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-100 ${
-                      isTop
-                        ? 'shadow-[0_14px_36px_rgb(0,0,0,0.14)]'
-                        : 'shadow-[0_6px_18px_rgb(0,0,0,0.06)]'
-                    }`}
-                  >
-                    {/* Top visual band — banner photo + tinted gradient overlay */}
-                    <div className="relative h-20 overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={offer.banner}
-                        alt=""
-                        aria-hidden="true"
-                        className="absolute inset-0 h-full w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      {/* Subtle brand-color tint to keep contrast on Match badge */}
-                      <div
-                        aria-hidden="true"
-                        className={`absolute inset-0 bg-gradient-to-br ${offer.accent} mix-blend-multiply opacity-30`}
-                      />
-                      {/* Darken bottom-right for badge readability */}
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-0 bg-gradient-to-bl from-black/30 via-transparent to-transparent"
-                      />
-                      <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-neutral-100">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={offer.logo}
-                          alt={`${offer.company} logo`}
-                          width={36}
-                          height={36}
-                          className="h-9 w-9 object-contain"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex-1 p-3 pt-7">
-                      <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-500">
-                        {offer.company}
-                      </p>
-                      <h3 className="mt-0.5 text-[13px] font-bold leading-tight text-neutral-900">
-                        {offer.title}
-                      </h3>
-                      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] text-neutral-600">
-                        <span className="inline-flex items-center gap-0.5">
-                          <MapPin className="h-2.5 w-2.5" />
-                          {offer.city}
-                        </span>
-                        <span className="inline-flex items-center gap-0.5">
-                          <Briefcase className="h-2.5 w-2.5" />
-                          {offer.contract}
-                        </span>
-                      </div>
-                      <div className="mt-3 flex items-center gap-1">
-                        <Sparkles className="h-2.5 w-2.5 text-primary-500" />
-                        <p className="text-[9px] text-neutral-500">
-                          Matche ton CV sur 3 compétences clés
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
+            <AnimatePresence initial={false} mode="popLayout">
+              <motion.div
+                key={offer.id}
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1, x: 0, rotate: 0 }}
+                exit={{
+                  // Reproduit la courbe du deck : x [-300,0,300] → rotate [-22,0,22]
+                  // À x=±420 → rotate ≈ ±30°, slide-out tween fluide
+                  x: dir === 'right' ? 420 : -420,
+                  rotate: dir === 'right' ? 30 : -30,
+                  opacity: 0,
+                  transition: {
+                    duration: 0.5,
+                    ease: [0.4, 0, 0.2, 1],
+                  },
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 220,
+                  damping: 24,
+                  mass: 0.8,
+                }}
+                className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_14px_36px_rgb(0,0,0,0.14)] ring-1 ring-neutral-100"
+              >
+                {/* Top visual band — banner photo + tinted gradient overlay */}
+                <div className="relative h-20 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={offer.banner}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  {/* Subtle brand-color tint to keep contrast on Match badge */}
+                  <div
+                    aria-hidden="true"
+                    className={`absolute inset-0 bg-gradient-to-br ${offer.accent} mix-blend-multiply opacity-30`}
+                  />
+                  {/* Darken bottom-right for badge readability */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-bl from-black/30 via-transparent to-transparent"
+                  />
+                  <div className="absolute -bottom-5 left-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-md ring-1 ring-neutral-100">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={offer.logo}
+                      alt={`${offer.company} logo`}
+                      width={36}
+                      height={36}
+                      className="h-9 w-9 object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 p-3 pt-7">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-neutral-500">
+                    {offer.company}
+                  </p>
+                  <h3 className="mt-0.5 text-[13px] font-bold leading-tight text-neutral-900">
+                    {offer.title}
+                  </h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[9px] text-neutral-600">
+                    <span className="inline-flex items-center gap-0.5">
+                      <MapPin className="h-2.5 w-2.5" />
+                      {offer.city}
+                    </span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <Briefcase className="h-2.5 w-2.5" />
+                      {offer.contract}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1">
+                    <Sparkles className="h-2.5 w-2.5 text-primary-500" />
+                    <p className="text-[9px] text-neutral-500">
+                      Matche ton CV sur 3 compétences clés
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             </AnimatePresence>
           </div>
 
