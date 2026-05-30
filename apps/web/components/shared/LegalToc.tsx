@@ -33,22 +33,22 @@ export function LegalToc({ items }: { items: TocItem[] }) {
   return (
     <nav
       aria-label="Sommaire"
-      className="hidden lg:block sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto"
+      className="sticky top-24 hidden max-h-[calc(100vh-7rem)] overflow-y-auto rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm lg:block"
     >
-      <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+      <p className="mb-4 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
         Sommaire
       </p>
-      <ul className="space-y-1.5 text-body-sm">
+      <ul className="space-y-1 text-body-sm">
         {items.map((item) => {
           const isActive = activeId === item.id;
           return (
             <li key={item.id}>
               <a
                 href={`#${item.id}`}
-                className={`block py-1 px-2 rounded-md border-l-2 transition-colors ${
+                className={`block rounded-xl border-l-2 px-3 py-1.5 transition-all ${
                   isActive
-                    ? 'border-primary-500 bg-primary-50 text-primary-600 font-semibold'
-                    : 'border-transparent text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
+                    ? 'border-orange-500 bg-[#f7f5f1] font-semibold text-neutral-900'
+                    : 'border-transparent text-neutral-600 hover:bg-[#f7f5f1] hover:text-neutral-900'
                 }`}
               >
                 {item.label}

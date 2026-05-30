@@ -23,7 +23,7 @@ export function GoogleSignInButton({ disabled, nextPath }: Props) {
         type="button"
         disabled
         aria-label="S'inscrire avec Google (non disponible)"
-        className="flex w-full items-center justify-center gap-3 rounded-md border border-neutral-300 bg-neutral-100 px-4 py-3 text-sm font-medium text-neutral-500 min-h-[44px] cursor-not-allowed"
+        className="flex min-h-[52px] w-full cursor-not-allowed items-center justify-center gap-3 rounded-full border border-neutral-200 bg-neutral-100 px-5 py-3.5 text-body-md font-semibold text-neutral-500"
       >
         <GoogleLogo />
         <span>Continuer avec Google (indisponible)</span>
@@ -37,7 +37,7 @@ export function GoogleSignInButton({ disabled, nextPath }: Props) {
       onClick={handleClick}
       disabled={isPending}
       aria-label="S'inscrire ou se connecter avec Google"
-      className="flex w-full items-center justify-center gap-3 rounded-md border border-neutral-300 bg-white px-4 py-3 text-sm font-medium text-neutral-900 shadow-sm transition hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 min-h-[44px]"
+      className="flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full border border-neutral-200 bg-white px-5 py-3.5 text-body-md font-semibold text-neutral-900 shadow-sm transition-all hover:-translate-y-0.5 hover:border-neutral-300 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-orange-500/20 disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
     >
       <GoogleLogo />
       <span>{isPending ? 'Connexion en cours…' : 'Continuer avec Google'}</span>

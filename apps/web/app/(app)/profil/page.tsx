@@ -17,6 +17,8 @@ import { db, isDatabaseConfigured } from '@/lib/db';
 import { cvs, preferences, profiles, userBadges, users } from '@swipejob/db/schema';
 import type { LucideIcon } from 'lucide-react';
 import { BADGE_CATALOG } from '@/lib/badges';
+import { FadeIn } from '@/components/shared/motion/FadeIn';
+import { Stagger } from '@/components/shared/motion/Stagger';
 
 export default async function ProfilPage() {
   const session = await requireVerifiedAuth({});
@@ -61,144 +63,144 @@ export default async function ProfilPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-6 pb-24">
       {/* Header */}
-      <header className="space-y-3">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
-          <UserIcon className="w-3.5 h-3.5" aria-hidden="true" />
-          Mon compte
-        </span>
-        <h1 className="text-display-lg font-display font-bold text-neutral-900 leading-[1.05]">
-          Mon{' '}
-          <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-            profil
+      <FadeIn>
+        <header className="space-y-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-caption font-semibold tracking-wide text-neutral-700 ring-1 ring-neutral-200">
+            <UserIcon className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
+            Mon compte
           </span>
-        </h1>
-        <p className="text-body-md text-neutral-600">
-          Tes informations personnelles et préférences de recherche.
-        </p>
-      </header>
+          <h1 className="font-[family-name:var(--font-fraunces)] text-5xl font-semibold leading-[1.05] text-neutral-900 sm:text-6xl">
+            Mon <span className="italic text-neutral-400">profil</span>
+          </h1>
+          <p className="text-body-md leading-relaxed text-neutral-600">
+            Tes informations personnelles et préférences de recherche.
+          </p>
+        </header>
+      </FadeIn>
 
-      {/* Engagement shortcuts */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Engagement shortcuts FitMe */}
+      <Stagger className="grid grid-cols-1 gap-3 sm:grid-cols-2" stagger={0.1} initialDelay={0.15}>
         <Link
           href="/profil/badges"
-          className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-accent-500 via-primary-500 to-info-500 text-white shadow-md hover:shadow-lg transition-shadow"
+          style={{ backgroundColor: '#0D0D14', color: '#ffffff' }}
+          className="group relative block rounded-3xl shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
         >
-          <div className="p-5 flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <Trophy className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
+          <div className="flex items-center gap-3 p-5">
+            <span
+              style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+            >
+              <Trophy className="h-6 w-6" strokeWidth={2.25} aria-hidden="true" />
             </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+            <div className="min-w-0 flex-1">
+              <p
+                style={{ color: 'rgba(255,255,255,0.7)' }}
+                className="text-caption font-semibold uppercase tracking-[0.18em]"
+              >
                 Mes badges
               </p>
-              <p className="text-heading-md font-semibold leading-tight">
-                {unlockedBadgeCount} / {totalBadges} débloqué{unlockedBadgeCount > 1 ? 's' : ''}
+              <p className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold leading-tight">
+                {unlockedBadgeCount}{' '}
+                <span style={{ color: 'rgba(255,255,255,0.5)' }} className="italic">
+                  / {totalBadges}
+                </span>
               </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
+            <ChevronRight
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+              className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </div>
         </Link>
 
         <Link
           href="/profil/parrainage"
-          className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-info-500 via-primary-500 to-success-500 text-white shadow-md hover:shadow-lg transition-shadow"
+          className="group relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
         >
-          <div className="p-5 flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-              <Sparkles className="w-6 h-6" strokeWidth={2.25} aria-hidden="true" />
+          <div className="h-1 bg-orange-500" />
+          <div className="flex items-center gap-3 p-5">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f7f5f1] ring-1 ring-neutral-200">
+              <Sparkles className="h-6 w-6 text-orange-500" strokeWidth={2.25} aria-hidden="true" />
             </span>
-            <div className="flex-1 min-w-0">
-              <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+            <div className="min-w-0 flex-1">
+              <p className="text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
                 Parrainage
               </p>
-              <p className="text-heading-md font-semibold leading-tight">Inviter mes amis</p>
+              <p className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold leading-tight text-neutral-900">
+                Inviter <span className="italic text-neutral-400">mes amis</span>
+              </p>
             </div>
-            <ChevronRight className="w-5 h-5 text-white/85 shrink-0" aria-hidden="true" />
+            <ChevronRight
+              className="h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </div>
         </Link>
-      </div>
+      </Stagger>
 
-      <Section
-        title="Identité"
-        icon={UserIcon}
-        iconBg="bg-info-100"
-        iconColor="text-info-500"
-        editHref="/etape-1-cv/revue"
-      >
-        <Row label="Email" value={user?.email} />
-        <Row label="Prénom" value={profile?.firstName} />
-        <Row label="Nom" value={profile?.lastName} />
-        <Row label="Titre" value={profile?.headline} />
-        <Row label="Bio" value={profile?.summary} />
-        <Row label="Téléphone" value={profile?.phone} />
-        <Row label="Ville" value={profile?.city} />
-        <Row label="LinkedIn" value={profile?.linkedinUrl} />
-      </Section>
+      <Stagger stagger={0.08} initialDelay={0.3} className="space-y-8">
+        <Section title="Identité" icon={UserIcon} editHref="/etape-1-cv/revue">
+          <Row label="Email" value={user?.email} />
+          <Row label="Prénom" value={profile?.firstName} />
+          <Row label="Nom" value={profile?.lastName} />
+          <Row label="Titre" value={profile?.headline} />
+          <Row label="Bio" value={profile?.summary} />
+          <Row label="Téléphone" value={profile?.phone} />
+          <Row label="Ville" value={profile?.city} />
+          <Row label="LinkedIn" value={profile?.linkedinUrl} />
+        </Section>
 
-      <Section
-        title="École & niveau"
-        icon={BookOpen}
-        iconBg="bg-primary-100"
-        iconColor="text-primary-500"
-        editHref="/etape-1-cv/revue"
-      >
-        <Row label="École" value={profile?.currentSchool?.name} />
-        <Row label="Niveau" value={profile?.educationLevel} />
-      </Section>
+        <Section title="École & niveau" icon={BookOpen} editHref="/etape-1-cv/revue">
+          <Row label="École" value={profile?.currentSchool?.name} />
+          <Row label="Niveau" value={profile?.educationLevel} />
+        </Section>
 
-      <Section
-        title="Préférences de recherche"
-        icon={Search}
-        iconBg="bg-success-100"
-        iconColor="text-success-500"
-        editHref="/etape-2-preferences"
-      >
-        <Row label="Contrats" value={pref?.contractTypes?.join(', ') ?? ''} />
-        <Row label="Villes" value={pref?.cities?.join(', ') ?? ''} />
-        <Row label="Mode de travail" value={pref?.workModes?.join(', ') ?? ''} />
-        <Row label="Secteurs" value={pref?.sectors?.join(', ') ?? ''} />
-        <Row
-          label="Salaire (€/mois)"
-          value={
-            pref?.salaryMinMonthly || pref?.salaryMaxMonthly
-              ? `${pref?.salaryMinMonthly ?? '?'} – ${pref?.salaryMaxMonthly ?? '?'}`
-              : ''
-          }
-        />
-      </Section>
+        <Section title="Préférences de recherche" icon={Search} editHref="/etape-2-preferences">
+          <Row label="Contrats" value={pref?.contractTypes?.join(', ') ?? ''} />
+          <Row label="Villes" value={pref?.cities?.join(', ') ?? ''} />
+          <Row label="Mode de travail" value={pref?.workModes?.join(', ') ?? ''} />
+          <Row label="Secteurs" value={pref?.sectors?.join(', ') ?? ''} />
+          <Row
+            label="Salaire (€/mois)"
+            value={
+              pref?.salaryMinMonthly || pref?.salaryMaxMonthly
+                ? `${pref?.salaryMinMonthly ?? '?'} – ${pref?.salaryMaxMonthly ?? '?'}`
+                : ''
+            }
+          />
+        </Section>
 
-      <Section
-        title="CV"
-        icon={FileText}
-        iconBg="bg-warning-100"
-        iconColor="text-warning-500"
-        editHref="/etape-1-cv"
-      >
-        <Row label="Version" value={cv ? `v${cv.version}` : 'Aucun CV uploadé'} />
-        <Row label="Fichier" value={cv?.originalFilename} />
-      </Section>
+        <Section title="CV" icon={FileText} editHref="/etape-1-cv">
+          <Row label="Version" value={cv ? `v${cv.version}` : 'Aucun CV uploadé'} />
+          <Row label="Fichier" value={cv?.originalFilename} />
+        </Section>
 
-      {/* Confidentialité hub (Stories 6.2-6.4) */}
-      <Link
-        href="/profil/confidentialite"
-        className="block relative rounded-2xl bg-white shadow-sm overflow-hidden border border-neutral-100 hover:shadow-md transition-shadow"
-      >
-        <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
-        <div className="p-5 flex items-center gap-3">
-          <span className="w-11 h-11 rounded-xl bg-info-100 text-info-500 flex items-center justify-center shrink-0">
-            <Shield className="w-5 h-5" aria-hidden="true" />
-          </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-body-md font-semibold text-neutral-900">
-              Confidentialité &amp; RGPD
-            </p>
-            <p className="text-caption text-neutral-600 mt-0.5">
-              Consentements granulaires, export de tes données, suppression de compte.
-            </p>
+        {/* Confidentialité hub (Stories 6.2-6.4) */}
+        <Link
+          href="/profil/confidentialite"
+          className="group relative block overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="h-1 bg-neutral-900" />
+          <div className="flex items-center gap-3 p-5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f7f5f1] ring-1 ring-neutral-200">
+              <Shield className="h-5 w-5 text-neutral-700" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-body-md font-semibold text-neutral-900">
+                Confidentialité <span className="italic text-neutral-400">&amp; RGPD</span>
+              </p>
+              <p className="mt-0.5 text-caption text-neutral-600">
+                Consentements granulaires, export de tes données, suppression de compte.
+              </p>
+            </div>
+            <ChevronRight
+              className="h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:translate-x-1"
+              aria-hidden="true"
+            />
           </div>
-          <ChevronRight className="w-5 h-5 text-neutral-400 shrink-0" aria-hidden="true" />
-        </div>
-      </Link>
+        </Link>
+      </Stagger>
     </div>
   );
 }
@@ -206,36 +208,32 @@ export default async function ProfilPage() {
 function Section({
   title,
   icon: Icon,
-  iconBg,
-  iconColor,
   editHref,
   children,
 }: {
   title: string;
   icon: LucideIcon;
-  iconBg: string;
-  iconColor: string;
   editHref: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="relative rounded-2xl bg-white shadow-sm overflow-hidden border border-neutral-100 hover:shadow-md transition-shadow">
-      <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+    <section className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+      <div className="h-1 bg-neutral-900" />
       <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span
-              className={`w-10 h-10 rounded-xl ${iconBg} ${iconColor} flex items-center justify-center`}
-            >
-              <Icon className="w-5 h-5" aria-hidden="true" />
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f7f5f1] text-neutral-700 ring-1 ring-neutral-200">
+              <Icon className="h-5 w-5" aria-hidden="true" />
             </span>
-            <h2 className="text-heading-md font-semibold text-neutral-900">{title}</h2>
+            <h2 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold text-neutral-900">
+              {title}
+            </h2>
           </div>
           <a
             href={editHref}
-            className="inline-flex items-center gap-1.5 text-caption font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#f7f5f1] px-3 py-1.5 text-caption font-semibold text-neutral-700 ring-1 ring-neutral-200 transition-all hover:bg-neutral-900 hover:text-white"
           >
-            <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
+            <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             Modifier
           </a>
         </div>
@@ -248,9 +246,11 @@ function Section({
 function Row({ label, value }: { label: string; value?: string | null }) {
   return (
     <div className="flex gap-3 text-body-sm">
-      <dt className="w-36 text-neutral-500 font-medium shrink-0">{label}</dt>
+      <dt className="w-36 shrink-0 font-medium uppercase tracking-[0.1em] text-neutral-500 text-caption">
+        {label}
+      </dt>
       <dd className="flex-1 text-neutral-900">
-        {value || <span className="text-neutral-400 italic">Non renseigné</span>}
+        {value || <span className="italic text-neutral-400">Non renseigné</span>}
       </dd>
     </div>
   );

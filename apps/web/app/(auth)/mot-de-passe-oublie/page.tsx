@@ -2,22 +2,21 @@ import { ArrowLeft, KeyRound } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
-      <div className="h-1.5 bg-gradient-to-r from-warning-500 to-primary-500" />
-      <div className="p-8 space-y-6">
+    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.18)]">
+      <div className="space-y-6 p-8">
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-warning-100 text-warning-500 text-caption font-semibold tracking-wide">
-            <KeyRound className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-[#f7f5f1] px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-700">
+            <KeyRound className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
             Récupération
           </span>
-          <h2 className="text-display-md font-display font-bold text-neutral-900">
-            Mot de passe oublié
+          <h2 className="font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight tracking-tight text-neutral-900">
+            Mot de passe <span className="italic font-light text-neutral-400">oublié</span>
           </h2>
-          <p className="text-body-sm text-neutral-600">
+          <p className="text-body-sm leading-relaxed text-neutral-600">
             Le flow self-service &quot;mot de passe oublié&quot; arrive bientôt. En attendant,
             contacte l&apos;équipe à{' '}
             <a
-              className="font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+              className="font-semibold text-neutral-900 underline-offset-4 hover:underline"
               href="mailto:support@swipejob.fr"
             >
               support@swipejob.fr
@@ -25,12 +24,12 @@ export default function ForgotPasswordPage() {
             en précisant l&apos;email de ton compte.
           </p>
         </div>
-        <div className="text-center pt-2 border-t border-neutral-100">
+        <div className="border-t border-neutral-200 pt-4 text-center">
           <a
-            className="inline-flex items-center gap-1 pt-4 font-semibold text-primary-500 hover:text-primary-600 hover:underline text-body-sm"
+            className="inline-flex items-center gap-1.5 text-body-sm font-semibold text-neutral-900 underline-offset-4 hover:underline"
             href="/connexion"
           >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Retour à la connexion
           </a>
         </div>

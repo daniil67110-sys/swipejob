@@ -1,51 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Layers, Menu, Send, Settings, User, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { SwipejobLogo } from './SwipejobLogo';
 
 const MENU_ITEMS: Array<{
   href: string;
   label: string;
   description: string;
   icon: LucideIcon;
-  color: string;
-  iconBg: string;
 }> = [
   {
     href: '/deck',
     label: 'Deck du jour',
     description: 'Découvre tes offres',
     icon: Layers,
-    color: 'text-primary-500',
-    iconBg: 'bg-primary-100',
   },
   {
     href: '/candidatures',
     label: 'Mes candidatures',
     description: 'Suis tes envois',
     icon: Send,
-    color: 'text-success-500',
-    iconBg: 'bg-success-100',
   },
   {
     href: '/profil',
     label: 'Mon profil',
     description: 'CV et préférences',
     icon: User,
-    color: 'text-info-500',
-    iconBg: 'bg-info-100',
   },
   {
     href: '/parametres',
     label: 'Réglages',
     description: 'Notifications et compte',
     icon: Settings,
-    color: 'text-warning-500',
-    iconBg: 'bg-warning-100',
   },
 ];
 
@@ -53,66 +44,74 @@ export function TopMenuButton() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Ferme automatiquement la Sheet quand l'URL change.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
-    <div className="fixed top-5 right-5 z-40 lg:hidden">
+    <div className="fixed right-5 top-5 z-40 lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <button
             type="button"
             aria-label="Ouvrir le menu"
-            className="w-11 h-11 rounded-full bg-white shadow-md ring-1 ring-neutral-200 flex items-center justify-center text-neutral-700 hover:scale-105 hover:shadow-lg hover:ring-primary-200 active:scale-95 transition-all"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-900 shadow-md ring-1 ring-neutral-200 transition-all hover:scale-105 hover:shadow-lg active:scale-95"
           >
-            <Menu className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
+            <Menu className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
           </button>
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="w-[340px] sm:w-[400px] p-0 border-l border-neutral-100"
+          className="w-[340px] border-l border-neutral-200 bg-[#f7f5f1] p-0 sm:w-[400px]"
         >
-          {/* Header gradient */}
-          <div className="relative bg-gradient-to-br from-info-500 via-primary-500 to-success-500 px-6 pt-8 pb-12 text-white">
+          {/* Header noir éditorial */}
+          <div className="relative bg-neutral-950 px-6 pb-12 pt-8 text-white">
             <button
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Fermer le menu"
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-colors"
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm transition-colors hover:bg-white/20"
             >
-              <X className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
+              <X className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
             </button>
-            <p className="text-caption font-semibold tracking-wider uppercase text-white/80 mb-2">
-              SwipeJob
-            </p>
-            <h2 className="text-display-md font-display font-bold">Menu</h2>
+            <SwipejobLogo size="sm" markOnly />
+            <h2 className="mt-5 font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight">
+              Menu
+            </h2>
           </div>
 
           {/* Items */}
-          <nav className="px-3 py-4 -mt-6 relative">
-            <ul className="space-y-1.5 bg-white rounded-2xl shadow-lg border border-neutral-100 p-2">
+          <nav className="relative -mt-6 px-3 py-4">
+            <ul className="space-y-1.5 rounded-3xl border border-neutral-200 bg-white p-2 shadow-lg">
               {MENU_ITEMS.map((item) => {
                 const isActive =
                   pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
                 const Icon = item.icon;
                 return (
                   <li key={item.href}>
-                    <Link
+                    <a
                       href={item.href}
-                      onClick={() => setOpen(false)}
                       aria-current={isActive ? 'page' : undefined}
-                      className={`group flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                      className={`group flex items-center gap-3 rounded-2xl p-3 transition-all duration-200 ${
                         isActive
-                          ? 'bg-gradient-to-r from-info-50 to-success-50 ring-1 ring-primary-100'
-                          : 'hover:bg-neutral-50 hover:translate-x-1'
+                          ? 'bg-[#f7f5f1] ring-1 ring-neutral-900/10'
+                          : 'hover:bg-[#f7f5f1] hover:translate-x-1'
                       }`}
                     >
                       <span
-                        className={`w-11 h-11 rounded-xl ${item.iconBg} ${item.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110 ${
+                          isActive
+                            ? 'bg-neutral-900 text-white'
+                            : 'bg-[#f7f5f1] text-neutral-700 ring-1 ring-neutral-200'
+                        }`}
                       >
-                        <Icon className="w-5 h-5" strokeWidth={2.25} aria-hidden="true" />
+                        <Icon className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
                       </span>
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p
                           className={`text-body-md font-semibold ${
-                            isActive ? 'text-primary-600' : 'text-neutral-900'
+                            isActive ? 'text-neutral-900' : 'text-neutral-900'
                           }`}
                         >
                           {item.label}
@@ -120,9 +119,9 @@ export function TopMenuButton() {
                         <p className="text-caption text-neutral-500">{item.description}</p>
                       </div>
                       {isActive ? (
-                        <span className="shrink-0 w-2 h-2 rounded-full bg-gradient-to-br from-info-500 to-success-500" />
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-orange-500" />
                       ) : null}
-                    </Link>
+                    </a>
                   </li>
                 );
               })}
@@ -130,40 +129,27 @@ export function TopMenuButton() {
           </nav>
 
           {/* Footer : liens légaux */}
-          <div className="absolute bottom-0 left-0 right-0 px-6 py-5 border-t border-neutral-100 bg-neutral-50 space-y-2">
+          <div className="absolute bottom-0 left-0 right-0 space-y-2 border-t border-neutral-200 bg-[#f7f5f1] px-6 py-5">
             <nav
               aria-label="Liens légaux"
               className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-neutral-500"
             >
-              <Link
-                href="/mentions-legales"
-                className="hover:text-neutral-700 hover:underline"
-                onClick={() => setOpen(false)}
-              >
+              <Link href="/mentions-legales" className="hover:text-neutral-700 hover:underline">
                 Mentions
               </Link>
               <span aria-hidden="true">·</span>
-              <Link
-                href="/cgu"
-                className="hover:text-neutral-700 hover:underline"
-                onClick={() => setOpen(false)}
-              >
+              <Link href="/cgu" className="hover:text-neutral-700 hover:underline">
                 CGU
               </Link>
               <span aria-hidden="true">·</span>
               <Link
                 href="/politique-confidentialite"
                 className="hover:text-neutral-700 hover:underline"
-                onClick={() => setOpen(false)}
               >
                 Confidentialité
               </Link>
               <span aria-hidden="true">·</span>
-              <Link
-                href="/cookies"
-                className="hover:text-neutral-700 hover:underline"
-                onClick={() => setOpen(false)}
-              >
+              <Link href="/cookies" className="hover:text-neutral-700 hover:underline">
                 Cookies
               </Link>
             </nav>

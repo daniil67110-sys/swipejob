@@ -179,19 +179,20 @@ export default async function ValiderEmailPage(props: {
 function renderOutcome(outcome: Outcome) {
   const m = MESSAGES[outcome];
   return (
-    <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
-      <div className="h-1.5 bg-gradient-to-r from-warning-500 via-primary-500 to-error-500" />
-      <div className="p-8 space-y-6">
+    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.18)]">
+      <div className="space-y-6 p-8">
         <div className="space-y-3">
-          <h2 className="text-display-md font-display font-bold text-neutral-900">{m.title}</h2>
-          <p className="text-body-sm text-neutral-600">{m.body}</p>
+          <h2 className="font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight tracking-tight text-neutral-900">
+            {m.title}
+          </h2>
+          <p className="text-body-sm leading-relaxed text-neutral-600">{m.body}</p>
         </div>
-        <div className="text-center pt-2 border-t border-neutral-100">
+        <div className="border-t border-neutral-200 pt-4 text-center">
           <a
-            className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-4 py-2.5 mt-4 text-body-sm font-semibold text-white shadow-md hover:shadow-lg transition-shadow min-h-[44px]"
+            className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-body-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
             href="/inscription/email"
           >
-            Recevoir un nouveau lien
+            Recevoir un nouveau lien →
           </a>
         </div>
       </div>

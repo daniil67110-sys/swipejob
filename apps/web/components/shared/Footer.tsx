@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SwipejobLogo } from './SwipejobLogo';
 
 const LEGAL_LINKS: Array<{ href: string; label: string }> = [
   { href: '/mentions-legales', label: 'Mentions légales' },
@@ -15,35 +16,32 @@ const SUPPORT_LINKS: Array<{ href: string; label: string }> = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-neutral-100 bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="border-t border-neutral-200/60 bg-[#f7f5f1]">
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <Link href="/" className="inline-flex items-center gap-2.5 group">
-              <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-info-500 via-primary-500 to-success-500 flex items-center justify-center text-white font-display font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-                S
+            <SwipejobLogo asLink href="/" size="md" />
+            <p className="mt-4 text-body-sm leading-relaxed text-neutral-600">
+              La recherche d&apos;emploi qui{' '}
+              <span className="font-[family-name:var(--font-fraunces)] italic text-neutral-900">
+                swipe avec toi
               </span>
-              <span className="text-heading-md font-display font-bold text-neutral-900">
-                SwipeJob
-              </span>
-            </Link>
-            <p className="mt-3 text-body-sm text-neutral-600">
-              La recherche d&apos;emploi qui swipe avec toi.
+              .
             </p>
           </div>
 
           {/* Légal */}
           <div>
-            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+            <p className="mb-4 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
               Légal
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {LEGAL_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-body-sm text-neutral-700 hover:text-primary-500 hover:underline"
+                    className="text-body-sm text-neutral-700 transition-colors hover:text-neutral-900 hover:underline hover:decoration-orange-400 hover:underline-offset-2"
                   >
                     {link.label}
                   </Link>
@@ -54,15 +52,15 @@ export function Footer() {
 
           {/* Compte */}
           <div>
-            <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-3">
+            <p className="mb-4 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
               Compte
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {SUPPORT_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-body-sm text-neutral-700 hover:text-primary-500 hover:underline"
+                    className="text-body-sm text-neutral-700 transition-colors hover:text-neutral-900 hover:underline hover:decoration-orange-400 hover:underline-offset-2"
                   >
                     {link.label}
                   </Link>
@@ -71,7 +69,7 @@ export function Footer() {
               <li>
                 <a
                   href="mailto:contact@swipejob.fr"
-                  className="text-body-sm text-neutral-700 hover:text-primary-500 hover:underline"
+                  className="text-body-sm text-neutral-700 transition-colors hover:text-neutral-900 hover:underline hover:decoration-orange-400 hover:underline-offset-2"
                 >
                   Nous contacter
                 </a>
@@ -80,11 +78,12 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="mt-12 flex flex-col gap-3 border-t border-neutral-200/60 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-caption text-neutral-500">
-            © {new Date().getFullYear()} SwipeJob · Tous droits réservés
+            © {new Date().getFullYear()} SwipeJob ·{' '}
+            <span className="italic">Tous droits réservés</span>
           </p>
-          <p className="text-caption text-neutral-400">Beta privée · France</p>
+          <p className="text-caption italic text-neutral-400">Beta privée · France</p>
         </div>
       </div>
     </footer>

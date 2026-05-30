@@ -32,21 +32,20 @@ export function PendingReviewSection({ items }: Props) {
   return (
     <section
       aria-label="Lettres en attente de relecture"
-      className="relative rounded-2xl bg-white shadow-md overflow-hidden border border-info-100"
+      className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
     >
-      <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-accent-500" />
-      <div className="p-5 space-y-4">
+      <div className="h-1 bg-neutral-900" />
+      <div className="space-y-4 p-5">
         <header className="flex items-start gap-3">
-          <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-info-500 to-primary-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <Sparkles className="w-5 h-5" aria-hidden="true" />
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-neutral-900 text-white shadow-sm">
+            <Sparkles className="h-5 w-5" aria-hidden="true" />
           </span>
-          <div className="flex-1 min-w-0">
-            <p className="text-heading-sm font-semibold text-neutral-900">
-              {items.length === 1
-                ? '1 lettre à relire avant envoi'
-                : `${items.length} lettres à relire avant envoi`}
+          <div className="min-w-0 flex-1">
+            <p className="font-[family-name:var(--font-fraunces)] text-xl font-semibold leading-tight text-neutral-900">
+              {items.length === 1 ? '1 lettre à relire' : `${items.length} lettres à relire`}{' '}
+              <span className="italic text-neutral-400">avant envoi</span>
             </p>
-            <p className="text-body-sm text-neutral-600 mt-0.5">
+            <p className="mt-1 text-body-sm text-neutral-600">
               Mode relecture activé — édite ta lettre puis valide l&apos;envoi.
             </p>
           </div>
@@ -54,10 +53,10 @@ export function PendingReviewSection({ items }: Props) {
             type="button"
             onClick={handleDisableMode}
             disabled={disabling}
-            className="hidden sm:inline text-caption font-medium text-neutral-500 hover:text-neutral-900 hover:underline transition-colors disabled:opacity-50"
+            className="hidden text-caption font-semibold text-neutral-500 transition-colors hover:text-neutral-900 hover:underline disabled:opacity-50 sm:inline"
             title="Désactiver le mode relecture (les prochaines candidatures partiront sans relecture)"
           >
-            Désactiver le mode
+            Désactiver
           </button>
         </header>
 
@@ -67,19 +66,19 @@ export function PendingReviewSection({ items }: Props) {
               <button
                 type="button"
                 onClick={() => setSelectedId(item.id)}
-                className="w-full group flex items-center gap-3 p-3 rounded-xl border border-neutral-100 hover:border-info-200 hover:bg-info-50/40 transition-all text-left"
+                className="group flex w-full items-center gap-3 rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-3 text-left transition-all hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-white hover:shadow-sm"
               >
                 <CompanyLogo name={item.offer.companyName} size="sm" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold">
+                  <p className="text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
                     {item.offer.companyName ?? 'Entreprise non précisée'}
                   </p>
-                  <p className="text-body-sm font-semibold text-neutral-900 truncate">
+                  <p className="truncate text-body-sm font-semibold text-neutral-900">
                     {item.offer.title}
                   </p>
                 </div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-500 to-primary-500 text-white text-caption font-semibold shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
-                  <Eye className="w-3.5 h-3.5" aria-hidden="true" />
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1.5 text-caption font-semibold text-white shadow-sm transition-all group-hover:bg-orange-500">
+                  <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                   Relire
                 </span>
               </button>
@@ -91,7 +90,7 @@ export function PendingReviewSection({ items }: Props) {
           type="button"
           onClick={handleDisableMode}
           disabled={disabling}
-          className="sm:hidden w-full text-caption font-medium text-neutral-500 hover:text-neutral-900 hover:underline transition-colors disabled:opacity-50 py-2"
+          className="w-full py-2 text-caption font-semibold text-neutral-500 transition-colors hover:text-neutral-900 hover:underline disabled:opacity-50 sm:hidden"
         >
           Désactiver le mode relecture
         </button>

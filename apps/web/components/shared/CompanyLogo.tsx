@@ -50,11 +50,14 @@ export function CompanyLogo({
   const sizeClass = SIZE_CLASSES[size];
   const iconClass = ICON_SIZES[size];
 
+  // Clearbit Logo API a fermé (HubSpot rachat). On utilise Google Favicon API
+  // qui est public et fiable. Fallback en cascade : logoUrl explicite → .com →
+  // .fr → placeholder éditorial noir+initiale.
   const candidates: string[] = [];
   if (logoUrl) candidates.push(logoUrl);
   if (name) {
-    candidates.push(`https://logo.clearbit.com/${guessDomain(name, 'com')}`);
-    candidates.push(`https://logo.clearbit.com/${guessDomain(name, 'fr')}`);
+    candidates.push(`https://www.google.com/s2/favicons?domain=${guessDomain(name, 'com')}&sz=128`);
+    candidates.push(`https://www.google.com/s2/favicons?domain=${guessDomain(name, 'fr')}&sz=128`);
   }
 
   const currentUrl = candidates[attempt];
@@ -62,7 +65,7 @@ export function CompanyLogo({
   if (!currentUrl) {
     return (
       <div
-        className={`${sizeClass} rounded-xl bg-gradient-to-br from-info-500 to-primary-500 flex items-center justify-center text-white font-display font-bold shrink-0 shadow-sm ${className}`}
+        className={`${sizeClass} flex shrink-0 items-center justify-center rounded-xl bg-neutral-900 font-[family-name:var(--font-fraunces)] font-semibold italic text-white shadow-sm ${className}`}
         aria-hidden="true"
       >
         {initial ?? <Building2 className={iconClass} strokeWidth={1.75} />}
@@ -72,16 +75,17 @@ export function CompanyLogo({
 
   return (
     <div
-      className={`${sizeClass} rounded-xl overflow-hidden bg-white shrink-0 ring-1 ring-neutral-200 p-1.5 ${className}`}
+      className={`${sizeClass} shrink-0 overflow-hidden rounded-xl bg-white p-1.5 ring-1 ring-neutral-200 ${className}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         key={currentUrl}
         src={currentUrl}
         alt={name ?? ''}
-        className="w-full h-full object-contain"
+        className="h-full w-full object-contain"
         onError={() => setAttempt((a) => a + 1)}
         loading="lazy"
+        referrerPolicy="no-referrer"
       />
     </div>
   );

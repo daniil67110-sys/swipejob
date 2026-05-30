@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { updateNotificationSettingsAction } from './actions';
@@ -39,11 +40,13 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
   };
 
   return (
-    <form className="space-y-6" aria-busy={isPending}>
-      <fieldset className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-0 p-4">
-        <legend className="px-1 text-sm font-semibold">Notifications push</legend>
+    <form className="space-y-5" aria-busy={isPending}>
+      <fieldset className="space-y-4 rounded-2xl bg-[#f7f5f1] p-5 ring-1 ring-neutral-200">
+        <legend className="px-2 text-caption font-semibold uppercase tracking-[0.14em] text-neutral-700">
+          Notifications push
+        </legend>
         <Row>
-          <Label htmlFor="pushEnabled" className="flex-1">
+          <Label htmlFor="pushEnabled" className="flex-1 text-body-sm text-neutral-800">
             Recevoir une notification le matin avec mon deck du jour
           </Label>
           <Switch
@@ -53,31 +56,46 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
             disabled={isPending}
           />
         </Row>
-        {state.pushEnabled ? (
-          <Row>
-            <Label htmlFor="pushTime" className="flex-1">
-              Heure d’envoi (locale)
-            </Label>
-            <input
-              id="pushTime"
-              type="time"
-              value={state.pushTime}
-              onChange={(e) => setState({ ...state, pushTime: e.target.value })}
-              onBlur={() => save({ pushTime: state.pushTime })}
-              className="rounded-md border border-neutral-200 px-2 py-1 text-sm"
-            />
-          </Row>
-        ) : null}
+        <AnimatePresence initial={false}>
+          {state.pushEnabled ? (
+            <motion.div
+              key="pushTime"
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <Row>
+                <Label htmlFor="pushTime" className="flex-1 text-body-sm text-neutral-800">
+                  Heure d’envoi (locale)
+                </Label>
+                <input
+                  id="pushTime"
+                  type="time"
+                  value={state.pushTime}
+                  onChange={(e) => setState({ ...state, pushTime: e.target.value })}
+                  onBlur={() => save({ pushTime: state.pushTime })}
+                  className="rounded-xl border border-neutral-200 bg-white px-3 py-1.5 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
+                />
+              </Row>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </fieldset>
 
-      <fieldset className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-0 p-4">
-        <legend className="px-1 text-sm font-semibold">Emails</legend>
+      <fieldset className="space-y-4 rounded-2xl bg-[#f7f5f1] p-5 ring-1 ring-neutral-200">
+        <legend className="px-2 text-caption font-semibold uppercase tracking-[0.14em] text-neutral-700">
+          Emails
+        </legend>
         <Row>
-          <Label className="flex-1">Email transactionnel (vérif, RGPD)</Label>
-          <span className="text-xs text-neutral-500">Toujours actif (obligatoire)</span>
+          <Label className="flex-1 text-body-sm text-neutral-800">
+            Email transactionnel (vérif, RGPD)
+          </Label>
+          <span className="italic text-caption text-neutral-500">Toujours actif</span>
         </Row>
         <Row>
-          <Label htmlFor="emailDigest" className="flex-1">
+          <Label htmlFor="emailDigest" className="flex-1 text-body-sm text-neutral-800">
             Récap hebdomadaire (dimanche soir)
           </Label>
           <Switch
@@ -93,7 +111,7 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
           />
         </Row>
         <Row>
-          <Label htmlFor="emailMarketing" className="flex-1">
+          <Label htmlFor="emailMarketing" className="flex-1 text-body-sm text-neutral-800">
             Annonces produit & promos
           </Label>
           <Switch
@@ -105,12 +123,16 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
         </Row>
       </fieldset>
 
-      <fieldset className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-0 p-4">
-        <legend className="px-1 text-sm font-semibold">Candidatures</legend>
+      <fieldset className="space-y-4 rounded-2xl bg-[#f7f5f1] p-5 ring-1 ring-neutral-200">
+        <legend className="px-2 text-caption font-semibold uppercase tracking-[0.14em] text-neutral-700">
+          Candidatures
+        </legend>
         <Row>
-          <div className="flex-1 space-y-0.5">
-            <Label htmlFor="reviewBeforeSend">Relire ma lettre avant envoi</Label>
-            <p className="text-xs text-neutral-500">
+          <div className="flex-1 space-y-1">
+            <Label htmlFor="reviewBeforeSend" className="text-body-sm text-neutral-800">
+              Relire ma lettre avant envoi
+            </Label>
+            <p className="text-caption text-neutral-500">
               Tu pourras éditer ou régénérer chaque lettre IA avant qu&apos;elle parte. Sinon, swipe
               = envoi direct.
             </p>
@@ -124,15 +146,35 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
         </Row>
       </fieldset>
 
-      {error ? (
-        <p role="status" aria-live="polite" className="text-sm text-error-500">
-          {error}
-        </p>
-      ) : savedTick > 0 ? (
-        <p role="status" aria-live="polite" className="text-xs text-neutral-500">
-          Préférences enregistrées.
-        </p>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {error ? (
+          <motion.p
+            key={`err-${error}`}
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="text-body-sm text-error-500"
+          >
+            {error}
+          </motion.p>
+        ) : savedTick > 0 ? (
+          <motion.p
+            key={`ok-${savedTick}`}
+            role="status"
+            aria-live="polite"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="italic text-caption text-neutral-500"
+          >
+            Préférences enregistrées.
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
     </form>
   );
 }

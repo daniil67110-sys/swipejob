@@ -21,18 +21,15 @@ export default async function InscriptionPage(props: {
   const errorMessage = errorCode ? (ERROR_MESSAGES[errorCode] ?? ERROR_MESSAGES['default']) : null;
 
   return (
-    <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
-      {/* Gradient bar top */}
-      <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
-
-      <div className="p-8 space-y-6">
+    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.18)]">
+      <div className="space-y-6 p-8">
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
-            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-[#f7f5f1] px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-700">
+            <Sparkles className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
             Bienvenue
           </span>
-          <h2 className="text-display-md font-display font-bold text-neutral-900">
-            Crée ton compte
+          <h2 className="font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight tracking-tight text-neutral-900">
+            Crée <span className="italic font-light text-neutral-400">ton compte</span>
           </h2>
           <p className="text-body-sm text-neutral-600">
             En 1 clic avec Google. Aucun mot de passe à retenir.
@@ -42,31 +39,31 @@ export default async function InscriptionPage(props: {
         {errorMessage ? (
           <div
             role="alert"
-            className="rounded-xl border border-error-100 bg-error-100/50 p-3 flex items-start gap-2.5"
+            className="flex items-start gap-2.5 rounded-2xl border border-red-200 bg-red-50 p-3"
           >
-            <AlertCircle className="w-4 h-4 text-error-500 shrink-0 mt-0.5" aria-hidden="true" />
-            <p className="text-body-sm text-error-500">{errorMessage}</p>
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
+            <p className="text-body-sm text-red-700">{errorMessage}</p>
           </div>
         ) : null}
 
         {isAuthConfigured ? <GoogleSignInButton nextPath={nextPath} /> : null}
 
-        <div className="space-y-2 text-center pt-2 border-t border-neutral-100">
+        <div className="space-y-2 border-t border-neutral-200 pt-4 text-center">
           {isEmailConfigured ? (
-            <p className="text-body-sm text-neutral-500 pt-4">
+            <p className="text-body-sm text-neutral-500">
               Pas envie d&apos;utiliser Google ?{' '}
               <a
-                className="font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+                className="font-semibold text-neutral-900 underline-offset-4 hover:underline"
                 href="/inscription/email"
               >
                 S&apos;inscrire avec un email
               </a>
             </p>
           ) : null}
-          <p className={`text-body-sm text-neutral-500 ${isEmailConfigured ? '' : 'pt-4'}`}>
+          <p className="text-body-sm text-neutral-500">
             Déjà inscrit ?{' '}
             <a
-              className="font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+              className="font-semibold text-neutral-900 underline-offset-4 hover:underline"
               href="/connexion"
             >
               Se connecter

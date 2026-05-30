@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Briefcase, Calendar, Inbox, MapPin, PartyPopper, Send } from 'lucide-react';
 import { requireVerifiedAuth } from '@/lib/auth';
 import { CompanyLogo } from '@/components/shared/CompanyLogo';
+import { FadeIn } from '@/components/shared/motion/FadeIn';
+import { Stagger } from '@/components/shared/motion/Stagger';
 import { listApplicationsAction, listPendingReviewAction } from './actions';
 import { ApplicationsFilters } from './ApplicationsFilters';
 import { ApplicationStatusMenu } from './ApplicationStatusMenu';
@@ -42,77 +44,87 @@ export default async function CandidaturesPage({
   const pendingReviewItems = pendingRes.ok ? pendingRes.data.items : [];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8 p-6">
+    <div className="mx-auto max-w-4xl space-y-8 p-6 pb-24">
       {/* Header */}
-      <header className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600">
-          <Send className="w-3.5 h-3.5" aria-hidden="true" />
-          <span className="text-caption font-semibold tracking-wide">
-            {total} candidature{total > 1 ? 's' : ''}
-          </span>
-        </div>
-        <h1 className="text-display-lg font-display font-bold text-neutral-900">
-          Mes candidatures
-        </h1>
-        <p className="text-body-md text-neutral-600">
-          Suis l&apos;avancée de toutes tes opportunités en un coup d&apos;œil.
-        </p>
-      </header>
+      <FadeIn>
+        <header className="space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white ring-1 ring-neutral-200 text-neutral-700">
+            <Send className="w-3.5 h-3.5 text-orange-500" aria-hidden="true" />
+            <span className="text-caption font-semibold tracking-wide">
+              {total} candidature{total > 1 ? 's' : ''}
+            </span>
+          </div>
+          <h1 className="font-[family-name:var(--font-fraunces)] text-5xl font-semibold leading-[1.05] text-neutral-900 sm:text-6xl">
+            Mes <span className="italic text-neutral-400">candidatures</span>
+          </h1>
+          <p className="text-body-md leading-relaxed text-neutral-600">
+            Suis l&apos;avancée de toutes tes opportunités en un coup d&apos;œil.
+          </p>
+        </header>
+      </FadeIn>
 
       {params.signed === '1' ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="relative rounded-2xl bg-white shadow-md overflow-hidden border border-success-100"
-        >
-          <div className="h-1.5 bg-gradient-to-r from-success-500 to-info-500" />
-          <div className="p-5 flex items-start gap-3">
-            <span className="w-10 h-10 rounded-full bg-gradient-to-br from-success-500 to-info-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <PartyPopper className="w-5 h-5" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="text-body-md font-semibold text-neutral-900">Signature enregistrée</p>
-              <p className="text-body-sm text-neutral-600 mt-0.5">
-                Bravo, prends un moment pour célébrer.
-              </p>
+        <FadeIn delay={0.1}>
+          <div
+            role="status"
+            aria-live="polite"
+            className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+          >
+            <div className="h-1 bg-neutral-900" />
+            <div className="flex items-start gap-3 p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-neutral-900 text-white shadow-sm">
+                <PartyPopper className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-body-md font-semibold text-neutral-900">Signature enregistrée</p>
+                <p className="mt-0.5 text-body-sm text-neutral-600">
+                  Bravo, prends un moment pour célébrer.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </FadeIn>
       ) : null}
 
-      <PendingReviewSection items={pendingReviewItems} />
+      <FadeIn delay={0.15}>
+        <PendingReviewSection items={pendingReviewItems} />
+      </FadeIn>
 
-      <ApplicationsFilters />
+      <FadeIn delay={0.2}>
+        <ApplicationsFilters />
+      </FadeIn>
 
       {items.length === 0 ? (
-        <div className="relative rounded-2xl bg-white shadow-md overflow-hidden border border-neutral-100">
-          <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
-          <div className="p-12 text-center">
-            <span className="w-14 h-14 rounded-2xl bg-gradient-to-br from-info-100 to-success-100 text-info-500 inline-flex items-center justify-center mb-4">
-              <Inbox className="w-7 h-7" strokeWidth={1.75} aria-hidden="true" />
-            </span>
-            <p className="text-heading-md font-semibold text-neutral-900 mb-1">
-              Pas encore de candidature
-            </p>
-            <p className="text-body-sm text-neutral-500 mb-5">
-              Swipe quelques offres dans ton deck pour commencer.
-            </p>
-            <Link
-              href="/deck"
-              className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-5 py-2.5 text-body-sm font-semibold text-white shadow-md hover:shadow-lg transition-shadow min-h-[44px]"
-            >
-              Ouvrir mon deck
-            </Link>
+        <FadeIn delay={0.25}>
+          <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+            <div className="h-1 bg-neutral-900" />
+            <div className="p-12 text-center">
+              <span className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-neutral-900 text-white">
+                <Inbox className="h-7 w-7" strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              <p className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-tight text-neutral-900">
+                Pas encore de <span className="italic text-neutral-400">candidature</span>
+              </p>
+              <p className="mb-6 mt-2 text-body-sm text-neutral-500">
+                Swipe quelques offres dans ton deck pour commencer.
+              </p>
+              <Link
+                href="/deck"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-neutral-900 px-6 py-2.5 text-body-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              >
+                Ouvrir mon deck
+              </Link>
+            </div>
           </div>
-        </div>
+        </FadeIn>
       ) : (
-        <ul className="space-y-3">
+        <Stagger as="ul" className="space-y-3" stagger={0.06} initialDelay={0.25}>
           {items.map((app) => (
-            <li
+            <div
               key={app.id}
-              className="relative rounded-2xl bg-white shadow-sm overflow-hidden border border-neutral-100 hover:shadow-md hover:border-neutral-200 transition-all"
+              className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="h-1 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+              <div className="h-1 bg-neutral-900" />
               <div className="p-5">
                 <div className="flex items-start gap-4">
                   <CompanyLogo name={app.offer.companyName} size="md" />
@@ -120,10 +132,10 @@ export default async function CandidaturesPage({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-caption tracking-wider text-neutral-500 uppercase font-semibold mb-0.5">
+                        <p className="mb-0.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-500">
                           {app.offer.companyName ?? 'Entreprise non précisée'}
                         </p>
-                        <h2 className="text-heading-md font-semibold text-neutral-900 leading-tight">
+                        <h2 className="font-[family-name:var(--font-fraunces)] text-2xl font-semibold leading-tight text-neutral-900">
                           {app.offer.title}
                         </h2>
                       </div>
@@ -136,17 +148,17 @@ export default async function CandidaturesPage({
                       </div>
                     </div>
 
-                    {/* Pills colorées */}
+                    {/* Pills FitMe : neutres + accent orange */}
                     <div className="mt-3 flex flex-wrap gap-2">
                       {app.offer.locationCity ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-info-100 text-info-500 text-caption font-semibold">
-                          <MapPin className="w-3 h-3" aria-hidden="true" />
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f7f5f1] px-2.5 py-1 text-caption font-semibold text-neutral-700 ring-1 ring-neutral-200">
+                          <MapPin className="h-3 w-3 text-neutral-500" aria-hidden="true" />
                           {app.offer.locationCity}
                         </span>
                       ) : null}
                       {app.offer.contractType ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-100 text-primary-500 text-caption font-semibold">
-                          <Briefcase className="w-3 h-3" aria-hidden="true" />
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f7f5f1] px-2.5 py-1 text-caption font-semibold text-neutral-700 ring-1 ring-neutral-200">
+                          <Briefcase className="h-3 w-3 text-orange-500" aria-hidden="true" />
                           {app.offer.contractType}
                         </span>
                       ) : null}
@@ -155,18 +167,18 @@ export default async function CandidaturesPage({
                     {/* Dates */}
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-neutral-500">
                       <span className="inline-flex items-center gap-1.5">
-                        <Calendar className="w-3 h-3" aria-hidden="true" />
+                        <Calendar className="h-3 w-3" aria-hidden="true" />
                         Envoyée le {formatDateFr(app.sentAt ?? app.createdAt)}
                       </span>
                       {app.interviewAt ? (
-                        <span className="inline-flex items-center gap-1.5 text-primary-500 font-medium">
-                          <Calendar className="w-3 h-3" aria-hidden="true" />
+                        <span className="inline-flex items-center gap-1.5 font-medium text-orange-600">
+                          <Calendar className="h-3 w-3" aria-hidden="true" />
                           Entretien le {formatDateFr(app.interviewAt)}
                         </span>
                       ) : null}
                       {app.signedAt ? (
-                        <span className="inline-flex items-center gap-1.5 text-success-500 font-medium">
-                          <PartyPopper className="w-3 h-3" aria-hidden="true" />
+                        <span className="inline-flex items-center gap-1.5 font-medium text-neutral-900">
+                          <PartyPopper className="h-3 w-3" aria-hidden="true" />
                           Signée le {formatDateFr(app.signedAt)}
                         </span>
                       ) : null}
@@ -187,9 +199,9 @@ export default async function CandidaturesPage({
                   </div>
                 ) : null}
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </Stagger>
       )}
     </div>
   );

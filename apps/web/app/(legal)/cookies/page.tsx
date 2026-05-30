@@ -60,13 +60,10 @@ const COOKIES: CookieEntry[] = [
 
 export default function CookiesPage() {
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10 lg:py-16">
+    <div className="mx-auto max-w-5xl px-6 py-10 lg:py-16">
       <LegalPageView page="cookies" />
-      <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-12">
-        <aside className="lg:order-2">
-          <LegalToc items={TOC} />
-        </aside>
-        <article className="lg:order-1 max-w-3xl">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-12 lg:gap-16">
+        <article className="mx-auto w-full max-w-3xl">
           <LegalPageHeader
             icon={Cookie}
             label="Cookies"
@@ -137,11 +134,11 @@ export default function CookiesPage() {
                       </td>
                       <td className="py-2 px-2">
                         {c.category === 'necessary' ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-success-100 text-success-500 text-caption font-semibold">
+                          <span className="inline-flex items-center rounded-full bg-neutral-900 px-2 py-0.5 text-caption font-semibold text-white">
                             Nécessaire
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-info-100 text-info-500 text-caption font-semibold">
+                          <span className="inline-flex items-center rounded-full bg-[#f7f5f1] px-2 py-0.5 text-caption font-semibold text-neutral-700 ring-1 ring-neutral-200">
                             Analytics
                           </span>
                         )}
@@ -219,6 +216,9 @@ export default function CookiesPage() {
             </ul>
           </Section>
         </article>
+        <aside>
+          <LegalToc items={TOC} />
+        </aside>
       </div>
     </div>
   );
@@ -234,9 +234,11 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 mb-10">
-      <h2 className="text-heading-lg font-display font-bold text-neutral-900 mb-4">{title}</h2>
-      <div className="prose prose-neutral max-w-none text-body-md text-neutral-700 leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_ul]:my-3 [&_p]:my-3 [&_a]:text-primary-500 [&_a]:font-semibold [&_a:hover]:underline">
+    <section id={id} className="scroll-mt-24 mb-12">
+      <h2 className="mb-5 font-[family-name:var(--font-fraunces)] text-3xl font-semibold leading-tight text-neutral-900">
+        {title}
+      </h2>
+      <div className="prose prose-neutral max-w-none text-body-md leading-relaxed text-neutral-700 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:space-y-1.5 [&_ul]:pl-6 [&_p]:my-3 [&_a]:font-semibold [&_a]:text-orange-600 [&_a]:underline [&_a]:decoration-orange-300 [&_a]:underline-offset-2 [&_a:hover]:text-orange-700 [&_a:hover]:decoration-orange-500">
         {children}
       </div>
     </section>

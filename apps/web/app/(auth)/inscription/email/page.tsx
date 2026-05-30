@@ -11,16 +11,15 @@ export default async function InscriptionEmailPage() {
   }
 
   return (
-    <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
-      <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
-      <div className="p-8 space-y-6">
+    <div className="relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-[0_24px_60px_-20px_rgba(0,0,0,0.18)]">
+      <div className="space-y-6 p-8">
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
-            <Mail className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-[#f7f5f1] px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-700">
+            <Mail className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
             Email
           </span>
-          <h2 className="text-display-md font-display font-bold text-neutral-900">
-            Crée ton compte par email
+          <h2 className="font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight tracking-tight text-neutral-900">
+            Crée ton compte <span className="italic font-light text-neutral-400">par email</span>
           </h2>
           <p className="text-body-sm text-neutral-600">
             On t&apos;envoie un lien magique pour valider ton email.
@@ -30,16 +29,16 @@ export default async function InscriptionEmailPage() {
         {isEmailConfigured ? (
           <EmailSignupForm />
         ) : (
-          <div className="rounded-xl border border-warning-100 bg-warning-100/40 p-3 text-body-sm text-neutral-700">
+          <div className="rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-4 text-body-sm text-neutral-600">
             L&apos;inscription par email n&apos;est pas encore configurée (Resend manquant).
           </div>
         )}
 
-        <div className="space-y-2 text-center pt-2 border-t border-neutral-100">
-          <p className="text-body-sm text-neutral-500 pt-4">
+        <div className="space-y-2 border-t border-neutral-200 pt-4 text-center">
+          <p className="text-body-sm text-neutral-500">
             Déjà inscrit ?{' '}
             <a
-              className="font-semibold text-primary-500 hover:text-primary-600 hover:underline"
+              className="font-semibold text-neutral-900 underline-offset-4 hover:underline"
               href="/connexion"
             >
               Se connecter
@@ -47,10 +46,10 @@ export default async function InscriptionEmailPage() {
           </p>
           <p className="text-body-sm">
             <a
-              className="inline-flex items-center gap-1 text-neutral-400 hover:text-neutral-600 hover:underline"
+              className="inline-flex items-center gap-1 text-neutral-400 hover:text-neutral-700 hover:underline"
               href="/inscription"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               Retour à l&apos;inscription Google
             </a>
           </p>
