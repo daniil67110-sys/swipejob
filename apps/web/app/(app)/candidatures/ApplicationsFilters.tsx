@@ -58,7 +58,7 @@ export function ApplicationsFilters() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
         {FILTERABLE.map((s) => {
           const active = activeStatuses.has(s);
@@ -69,10 +69,10 @@ export function ApplicationsFilters() {
               onClick={() => toggleStatus(s)}
               aria-pressed={active}
               className={
-                'rounded-full px-3.5 py-1.5 text-caption font-medium transition ' +
+                'rounded-full px-3.5 py-1.5 text-caption font-semibold transition-all ' +
                 (active
-                  ? 'bg-neutral-900 text-white'
-                  : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200')
+                  ? 'bg-neutral-900 text-white shadow-sm'
+                  : 'bg-[#f7f5f1] text-neutral-700 ring-1 ring-neutral-200 hover:bg-white hover:ring-neutral-300')
               }
             >
               {statusLabel(s)}
@@ -80,8 +80,11 @@ export function ApplicationsFilters() {
           );
         })}
       </div>
-      <div className="flex items-center gap-2">
-        <label htmlFor="sort" className="text-caption text-neutral-500">
+      <div className="flex items-center gap-3 border-t border-neutral-100 pt-4">
+        <label
+          htmlFor="sort"
+          className="text-caption font-semibold uppercase tracking-[0.14em] text-neutral-500"
+        >
           Trier par
         </label>
         <div className="relative">
@@ -89,7 +92,7 @@ export function ApplicationsFilters() {
             id="sort"
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="appearance-none rounded-md border border-neutral-200 bg-white pl-3 pr-8 py-1.5 text-caption font-medium text-neutral-700 hover:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+            className="appearance-none rounded-full border border-neutral-200 bg-[#f7f5f1] py-1.5 pl-4 pr-9 text-caption font-semibold text-neutral-800 transition-colors hover:border-neutral-300 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -98,7 +101,7 @@ export function ApplicationsFilters() {
             ))}
           </select>
           <ChevronDown
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none"
+            className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500"
             aria-hidden="true"
           />
         </div>

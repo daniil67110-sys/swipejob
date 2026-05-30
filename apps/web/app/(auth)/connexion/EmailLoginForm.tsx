@@ -41,8 +41,11 @@ export function EmailLoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      <div className="space-y-1">
-        <label htmlFor="login-email" className="block text-sm font-medium text-neutral-900">
+      <div className="space-y-1.5">
+        <label
+          htmlFor="login-email"
+          className="block text-caption font-semibold uppercase tracking-[0.14em] text-neutral-700"
+        >
           Email
         </label>
         <input
@@ -51,18 +54,21 @@ export function EmailLoginForm() {
           autoComplete="email"
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'login-email-error' : undefined}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block min-h-[48px] w-full rounded-2xl border border-neutral-200 bg-[#fafaf8] px-4 py-3 text-body-md text-neutral-900 transition-colors placeholder:text-neutral-400 focus:border-neutral-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/15"
           {...register('email')}
         />
         {errors.email ? (
-          <p id="login-email-error" className="text-xs text-error-500">
+          <p id="login-email-error" className="text-caption font-medium text-red-600">
             {errors.email.message}
           </p>
         ) : null}
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="login-password" className="block text-sm font-medium text-neutral-900">
+      <div className="space-y-1.5">
+        <label
+          htmlFor="login-password"
+          className="block text-caption font-semibold uppercase tracking-[0.14em] text-neutral-700"
+        >
           Mot de passe
         </label>
         <input
@@ -71,11 +77,11 @@ export function EmailLoginForm() {
           autoComplete="current-password"
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'login-password-error' : undefined}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block min-h-[48px] w-full rounded-2xl border border-neutral-200 bg-[#fafaf8] px-4 py-3 text-body-md text-neutral-900 transition-colors placeholder:text-neutral-400 focus:border-neutral-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/15"
           {...register('password')}
         />
         {errors.password ? (
-          <p id="login-password-error" className="text-xs text-error-500">
+          <p id="login-password-error" className="text-caption font-medium text-red-600">
             {errors.password.message}
           </p>
         ) : null}
@@ -84,16 +90,16 @@ export function EmailLoginForm() {
       <button
         type="submit"
         disabled={isPending || !isValid}
-        className="flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="group flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-neutral-900 px-6 py-3.5 text-body-md font-semibold text-white shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.5)] focus:outline-none focus:ring-4 focus:ring-orange-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
       >
-        {isPending ? 'Connexion…' : 'Se connecter'}
+        {isPending ? 'Connexion…' : 'Se connecter →'}
       </button>
 
       {serverError ? (
         <div
           role="alert"
           aria-live="polite"
-          className="rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500"
+          className="rounded-2xl border border-red-200 bg-red-50 p-3 text-body-sm text-red-700"
         >
           {serverError}
         </div>

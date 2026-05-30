@@ -7,6 +7,7 @@ import { db, isDatabaseConfigured } from '@/lib/db';
 import { offers } from '@swipejob/db/schema';
 import { CompanyLogo } from '@/components/shared/CompanyLogo';
 import { Footer } from '@/components/shared/Footer';
+import { SwipejobLogo } from '@/components/shared/SwipejobLogo';
 import { env } from '@/lib/env';
 import { buildOfferSlug, extractOfferId } from '@/lib/offer-slug';
 
@@ -106,27 +107,20 @@ export default async function PublicOfferPage({ params }: Props) {
   const start = formatDateFr(offer.startDate);
 
   return (
-    <div className="min-h-dvh bg-neutral-50 flex flex-col">
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-lg border-b border-neutral-100">
-        <div className="mx-auto max-w-3xl px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-info-500 via-primary-500 to-success-500 flex items-center justify-center text-white font-display font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-              S
-            </span>
-            <span className="text-heading-md font-display font-bold text-neutral-900">
-              SwipeJob
-            </span>
-          </Link>
+    <div className="flex min-h-dvh flex-col bg-[#f7f5f1]">
+      <header className="sticky top-0 z-30 border-b border-neutral-200/60 bg-[#f7f5f1]/85 backdrop-blur-lg">
+        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
+          <SwipejobLogo asLink href="/" size="md" />
           <nav className="flex items-center gap-3">
             <Link
               href="/connexion"
-              className="hidden sm:inline text-body-sm font-medium text-neutral-600 hover:text-primary-500"
+              className="hidden text-body-sm font-semibold text-neutral-700 transition-colors hover:text-neutral-900 sm:inline"
             >
               Se connecter
             </Link>
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-4 py-2 text-body-sm font-semibold text-white shadow-md hover:shadow-lg transition-shadow min-h-[40px]"
+              className="inline-flex min-h-[40px] items-center justify-center rounded-full bg-neutral-900 px-4 py-2 text-body-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               S&apos;inscrire
             </Link>

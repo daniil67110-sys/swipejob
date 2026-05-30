@@ -16,19 +16,16 @@ export function LegalPageHeader({
   lastUpdated: string;
 }) {
   return (
-    <header className="space-y-4 mb-8">
-      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-info-100 to-success-100 text-primary-600 text-caption font-semibold tracking-wide">
-        <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+    <header className="mb-10 space-y-4">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-caption font-semibold tracking-wide text-neutral-700 ring-1 ring-neutral-200">
+        <Icon className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
         {label}
       </span>
-      <h1 className="text-display-lg font-display font-bold text-neutral-900 leading-[1.05]">
-        {title}{' '}
-        <span className="bg-gradient-to-r from-info-500 via-primary-500 to-success-500 bg-clip-text text-transparent">
-          {highlightedWord}
-        </span>
+      <h1 className="font-[family-name:var(--font-fraunces)] text-5xl font-semibold leading-[1.05] text-neutral-900 sm:text-6xl">
+        {title} <span className="italic text-neutral-400">{highlightedWord}</span>
       </h1>
-      <p className="text-body-md text-neutral-600">{description}</p>
-      <p className="text-caption text-neutral-400">Dernière mise à jour : {lastUpdated}</p>
+      <p className="text-body-md leading-relaxed text-neutral-600">{description}</p>
+      <p className="italic text-caption text-neutral-400">Dernière mise à jour : {lastUpdated}</p>
     </header>
   );
 }

@@ -1,31 +1,25 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/shared/Footer';
+import { SwipejobLogo } from '@/components/shared/SwipejobLogo';
 
 export default function LegalLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-dvh bg-neutral-50 flex flex-col">
+    <div className="flex min-h-dvh flex-col bg-[#f7f5f1]">
       {/* Top header */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-lg border-b border-neutral-100">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-info-500 via-primary-500 to-success-500 flex items-center justify-center text-white font-display font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
-              S
-            </span>
-            <span className="text-heading-md font-display font-bold text-neutral-900">
-              SwipeJob
-            </span>
-          </Link>
-          <nav className="flex items-center gap-4">
+      <header className="sticky top-0 z-30 border-b border-neutral-200/60 bg-[#f7f5f1]/85 backdrop-blur-lg">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <SwipejobLogo asLink href="/" size="md" />
+          <nav className="flex items-center gap-3">
             <Link
               href="/connexion"
-              className="text-body-sm font-medium text-neutral-600 hover:text-primary-500"
+              className="text-body-sm font-semibold text-neutral-700 transition-colors hover:text-neutral-900"
             >
               Se connecter
             </Link>
             <Link
               href="/inscription"
-              className="inline-flex items-center justify-center rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-4 py-2 text-body-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow"
+              className="inline-flex items-center justify-center rounded-full bg-neutral-900 px-4 py-2 text-body-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               S&apos;inscrire
             </Link>

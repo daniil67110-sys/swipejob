@@ -69,7 +69,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
           required
           defaultValue={defaultUrl}
           placeholder="https://swipejob.fr/…"
-          className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
         />
       </div>
 
@@ -87,7 +87,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
           minLength={10}
           rows={5}
           placeholder="Exemple : le bouton « Postuler » n'est pas accessible au lecteur d'écran (NVDA) sur la page de détail d'une offre…"
-          className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
         />
       </div>
 
@@ -103,7 +103,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
           name="contactEmail"
           type="email"
           placeholder="ton@email.fr"
-          className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-body-sm placeholder:text-neutral-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
         />
         <p className="mt-1 text-caption text-neutral-500">
           Pour qu'on puisse te répondre. Non utilisé à d'autres fins.
@@ -123,7 +123,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-info-500 to-primary-500 px-5 py-2.5 text-body-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow disabled:opacity-60 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-2.5 text-body-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
       >
         <Send className="w-4 h-4" aria-hidden="true" />
         {isPending ? 'Envoi…' : 'Envoyer le signalement'}
