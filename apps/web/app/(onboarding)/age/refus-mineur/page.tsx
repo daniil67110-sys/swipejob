@@ -30,9 +30,9 @@ export default function RefusMineurPage() {
               <p className="text-body-sm">
                 <a
                   className="font-semibold text-orange-600 underline decoration-orange-300 underline-offset-2 hover:decoration-orange-500"
-                  href="/help/age-minimum"
+                  href="/politique-confidentialite#mineurs"
                 >
-                  En savoir plus sur cette limite →
+                  Lire notre politique de confidentialité →
                 </a>
               </p>
               <p className="text-caption text-neutral-500">À très vite, dans quelques années !</p>
