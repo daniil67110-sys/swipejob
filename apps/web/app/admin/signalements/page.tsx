@@ -35,7 +35,7 @@ export default async function AdminAccessibilityReportsPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-display-sm font-display font-bold text-neutral-900">
+        <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
           Signalements accessibilité
         </h1>
         <p className="mt-2 text-body-md text-neutral-600">

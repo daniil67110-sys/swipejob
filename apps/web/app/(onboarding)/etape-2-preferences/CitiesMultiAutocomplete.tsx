@@ -100,7 +100,7 @@ export function CitiesMultiAutocomplete({
           {cities.map((c) => (
             <li
               key={c.label}
-              className="flex items-center gap-1 rounded-full border border-primary-500/40 bg-orange-50 px-3 py-1 text-xs"
+              className="flex items-center gap-1 rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-xs"
             >
               <span>{c.label}</span>
               <button

@@ -225,7 +225,7 @@ export function SwipeCard({
         aria-hidden="true"
       >
         <div
-          className="rounded-2xl border-[4px] border-success-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-success-600 shadow-xl"
+          className="rounded-2xl border-[4px] border-neutral-900 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-neutral-900 shadow-xl"
           style={{ transform: 'rotate(-18deg)' }}
         >
           Match
@@ -237,7 +237,7 @@ export function SwipeCard({
         aria-hidden="true"
       >
         <div
-          className="rounded-2xl border-[4px] border-primary-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-primary-600 shadow-xl"
+          className="rounded-2xl border-[4px] border-orange-500 bg-white/95 px-6 py-3 font-[family-name:var(--font-fraunces)] text-5xl font-extrabold italic uppercase tracking-wider text-orange-600 shadow-xl"
           style={{ transform: 'rotate(-4deg)' }}
         >
           Favori
@@ -272,14 +272,14 @@ export function SwipeCard({
               aria-label={`Score de matching : ${scorePct} pourcent`}
             >
               {isStrongMatch ? (
-                <Sparkles className="h-3.5 w-3.5 text-primary-400" aria-hidden="true" />
+                <Sparkles className="h-3.5 w-3.5 text-orange-400" aria-hidden="true" />
               ) : (
                 <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
               )}
               {scorePct}% match
             </div>
           ) : (
-            <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-3 py-1.5 text-caption font-semibold text-primary-700">
+            <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-caption font-semibold text-orange-700 ring-1 ring-orange-200">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />À découvrir
             </div>
           )}
@@ -323,7 +323,7 @@ export function SwipeCard({
             </span>
           )}
           {offer.contractType ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-100 px-3 py-1.5 text-body-sm font-semibold text-primary-700 ring-1 ring-primary-200">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1.5 text-body-sm font-semibold text-orange-700 ring-1 ring-orange-200">
               <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
               {offer.contractType}
             </span>
@@ -456,7 +456,7 @@ export function UndoToast({
       transition={{ type: 'spring', stiffness: 320, damping: 22 }}
       className="fixed bottom-28 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-2xl bg-neutral-900 px-5 py-3.5 text-white shadow-2xl lg:left-[calc(50%+128px)]"
     >
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-500">
         <Heart className="h-3.5 w-3.5 text-white" fill="currentColor" aria-hidden="true" />
       </span>
       <span className="text-body-sm">Candidature envoyée · annulable ({secondsLeft}s)</span>
@@ -464,7 +464,7 @@ export function UndoToast({
         type="button"
         onClick={handleUndo}
         disabled={isPending}
-        className="ml-2 text-caption font-semibold text-primary-300 underline-offset-2 hover:text-white hover:underline disabled:opacity-50"
+        className="ml-2 text-caption font-semibold text-orange-300 underline-offset-2 hover:text-white hover:underline disabled:opacity-50"
       >
         Annuler
       </button>

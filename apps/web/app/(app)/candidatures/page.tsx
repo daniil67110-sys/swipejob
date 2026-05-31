@@ -36,7 +36,7 @@ export default async function CandidaturesPage({
   if (!res.ok) {
     return (
       <div className="mx-auto max-w-3xl p-8">
-        <p className="text-body-sm text-error-500">{res.error.message}</p>
+        <p className="text-body-sm text-red-600">{res.error.message}</p>
       </div>
     );
   }

@@ -112,9 +112,11 @@ function renderOutcome(outcome: Outcome) {
   const m = MESSAGES[outcome];
   return (
     <div className="relative rounded-2xl bg-white shadow-xl border border-neutral-100 overflow-hidden">
-      <div className="h-1.5 bg-gradient-to-r from-error-500 to-warning-500" />
+      <div className="h-1.5 bg-red-600" />
       <div className="p-8 space-y-3 text-center">
-        <h2 className="text-display-md font-display font-bold text-neutral-900">{m.title}</h2>
+        <h2 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
+          {m.title}
+        </h2>
         <p className="text-body-sm text-neutral-600 leading-relaxed">{m.body}</p>
       </div>
     </div>

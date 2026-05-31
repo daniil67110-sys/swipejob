@@ -39,7 +39,7 @@ export function DeletionForm({ userEmail }: { userEmail: string }) {
           <button
             type="button"
             onClick={() => setStep(2)}
-            className="rounded-md bg-error-500 px-4 py-3 text-sm font-medium text-white hover:opacity-90 min-h-[44px]"
+            className="rounded-full bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-700 min-h-[44px]"
           >
             Continuer
           </button>
@@ -77,7 +77,7 @@ export function DeletionForm({ userEmail }: { userEmail: string }) {
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-error-500 px-4 py-3 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+          className="rounded-full bg-red-600 px-4 py-3 text-sm font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
         >
           {isPending ? 'Suppression…' : 'Confirmer la suppression'}
         </button>

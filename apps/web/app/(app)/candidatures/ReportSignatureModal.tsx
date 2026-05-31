@@ -91,7 +91,7 @@ export function ReportSignatureModal({
               />
             </div>
             {error ? (
-              <p role="status" aria-live="polite" className="text-sm text-error-500">
+              <p role="status" aria-live="polite" className="text-sm text-red-600">
                 {error}
               </p>
             ) : null}

@@ -115,7 +115,7 @@ export function SwipeDeck({
             scale: [1, 1.15, 1, 1.08, 1],
           }}
           transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-          className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-lg"
+          className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg"
         >
           <PartyPopper className="h-8 w-8" strokeWidth={2.2} aria-hidden="true" />
         </motion.div>
@@ -154,7 +154,7 @@ export function SwipeDeck({
               initial={false}
               animate={{ width: `${progressPct}%` }}
               transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              className="h-full rounded-full bg-gradient-to-r from-neutral-900 via-neutral-800 to-primary-500"
+              className="h-full rounded-full bg-gradient-to-r from-neutral-900 via-neutral-800 to-orange-500"
               role="progressbar"
               aria-valuenow={index + 1}
               aria-valuemin={1}
@@ -222,7 +222,7 @@ export function SwipeDeck({
             whileHover={{ scale: 1.12, rotate: 6 }}
             whileTap={{ scale: 0.92 }}
             transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-            className="pointer-events-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-[0_12px_36px_-8px_rgba(251,146,60,0.6)] ring-2 ring-primary-300 transition-shadow hover:shadow-[0_16px_44px_-8px_rgba(251,146,60,0.8)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="pointer-events-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-[0_12px_36px_-8px_rgba(251,146,60,0.6)] ring-2 ring-orange-300 transition-shadow hover:shadow-[0_16px_44px_-8px_rgba(251,146,60,0.8)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Heart className="h-7 w-7" fill="currentColor" aria-hidden="true" />
           </motion.button>

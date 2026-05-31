@@ -40,13 +40,13 @@ export function OfferDetailModal({ offer, siteUrl, onClose }: Props) {
       }}
     >
       <div className="relative rounded-2xl bg-white max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
-        <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500 shrink-0" />
+        <div className="h-1.5 bg-neutral-900 shrink-0" />
 
         <button
           type="button"
           onClick={onClose}
           aria-label="Fermer"
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow-md ring-1 ring-neutral-200 flex items-center justify-center text-neutral-700 hover:scale-105 hover:ring-primary-200 active:scale-95 transition-all z-10"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white shadow-md ring-1 ring-neutral-200 flex items-center justify-center text-neutral-700 hover:scale-105 hover:ring-orange-200 active:scale-95 transition-all z-10"
         >
           <X className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />
         </button>
@@ -67,13 +67,13 @@ export function OfferDetailModal({ offer, siteUrl, onClose }: Props) {
                 </h2>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {offer.locationCity ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-info-100 text-info-500 text-caption font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-caption font-semibold">
                       <MapPin className="w-3 h-3" aria-hidden="true" />
                       {offer.locationCity}
                     </span>
                   ) : null}
                   {offer.contractType ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-100 text-primary-500 text-caption font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-caption font-semibold">
                       <Briefcase className="w-3 h-3" aria-hidden="true" />
                       {offer.contractType}
                     </span>
@@ -93,14 +93,14 @@ export function OfferDetailModal({ offer, siteUrl, onClose }: Props) {
             )}
 
             {offer.matchReasons.length > 0 ? (
-              <section className="space-y-2 rounded-xl border border-neutral-100 bg-gradient-to-br from-info-50/40 to-success-50/40 p-4">
+              <section className="space-y-2 rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-4">
                 <h3 className="text-body-sm font-semibold text-neutral-900">Pourquoi ce match</h3>
                 <ul className="space-y-1.5 text-caption">
                   {offer.matchReasons.map((r) => (
                     <li key={r.factor} className="flex items-center gap-2">
                       <span
                         className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                          r.matched ? 'bg-success-500' : 'bg-neutral-300'
+                          r.matched ? 'bg-orange-500' : 'bg-neutral-300'
                         }`}
                         aria-hidden="true"
                       />
@@ -128,7 +128,7 @@ export function OfferDetailModal({ offer, siteUrl, onClose }: Props) {
               href={offer.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-body-sm font-semibold text-neutral-700 hover:border-primary-200 hover:bg-primary-50 transition-all min-h-[40px]"
+              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-2 text-body-sm font-semibold text-neutral-700 hover:border-orange-200 hover:bg-orange-50 transition-all min-h-[40px]"
             >
               <ExternalLink className="w-4 h-4" aria-hidden="true" />
               Source
@@ -137,7 +137,7 @@ export function OfferDetailModal({ offer, siteUrl, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-info-500 to-primary-500 text-white px-4 py-2 text-body-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all min-h-[40px]"
+            className="inline-flex items-center justify-center rounded-full bg-neutral-900 text-white px-4 py-2 text-body-sm font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all min-h-[40px]"
           >
             Fermer
           </button>

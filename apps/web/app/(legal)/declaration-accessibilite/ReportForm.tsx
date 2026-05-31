@@ -35,19 +35,19 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
       <div
         role="status"
         aria-live="polite"
-        className="rounded-lg border border-success-200 bg-success-50 p-4 flex items-start gap-3"
+        className="rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-4 flex items-start gap-3"
       >
-        <CheckCircle2 className="w-5 h-5 text-success-600 mt-0.5" aria-hidden="true" />
+        <CheckCircle2 className="w-5 h-5 text-neutral-900 mt-0.5" aria-hidden="true" />
         <div>
-          <p className="font-semibold text-success-900">Merci, ton signalement est bien arrivé.</p>
-          <p className="text-body-sm text-success-800 mt-1">
+          <p className="font-semibold text-neutral-900">Merci, ton signalement est bien arrivé.</p>
+          <p className="text-body-sm text-neutral-700 mt-1">
             Notre équipe le traite dans les meilleurs délais. Si tu as laissé un email, on reviendra
             vers toi.
           </p>
           <button
             type="button"
             onClick={() => setStatus({ kind: 'idle' })}
-            className="mt-3 text-body-sm font-medium text-success-700 hover:underline"
+            className="mt-3 text-body-sm font-medium text-orange-600 hover:underline"
           >
             Envoyer un autre signalement
           </button>
@@ -60,7 +60,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div>
         <label htmlFor="url" className="block text-body-sm font-semibold text-neutral-800 mb-1">
-          URL concernée <span className="text-error-600">*</span>
+          URL concernée <span className="text-red-600">*</span>
         </label>
         <input
           id="url"
@@ -78,7 +78,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
           htmlFor="description"
           className="block text-body-sm font-semibold text-neutral-800 mb-1"
         >
-          Description du problème <span className="text-error-600">*</span>
+          Description du problème <span className="text-red-600">*</span>
         </label>
         <textarea
           id="description"
@@ -113,7 +113,7 @@ export function ReportForm({ defaultUrl }: { defaultUrl?: string }) {
       {status.kind === 'error' ? (
         <div
           role="alert"
-          className="rounded-lg border border-error-200 bg-error-50 p-3 flex items-start gap-2 text-error-800"
+          className="rounded-2xl border border-red-200 bg-red-50 p-3 flex items-start gap-2 text-red-700"
         >
           <AlertCircle className="w-4 h-4 mt-0.5" aria-hidden="true" />
           <p className="text-body-sm">{status.message}</p>

@@ -48,7 +48,7 @@ export function MatchExplanationPopover({
 
   const gradientClass =
     score >= 75
-      ? 'bg-neutral-900 text-white shadow-md ring-1 ring-primary-300/40'
+      ? 'bg-neutral-900 text-white shadow-md ring-1 ring-orange-300/40'
       : score >= 50
         ? 'border border-neutral-300 bg-white text-neutral-800 shadow-sm'
         : 'bg-neutral-100 text-neutral-600';
@@ -99,7 +99,7 @@ export function MatchExplanationPopover({
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
                     <div
-                      className={r.matched ? 'h-full bg-success-500' : 'h-full bg-neutral-300'}
+                      className={r.matched ? 'h-full bg-orange-500' : 'h-full bg-neutral-300'}
                       style={{ width: `${Math.round(r.value * 100)}%` }}
                       aria-label={`${r.label} ${Math.round(r.value * 100)}%`}
                     />
@@ -110,7 +110,7 @@ export function MatchExplanationPopover({
           </ul>
           <a
             href="/help/matching"
-            className="mt-3 inline-block text-xs font-medium text-primary-500 hover:underline"
+            className="mt-3 inline-block text-xs font-medium text-orange-600 hover:underline"
           >
             En savoir plus sur le matching
           </a>

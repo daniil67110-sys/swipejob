@@ -156,7 +156,7 @@ export function NotificationsForm({ initial }: { initial: NotificationSettings }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.25 }}
-            className="text-body-sm text-error-500"
+            className="text-body-sm text-red-600"
           >
             {error}
           </motion.p>

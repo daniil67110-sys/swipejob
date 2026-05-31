@@ -71,7 +71,7 @@ export function ReferralShareButtons({ url, code }: Props) {
       <div className="flex items-stretch gap-2">
         <div
           id="referral-url"
-          className="flex-1 min-w-0 rounded-xl bg-gradient-to-r from-info-50 to-success-50 border border-info-100 px-4 py-3 font-mono text-body-sm text-neutral-900 truncate select-all"
+          className="flex-1 min-w-0 rounded-2xl bg-[#f7f5f1] border border-neutral-200 px-4 py-3 font-mono text-body-sm text-neutral-900 truncate select-all"
           aria-label="Mon lien de parrainage"
         >
           {url}
@@ -123,7 +123,7 @@ export function ReferralShareButtons({ url, code }: Props) {
           <button
             type="button"
             onClick={handleNativeShare}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-accent-100 text-accent-500 hover:bg-accent-100/70 text-body-sm font-semibold transition-all min-h-[44px]"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 text-body-sm font-semibold transition-all min-h-[44px]"
           >
             <Share2 className="w-4 h-4" aria-hidden="true" />
             Partager
@@ -134,7 +134,7 @@ export function ReferralShareButtons({ url, code }: Props) {
             onClick={() => track('native')}
             label="Ouvrir"
             icon={<Share2 className="w-4 h-4" aria-hidden="true" />}
-            colorClass="bg-accent-100 text-accent-500 hover:bg-accent-100/70"
+            colorClass="bg-neutral-900 text-white hover:bg-neutral-800"
             external
           />
         )}

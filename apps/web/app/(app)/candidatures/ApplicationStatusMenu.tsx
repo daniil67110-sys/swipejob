@@ -60,7 +60,7 @@ export function ApplicationStatusMenu({
     <div className="flex items-center gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild aria-label="Modifier le statut" disabled={isPending}>
-          <button className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-md">
+          <button className="cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded-full">
             <StatusBadge status={optimisticStatus} />
           </button>
         </DropdownMenuTrigger>
@@ -81,7 +81,7 @@ export function ApplicationStatusMenu({
           ))}
           <DropdownMenuItem
             onSelect={() => setSignatureOpen(true)}
-            className="text-primary-600 font-semibold flex items-center gap-2"
+            className="text-orange-700 font-semibold flex items-center gap-2"
           >
             <PartyPopper className="w-4 h-4" aria-hidden="true" />
             Reporter ma signature
@@ -89,7 +89,7 @@ export function ApplicationStatusMenu({
         </DropdownMenuContent>
       </DropdownMenu>
       {error ? (
-        <span role="status" aria-live="polite" className="text-xs text-error-500">
+        <span role="status" aria-live="polite" className="text-xs text-red-600">
           {error}
         </span>
       ) : null}

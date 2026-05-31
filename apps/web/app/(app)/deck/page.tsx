@@ -20,12 +20,12 @@ export default async function DeckPage() {
         <div className="flex items-center justify-between gap-3">
           {deck.fallback ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-neutral-700">
-              <Sparkles className="h-3.5 w-3.5 text-primary-500" aria-hidden="true" />
+              <Sparkles className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
               Mode découverte
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-neutral-900 px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.18em] text-white">
-              <Target className="h-3.5 w-3.5 text-primary-400" aria-hidden="true" />
+              <Target className="h-3.5 w-3.5 text-orange-400" aria-hidden="true" />
               Matching personnalisé
             </span>
           )}
@@ -39,7 +39,7 @@ export default async function DeckPage() {
       {deck.scarcityHint ? (
         <div className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
               <Lightbulb className="h-5 w-5" aria-hidden="true" />
             </span>
             <div className="flex-1">

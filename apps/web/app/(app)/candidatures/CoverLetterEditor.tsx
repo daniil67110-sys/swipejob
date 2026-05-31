@@ -99,7 +99,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
         className="max-w-2xl w-[calc(100vw-2rem)] p-0 overflow-hidden bg-white border border-neutral-100 shadow-2xl"
         aria-describedby={undefined}
       >
-        <div className="h-1.5 bg-gradient-to-r from-info-500 via-primary-500 to-success-500" />
+        <div className="h-1.5 bg-neutral-900" />
 
         {/* Header */}
         <div className="px-6 pt-5 pb-4 border-b border-neutral-100">
@@ -114,13 +114,13 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
               </p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {application.offer.locationCity ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-info-100 text-info-500 text-caption font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-caption font-semibold">
                     <MapPin className="w-3 h-3" aria-hidden="true" />
                     {application.offer.locationCity}
                   </span>
                 ) : null}
                 {application.offer.contractType ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-100 text-primary-500 text-caption font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 text-caption font-semibold">
                     <Briefcase className="w-3 h-3" aria-hidden="true" />
                     {application.offer.contractType}
                   </span>
@@ -141,7 +141,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
             </label>
             <span
               className={`text-caption font-medium tabular-nums ${
-                isTooShort || isTooLong ? 'text-error-500' : 'text-neutral-500'
+                isTooShort || isTooLong ? 'text-red-600' : 'text-neutral-500'
               }`}
               aria-live="polite"
             >
@@ -155,16 +155,16 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
               onChange={(e) => setText(e.target.value)}
               disabled={isBusy}
               rows={14}
-              className="w-full min-h-[280px] max-h-[50vh] resize-y rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-body-sm text-neutral-900 leading-relaxed font-sans focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full min-h-[280px] max-h-[50vh] resize-y rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-4 text-body-sm text-neutral-900 leading-relaxed font-sans focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500 disabled:opacity-60 disabled:cursor-not-allowed"
               aria-describedby={error ? `letter-error-${application.id}` : undefined}
               aria-invalid={Boolean(error)}
               placeholder="Lettre de motivation..."
             />
             {regenerating ? (
-              <div className="absolute inset-0 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-md border border-primary-100">
-                  <Loader2 className="w-4 h-4 text-primary-500 animate-spin" aria-hidden="true" />
-                  <span className="text-body-sm font-medium text-primary-600">
+              <div className="absolute inset-0 rounded-2xl bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-md border border-orange-200">
+                  <Loader2 className="w-4 h-4 text-orange-500 animate-spin" aria-hidden="true" />
+                  <span className="text-body-sm font-medium text-orange-700">
                     Régénération en cours…
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
             <p
               id={`letter-error-${application.id}`}
               role="alert"
-              className="flex items-start gap-2 text-body-sm text-error-500"
+              className="flex items-start gap-2 text-body-sm text-red-600"
             >
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
               <span>{error}</span>
@@ -184,7 +184,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
           ) : null}
 
           {application.coverLetterStatus === 'template_fallback' ? (
-            <p className="text-caption text-warning-500 flex items-start gap-2">
+            <p className="text-caption text-amber-700 flex items-start gap-2">
               <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
               <span>IA indisponible — lettre générique fournie. Personnalise-la avant envoi.</span>
             </p>
@@ -212,7 +212,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
                   type="button"
                   onClick={handleCancel}
                   disabled={cancelling}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-body-sm font-semibold text-white bg-error-500 hover:bg-error-500/90 disabled:opacity-60 transition-colors min-h-[44px]"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-body-sm font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 transition-colors min-h-[44px]"
                 >
                   {cancelling ? (
                     <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
@@ -229,7 +229,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
                 type="button"
                 onClick={() => setConfirmCancel(true)}
                 disabled={isBusy}
-                className="text-body-sm font-medium text-neutral-500 hover:text-error-500 transition-colors min-h-[44px] sm:min-h-0 px-2"
+                className="text-body-sm font-medium text-neutral-500 hover:text-red-600 transition-colors min-h-[44px] sm:min-h-0 px-2"
               >
                 Annuler la candidature
               </button>
@@ -238,7 +238,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
                   type="button"
                   onClick={handleRegenerate}
                   disabled={isBusy}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-body-sm font-semibold text-neutral-700 bg-white border border-neutral-200 hover:border-primary-200 hover:bg-primary-50 disabled:opacity-60 transition-all min-h-[44px]"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-body-sm font-semibold text-neutral-700 bg-white border border-neutral-200 hover:border-orange-200 hover:bg-orange-50 disabled:opacity-60 transition-all min-h-[44px]"
                 >
                   {regenerating ? (
                     <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
@@ -251,7 +251,7 @@ export function CoverLetterEditor({ application, open, onClose }: Props) {
                   type="button"
                   onClick={handleSend}
                   disabled={isBusy || isTooShort || isTooLong}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-body-sm font-semibold text-white bg-gradient-to-r from-info-500 to-primary-500 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all min-h-[44px]"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-body-sm font-semibold text-white bg-neutral-900 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed transition-all min-h-[44px]"
                 >
                   {sending ? (
                     <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />

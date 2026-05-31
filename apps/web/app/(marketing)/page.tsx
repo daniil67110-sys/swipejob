@@ -305,7 +305,7 @@ export default function MarketingHomePage() {
                               {step.title}
                             </h3>
                             <Icon
-                              className="h-5 w-5 text-neutral-400 transition-colors group-hover:text-primary-500"
+                              className="h-5 w-5 text-neutral-400 transition-colors group-hover:text-orange-500"
                               aria-hidden="true"
                               strokeWidth={2}
                             />
@@ -489,7 +489,7 @@ export default function MarketingHomePage() {
             <ScrollReveal delay={0.4}>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-caption text-neutral-400">
                 <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-success-500" aria-hidden="true" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
                   100 % gratuit
                 </span>
                 <span className="inline-flex items-center gap-1.5">

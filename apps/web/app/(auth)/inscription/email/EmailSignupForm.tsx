@@ -112,7 +112,7 @@ export function EmailSignupForm() {
           aria-live="polite"
           className={
             serverMessage.kind === 'success'
-              ? 'rounded-2xl border border-success-200 bg-success-50 p-3 text-body-sm text-success-700'
+              ? 'rounded-2xl border border-neutral-900 bg-neutral-900 p-3 text-body-sm text-white'
               : 'rounded-2xl border border-red-200 bg-red-50 p-3 text-body-sm text-red-700'
           }
         >

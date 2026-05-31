@@ -13,11 +13,11 @@ export type InterviewPrepCardData = {
 export function InterviewPrepCard({ data }: { data: InterviewPrepCardData }) {
   return (
     <section
-      className="rounded-lg border border-primary-500/40 bg-primary-100/30 p-4"
+      className="rounded-2xl border border-orange-200 bg-orange-50/50 p-4"
       aria-labelledby="interview-prep-title"
     >
       <header className="flex items-center justify-between gap-3">
-        <h3 id="interview-prep-title" className="text-sm font-semibold text-primary-600">
+        <h3 id="interview-prep-title" className="text-sm font-semibold text-orange-700">
           Prépa entretien ✨
         </h3>
         {data.interviewAt ? (

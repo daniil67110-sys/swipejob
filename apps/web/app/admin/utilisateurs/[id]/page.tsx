@@ -51,7 +51,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         </Link>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-display-sm font-display font-bold text-neutral-900 break-all">
+            <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl break-all">
               {detail.identity.email}
             </h1>
             <p className="mt-1 text-caption font-mono text-neutral-500 break-all">

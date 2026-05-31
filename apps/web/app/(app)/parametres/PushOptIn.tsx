@@ -112,7 +112,7 @@ export function PushOptIn({ vapidPublicKey }: { vapidPublicKey?: string }) {
         </p>
       ) : null}
       {error ? (
-        <p role="status" aria-live="polite" className="text-xs text-error-500">
+        <p role="status" aria-live="polite" className="text-xs text-red-600">
           {error}
         </p>
       ) : null}
