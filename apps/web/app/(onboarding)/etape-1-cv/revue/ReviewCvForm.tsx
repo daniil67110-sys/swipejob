@@ -94,7 +94,7 @@ export function ReviewCvForm({ initial }: { initial: FormValues }) {
         <textarea
           id="summary"
           rows={4}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
           {...register('summary')}
         />
       </div>
@@ -102,7 +102,7 @@ export function ReviewCvForm({ initial }: { initial: FormValues }) {
       <button
         type="submit"
         disabled={isPending || !isValid}
-        className="flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="flex w-full items-center justify-center rounded-md bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
       >
         {isPending ? 'Enregistrement…' : 'Valider et continuer'}
       </button>
@@ -111,7 +111,7 @@ export function ReviewCvForm({ initial }: { initial: FormValues }) {
         <div
           role="alert"
           aria-live="polite"
-          className="rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500"
+          className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600"
         >
           {serverError}
         </div>
@@ -143,11 +143,11 @@ function Field({
         type="text"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+        className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
         {...register}
       />
       {error ? (
-        <p id={`${id}-error`} className="text-xs text-error-500">
+        <p id={`${id}-error`} className="text-xs text-red-600">
           {error}
         </p>
       ) : null}

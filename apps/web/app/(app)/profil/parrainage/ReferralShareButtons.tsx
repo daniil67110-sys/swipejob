@@ -110,14 +110,14 @@ export function ReferralShareButtons({ url, code }: Props) {
           onClick={() => track('sms')}
           label="SMS"
           icon={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-          colorClass="bg-info-100 text-info-500 hover:bg-info-100/70"
+          colorClass="bg-[#f7f5f1] text-neutral-700 hover:bg-[#f7f5f1]/70"
         />
         <ShareLink
           href={`mailto:?subject=${EMAIL_SUBJECT}&body=${EMAIL_BODY}${encodeURIComponent(url)}`}
           onClick={() => track('email')}
           label="Email"
           icon={<Mail className="w-4 h-4" aria-hidden="true" />}
-          colorClass="bg-primary-100 text-primary-500 hover:bg-primary-100/70"
+          colorClass="bg-orange-50 text-orange-600 hover:bg-orange-50/70"
         />
         {canNativeShare ? (
           <button

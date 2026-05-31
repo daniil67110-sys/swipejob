@@ -49,13 +49,13 @@ export function ConsentToggles({ catalog, initial }: Props) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-body-md font-semibold text-neutral-900">{c.title}</h3>
                   {c.required ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 text-[11px] font-semibold">
                       <Lock className="w-3 h-3" aria-hidden="true" />
                       Obligatoire
                     </span>
                   ) : null}
                   {c.comingSoon ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-warning-100 text-warning-500 text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 text-[11px] font-semibold">
                       Bientôt
                     </span>
                   ) : null}
@@ -78,7 +78,7 @@ export function ConsentToggles({ catalog, initial }: Props) {
         );
       })}
       {error ? (
-        <li role="alert" className="flex items-start gap-2 text-body-sm text-error-500">
+        <li role="alert" className="flex items-start gap-2 text-body-sm text-red-600">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           {error}
         </li>

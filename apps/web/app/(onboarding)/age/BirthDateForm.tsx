@@ -54,11 +54,11 @@ export function BirthDateForm() {
           max={maxDate}
           aria-invalid={Boolean(errors.birthDate)}
           aria-describedby={errors.birthDate ? 'birthDate-error' : undefined}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full min-h-[44px] rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15"
           {...register('birthDate')}
         />
         {errors.birthDate ? (
-          <p id="birthDate-error" className="text-xs text-error-500">
+          <p id="birthDate-error" className="text-xs text-red-600">
             {errors.birthDate.message}
           </p>
         ) : null}
@@ -67,7 +67,7 @@ export function BirthDateForm() {
       <button
         type="submit"
         disabled={isPending || !isValid}
-        className="flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="flex min-h-[44px] w-full items-center justify-center rounded-full bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
       >
         {isPending ? 'Validation…' : 'Continuer'}
       </button>
@@ -76,7 +76,7 @@ export function BirthDateForm() {
         <div
           role="alert"
           aria-live="polite"
-          className="rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500"
+          className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"
         >
           {serverError}
         </div>

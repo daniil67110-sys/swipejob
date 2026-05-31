@@ -134,7 +134,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
             type="number"
             min={0}
             max={500}
-            className="ml-2 w-24 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm"
+            className="ml-2 w-24 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
             {...register('geoRadiusKm', { valueAsNumber: true })}
           />
         </label>
@@ -165,7 +165,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
               min={0}
               max={100_000}
               placeholder="ex 1000"
-              className="ml-2 w-32 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm"
+              className="ml-2 w-32 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
               {...register('salaryMinMonthly', { valueAsNumber: true })}
             />
           </label>
@@ -176,7 +176,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
               min={0}
               max={100_000}
               placeholder="ex 3000"
-              className="ml-2 w-32 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm"
+              className="ml-2 w-32 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
               {...register('salaryMaxMonthly', { valueAsNumber: true })}
             />
           </label>
@@ -186,7 +186,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
       <Section title="Date de démarrage souhaitée">
         <input
           type="date"
-          className="rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm"
+          className="rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm"
           {...register('desiredStartDate')}
         />
       </Section>
@@ -194,7 +194,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
       <button
         type="submit"
         disabled={isPending}
-        className="flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="flex w-full items-center justify-center rounded-md bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
       >
         {isPending ? 'Enregistrement…' : 'Enregistrer mes préférences'}
       </button>
@@ -203,7 +203,7 @@ export function PreferencesForm({ initial }: { initial: Partial<FormValues> }) {
         <div
           role="alert"
           aria-live="polite"
-          className="rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500"
+          className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600"
         >
           {serverError}
         </div>
@@ -237,7 +237,7 @@ function CheckGroup({
           <input
             type="checkbox"
             value={opt}
-            className="h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500"
+            className="h-4 w-4 rounded border-neutral-200 text-orange-600 focus:ring-orange-500/40"
             {...register(name)}
           />
           <span>{LABELS[opt] ?? opt}</span>

@@ -97,7 +97,7 @@ export function SchoolEducationSection({
             setQuery(e.target.value);
             if (selected && e.target.value !== selected.name) setSelected(null);
           }}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
         />
         {results.length > 0 ? (
           <ul className="mt-1 max-h-48 overflow-auto rounded-md border border-neutral-200 bg-white shadow-sm">
@@ -121,7 +121,7 @@ export function SchoolEducationSection({
             <button
               type="button"
               onClick={() => setUnverifiedName(query)}
-              className="font-medium text-primary-500 hover:underline"
+              className="font-medium text-orange-600 hover:underline"
             >
               Utiliser "{query}" comme nom libre (à valider par l'équipe)
             </button>
@@ -146,7 +146,7 @@ export function SchoolEducationSection({
                 value={lvl}
                 checked={level === lvl}
                 onChange={(e) => setLevel(e.target.value)}
-                className="h-4 w-4 border-neutral-300 text-primary-500 focus:ring-primary-500"
+                className="h-4 w-4 border-neutral-200 text-orange-600 focus:ring-orange-500/40"
               />
               <span>{lvl}</span>
             </label>
@@ -158,7 +158,7 @@ export function SchoolEducationSection({
         type="button"
         onClick={onSubmit}
         disabled={isPending}
-        className="rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="rounded-md border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
       >
         {isPending ? 'Enregistrement…' : 'Enregistrer école et niveau'}
       </button>

@@ -74,9 +74,11 @@ export function CvUploader() {
     <div className="space-y-4">
       <label
         htmlFor="cv-file"
-        className="flex flex-col items-center justify-center cursor-pointer rounded-md border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 text-center transition hover:border-primary-500 hover:bg-primary-100/30 min-h-[160px]"
+        className="flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-300 bg-[#f7f5f1] p-8 text-center transition-all hover:border-orange-500 hover:bg-orange-50/40"
       >
-        <span className="text-sm font-medium text-neutral-900">Clique pour choisir ton CV PDF</span>
+        <span className="text-sm font-semibold text-neutral-900">
+          Clique pour choisir ton CV PDF
+        </span>
         <span className="mt-1 text-xs text-neutral-500">Format PDF · 10 MB max</span>
         <input
           ref={inputRef}
@@ -95,10 +97,10 @@ export function CvUploader() {
           aria-live="polite"
           className={
             state === 'error'
-              ? 'rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500'
+              ? 'rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'
               : state === 'success'
-                ? 'rounded-md border border-success-500/40 bg-success-100 p-3 text-sm text-success-500'
-                : 'rounded-md border border-neutral-200 bg-neutral-100 p-3 text-sm text-neutral-700'
+                ? 'rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-3 text-sm text-neutral-800'
+                : 'rounded-2xl border border-neutral-200 bg-[#f7f5f1] p-3 text-sm text-neutral-700'
           }
         >
           {message}

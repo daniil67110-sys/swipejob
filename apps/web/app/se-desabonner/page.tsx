@@ -1,7 +1,10 @@
 import { eq } from 'drizzle-orm';
+import Link from 'next/link';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import { db, isDatabaseConfigured } from '@/lib/db';
 import { preferences } from '@swipejob/db/schema';
 import { auditLog } from '@/lib/audit';
+import { SwipejobLogo } from '@/components/shared/SwipejobLogo';
 
 export const metadata = {
   title: 'Désabonnement — SwipeJob',
@@ -64,11 +67,48 @@ export default async function UnsubscribePage({
 
 function Message({ ok, text }: { ok: boolean; text: string }) {
   return (
-    <main className="mx-auto max-w-md p-10">
-      <h1 className="mb-3 text-2xl font-bold">{ok ? 'Désabonnement confirmé' : 'Oups…'}</h1>
-      <p role="status" aria-live="polite" className={ok ? 'text-neutral-700' : 'text-error-500'}>
-        {text}
-      </p>
+    <main className="flex min-h-dvh flex-col bg-[#f7f5f1]">
+      <header className="border-b border-neutral-200/80 bg-[#f7f5f1]/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+          <SwipejobLogo asLink href="/" size="sm" />
+        </div>
+      </header>
+      <div className="mx-auto flex w-full max-w-md flex-1 items-center px-6 py-12">
+        <div className="relative w-full overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+          <div className={`h-1 ${ok ? 'bg-neutral-900' : 'bg-red-500'}`} />
+          <div className="space-y-4 p-8">
+            <span
+              className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-sm ${
+                ok ? 'bg-neutral-900' : 'bg-red-500'
+              }`}
+            >
+              {ok ? (
+                <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="h-7 w-7" aria-hidden="true" />
+              )}
+            </span>
+            <h1 className="font-[family-name:var(--font-fraunces)] text-4xl font-semibold leading-tight text-neutral-900">
+              {ok ? (
+                <>
+                  Désabonnement <span className="italic text-neutral-400">confirmé</span>
+                </>
+              ) : (
+                <>Oups…</>
+              )}
+            </h1>
+            <p role="status" aria-live="polite" className="text-body-md text-neutral-700">
+              {text}
+            </p>
+            <Link
+              href="/"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-neutral-900 px-6 py-2.5 text-body-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
+              Retour à l&apos;accueil
+            </Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

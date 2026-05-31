@@ -100,14 +100,14 @@ export function CitiesMultiAutocomplete({
           {cities.map((c) => (
             <li
               key={c.label}
-              className="flex items-center gap-1 rounded-full border border-primary-500/40 bg-primary-100 px-3 py-1 text-xs"
+              className="flex items-center gap-1 rounded-full border border-primary-500/40 bg-orange-50 px-3 py-1 text-xs"
             >
               <span>{c.label}</span>
               <button
                 type="button"
                 aria-label={`Retirer ${c.label}`}
                 onClick={() => remove(c.label)}
-                className="ml-1 rounded-full px-1 text-neutral-600 hover:bg-primary-500/20 hover:text-neutral-900"
+                className="ml-1 rounded-full px-1 text-neutral-600 hover:bg-orange-500/20 hover:text-neutral-900"
               >
                 ×
               </button>
@@ -130,7 +130,7 @@ export function CitiesMultiAutocomplete({
               add(suggestions[0]);
             }
           }}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
           aria-autocomplete="list"
           aria-expanded={open}
           aria-controls="cities-suggestions"
