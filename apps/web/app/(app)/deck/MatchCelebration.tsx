@@ -112,7 +112,7 @@ export function MatchCelebration({ triggerKey }: MatchCelebrationProps) {
                     }
               }
               transition={{ duration: 0.8, ease: 'easeInOut', repeat: 1 }}
-              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-white shadow-md"
+              className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-md"
             >
               <Sparkles className="h-7 w-7" strokeWidth={2.2} />
             </motion.span>

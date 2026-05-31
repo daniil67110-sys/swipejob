@@ -98,7 +98,7 @@ export function CityAutocomplete<TForm extends { city?: string }>({
             register.onChange(e);
           }}
           onFocus={() => setOpen(suggestions.length > 0)}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
           aria-autocomplete="list"
           aria-expanded={open}
           aria-controls="city-suggestions"
@@ -125,7 +125,7 @@ export function CityAutocomplete<TForm extends { city?: string }>({
           </ul>
         ) : null}
       </div>
-      {error ? <p className="text-xs text-error-500">{error}</p> : null}
+      {error ? <p className="text-xs text-red-600">{error}</p> : null}
     </div>
   );
 }

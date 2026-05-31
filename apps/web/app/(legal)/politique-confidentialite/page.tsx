@@ -28,7 +28,7 @@ export default function PolitiqueConfidentialitePage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10 lg:py-16">
       <LegalPageView page="politique-confidentialite" />
-      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-12">
         <article className="mx-auto w-full max-w-3xl">
           <LegalPageHeader
             icon={Shield}

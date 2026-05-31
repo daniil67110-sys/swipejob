@@ -52,11 +52,11 @@ export function ParentalConsentForm() {
           autoComplete="off"
           aria-invalid={Boolean(errors.parentName)}
           aria-describedby={errors.parentName ? 'parentName-error' : undefined}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
           {...register('parentName')}
         />
         {errors.parentName ? (
-          <p id="parentName-error" className="text-xs text-error-500">
+          <p id="parentName-error" className="text-xs text-red-600">
             {errors.parentName.message}
           </p>
         ) : null}
@@ -72,11 +72,11 @@ export function ParentalConsentForm() {
           autoComplete="off"
           aria-invalid={Boolean(errors.parentEmail)}
           aria-describedby={errors.parentEmail ? 'parentEmail-error' : undefined}
-          className="block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 min-h-[44px]"
+          className="block w-full rounded-2xl border border-neutral-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/15 min-h-[44px]"
           {...register('parentEmail')}
         />
         {errors.parentEmail ? (
-          <p id="parentEmail-error" className="text-xs text-error-500">
+          <p id="parentEmail-error" className="text-xs text-red-600">
             {errors.parentEmail.message}
           </p>
         ) : null}
@@ -87,7 +87,7 @@ export function ParentalConsentForm() {
           id="confirmed"
           type="checkbox"
           aria-invalid={Boolean(errors.confirmed)}
-          className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500"
+          className="mt-1 h-4 w-4 rounded border-neutral-200 text-orange-600 focus:ring-orange-500/40"
           {...register('confirmed')}
         />
         <label htmlFor="confirmed" className="text-sm text-neutral-700">
@@ -95,14 +95,12 @@ export function ParentalConsentForm() {
           recevoir cet email.
         </label>
       </div>
-      {errors.confirmed ? (
-        <p className="text-xs text-error-500">{errors.confirmed.message}</p>
-      ) : null}
+      {errors.confirmed ? <p className="text-xs text-red-600">{errors.confirmed.message}</p> : null}
 
       <button
         type="submit"
         disabled={isPending || !isValid}
-        className="flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
+        className="flex w-full items-center justify-center rounded-md bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-500/40 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 min-h-[44px]"
       >
         {isPending ? 'Envoi…' : 'Envoyer le lien à mon parent'}
       </button>
@@ -111,7 +109,7 @@ export function ParentalConsentForm() {
         <div
           role="alert"
           aria-live="polite"
-          className="rounded-md border border-error-500/40 bg-error-100 p-3 text-sm text-error-500"
+          className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600"
         >
           {serverError}
         </div>

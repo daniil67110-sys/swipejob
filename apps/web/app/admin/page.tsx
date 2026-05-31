@@ -41,7 +41,7 @@ export default async function AdminHomePage() {
     <div className="space-y-10">
       <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
         <div>
-          <h1 className="text-display-sm font-display font-bold text-neutral-900">
+          <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
             Tableau de bord
           </h1>
           <p className="mt-2 text-body-md text-neutral-600">

@@ -82,7 +82,9 @@ export default async function AdminAuditLogsPage({
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-display-sm font-display font-bold text-neutral-900">Journal audit</h1>
+          <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
+            Journal audit
+          </h1>
           <p className="mt-2 text-body-md text-neutral-600">
             Trace append-only des actions sensibles (RGPD, modération, auth). IP et user-agent sont
             hashés HMAC-SHA256 (Story 6.5).

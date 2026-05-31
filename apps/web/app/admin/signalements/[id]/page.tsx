@@ -33,7 +33,7 @@ export default async function AdminAccessibilityReportDetailPage({
       </Link>
 
       <header>
-        <h1 className="text-display-sm font-display font-bold text-neutral-900">
+        <h1 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
           Signalement #{report.id.slice(0, 8)}
         </h1>
       </header>

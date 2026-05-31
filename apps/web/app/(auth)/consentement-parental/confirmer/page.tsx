@@ -112,18 +112,14 @@ function renderOutcome(outcome: Outcome) {
   return (
     <div
       className={`relative rounded-2xl bg-white shadow-xl border overflow-hidden ${
-        isSuccess ? 'border-success-100' : 'border-neutral-100'
+        isSuccess ? 'border-neutral-200' : 'border-red-200'
       }`}
     >
-      <div
-        className={`h-1.5 ${
-          isSuccess
-            ? 'bg-gradient-to-r from-success-500 to-info-500'
-            : 'bg-gradient-to-r from-warning-500 to-error-500'
-        }`}
-      />
+      <div className={`h-1.5 ${isSuccess ? 'bg-neutral-900' : 'bg-red-600'}`} />
       <div className="p-8 space-y-3 text-center">
-        <h2 className="text-display-md font-display font-bold text-neutral-900">{m.title}</h2>
+        <h2 className="font-[family-name:var(--font-fraunces)] text-3xl font-semibold text-neutral-900 sm:text-4xl">
+          {m.title}
+        </h2>
         <p className="text-body-sm text-neutral-600 leading-relaxed">{m.body}</p>
       </div>
     </div>

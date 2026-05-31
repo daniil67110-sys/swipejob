@@ -116,9 +116,8 @@ export default async function ProfilPage() {
 
         <Link
           href="/profil/parrainage"
-          className="group relative overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          className="group relative block rounded-3xl border border-neutral-200 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
         >
-          <div className="h-1 bg-orange-500" />
           <div className="flex items-center gap-3 p-5">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#f7f5f1] ring-1 ring-neutral-200">
               <Sparkles className="h-6 w-6 text-orange-500" strokeWidth={2.25} aria-hidden="true" />

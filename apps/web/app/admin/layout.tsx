@@ -27,7 +27,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             </p>
           </div>
           <span
-            className="text-[10px] font-semibold uppercase tracking-wider text-warning-600 bg-warning-100 px-2 py-1 rounded-md"
+            className="text-[10px] font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-1 rounded-md"
             aria-label="Rôle administrateur"
           >
             Admin

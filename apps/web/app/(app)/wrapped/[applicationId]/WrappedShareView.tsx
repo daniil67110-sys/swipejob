@@ -49,7 +49,6 @@ export function WrappedShareView({ data }: Props) {
         });
         return;
       }
-      // Fallback : téléchargement
       downloadBlob(blob, 'swipejob-wrapped.png');
     } catch {
       // utilisateur a annulé — silencieux
@@ -84,16 +83,19 @@ export function WrappedShareView({ data }: Props) {
   };
 
   return (
-    <div className="min-h-dvh bg-gradient-to-br from-accent-500 via-primary-500 to-success-500 text-white relative overflow-hidden">
+    <div
+      className="relative min-h-dvh overflow-hidden text-white"
+      style={{ backgroundColor: '#0D0D14' }}
+    >
       <ConfettiBackdrop />
 
-      <div className="relative mx-auto max-w-2xl px-6 py-12 sm:py-16 space-y-10">
+      <div className="relative mx-auto max-w-2xl space-y-10 px-6 py-12 sm:py-16">
         {/* Hero */}
         <motion.header
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 220, damping: 22 }}
-          className="text-center space-y-4"
+          className="space-y-4 text-center"
           role="status"
           aria-live="polite"
         >
@@ -101,22 +103,19 @@ export function WrappedShareView({ data }: Props) {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.2 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-sm shadow-lg"
+            className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-orange-500 shadow-xl"
             aria-hidden="true"
           >
-            <PartyPopper className="w-10 h-10" strokeWidth={2.25} />
+            <PartyPopper className="h-10 w-10" strokeWidth={2.25} />
           </motion.div>
-          <p className="text-caption uppercase tracking-wider font-semibold text-white/85">
+          <p className="text-caption font-semibold uppercase tracking-[0.18em] text-white/70">
             C&apos;est signé !
           </p>
-          <h1 className="text-display-xl sm:text-display-2xl font-display font-bold leading-[1.05] tracking-tight">
+          <h1 className="font-[family-name:var(--font-fraunces)] text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
             Tu as signé chez{' '}
-            <span className="block sm:inline bg-white/20 backdrop-blur-sm rounded-2xl px-3 py-1">
-              {data.companyName}
-            </span>{' '}
-            🎉
+            <span className="block italic text-orange-400 sm:inline">{data.companyName}</span>
           </h1>
-          <p className="text-heading-md font-medium text-white/90 max-w-md mx-auto">
+          <p className="mx-auto max-w-md text-heading-md font-medium text-white/85">
             {data.jobTitle}
           </p>
         </motion.header>
@@ -145,15 +144,18 @@ export function WrappedShareView({ data }: Props) {
           className="space-y-3"
           aria-label="Aperçu Instagram Story"
         >
-          <p className="text-caption uppercase tracking-wider font-semibold text-white/85 text-center">
+          <p className="text-center text-caption font-semibold uppercase tracking-[0.18em] text-white/70">
             Image prête à partager
           </p>
-          <div className="rounded-2xl bg-white/10 backdrop-blur-sm p-3 shadow-xl">
+          <div
+            className="rounded-3xl p-3 shadow-xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={ogImageUrl}
               alt={`Carte de partage : signé chez ${data.companyName}`}
-              className="w-full max-w-[280px] mx-auto rounded-xl shadow-md"
+              className="mx-auto w-full max-w-[280px] rounded-2xl shadow-md"
               loading="eager"
             />
           </div>
@@ -172,25 +174,25 @@ export function WrappedShareView({ data }: Props) {
         >
           <ShareButton
             onClick={handleInstagramShare}
-            icon={<Instagram className="w-5 h-5" aria-hidden="true" />}
+            icon={<Instagram className="h-5 w-5" aria-hidden="true" />}
             label="Partager en Instagram Story"
             primary
           />
           <div className="grid grid-cols-2 gap-3">
             <ShareButton
               onClick={handleLinkedInShare}
-              icon={<Linkedin className="w-5 h-5" aria-hidden="true" />}
+              icon={<Linkedin className="h-5 w-5" aria-hidden="true" />}
               label="Post LinkedIn"
             />
             <ShareButton
               onClick={handleDownload}
-              icon={<Download className="w-5 h-5" aria-hidden="true" />}
+              icon={<Download className="h-5 w-5" aria-hidden="true" />}
               label="Télécharger"
             />
           </div>
           <ShareButton
             onClick={handleInviteFriends}
-            icon={<Sparkles className="w-5 h-5" aria-hidden="true" />}
+            icon={<Sparkles className="h-5 w-5" aria-hidden="true" />}
             label="Inviter un pote"
           />
         </motion.section>
@@ -200,37 +202,38 @@ export function WrappedShareView({ data }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4 }}
-          className="rounded-2xl bg-white/10 backdrop-blur-sm overflow-hidden"
+          className="overflow-hidden rounded-3xl"
+          style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
         >
-          <summary className="px-4 py-3 cursor-pointer text-body-sm font-semibold list-none flex items-center justify-between">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-body-sm font-semibold">
             <span>Texte pré-rédigé pour LinkedIn</span>
-            <ArrowRight className="w-4 h-4 transition-transform" aria-hidden="true" />
+            <ArrowRight className="h-4 w-4 transition-transform" aria-hidden="true" />
           </summary>
-          <div className="px-4 py-3 border-t border-white/15">
+          <div className="border-t border-white/15 px-4 py-3">
             <textarea
-              className="w-full min-h-[140px] rounded-lg bg-white/15 backdrop-blur-sm p-3 text-body-sm text-white placeholder:text-white/60 font-sans focus:outline-none focus:ring-2 focus:ring-white/40 resize-y"
+              className="min-h-[140px] w-full resize-y rounded-2xl p-3 font-sans text-body-sm text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-orange-500/60"
+              style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
               defaultValue={linkedinText}
               aria-label="Texte LinkedIn modifiable"
             />
-            <p className="text-caption text-white/80 mt-2">
+            <p className="mt-2 text-caption text-white/75">
               Modifie le texte, copie-le, puis clique sur « Post LinkedIn ».
             </p>
           </div>
         </motion.details>
 
-        {/* Back to dashboard */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6 }}
-          className="text-center pt-2"
+          className="pt-2 text-center"
         >
           <Link
             href="/candidatures"
             onClick={handleDashboard}
-            className="inline-flex items-center gap-2 text-body-sm font-semibold text-white/90 hover:text-white hover:underline"
+            className="inline-flex items-center gap-2 text-body-sm font-semibold text-white/85 transition-colors hover:text-orange-400 hover:underline"
           >
-            <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
+            <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
             Retour au dashboard
           </Link>
         </motion.div>
@@ -247,16 +250,17 @@ function StatCard({ label, sublabel, value }: { label: string; sublabel: string;
         visible: { opacity: 1, y: 0, scale: 1 },
       }}
       transition={{ type: 'spring', stiffness: 180, damping: 18 }}
-      className="rounded-2xl bg-white/15 backdrop-blur-sm p-4 sm:p-5 text-center shadow-md"
+      className="rounded-3xl p-4 text-center shadow-md sm:p-5"
+      style={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
     >
       <p
-        className="text-display-lg sm:text-display-xl font-display font-bold leading-none tabular-nums"
+        className="font-[family-name:var(--font-fraunces)] text-5xl font-semibold leading-none tabular-nums sm:text-6xl"
         aria-label={`${value} ${label.toLowerCase()} ${sublabel}`}
       >
         {value}
       </p>
-      <p className="text-caption text-white/85 font-semibold mt-1.5">{label}</p>
-      <p className="text-[10px] text-white/70 uppercase tracking-wider mt-0.5">{sublabel}</p>
+      <p className="mt-1.5 text-caption font-semibold text-white/85">{label}</p>
+      <p className="mt-0.5 text-[10px] uppercase tracking-[0.18em] text-white/65">{sublabel}</p>
     </motion.div>
   );
 }
@@ -280,11 +284,10 @@ function ShareButton({
       }}
       type="button"
       onClick={onClick}
-      className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl text-body-md font-semibold shadow-md hover:shadow-lg active:scale-95 transition-all min-h-[52px] ${
-        primary
-          ? 'bg-white text-primary-600 hover:bg-white/95'
-          : 'bg-white/15 backdrop-blur-sm text-white hover:bg-white/25'
+      className={`inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-body-md font-semibold shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95 ${
+        primary ? 'bg-orange-500 text-white hover:bg-orange-600' : 'text-white hover:bg-white/15'
       }`}
+      style={primary ? undefined : { backgroundColor: 'rgba(255,255,255,0.08)' }}
     >
       {icon}
       {label}
@@ -294,7 +297,7 @@ function ShareButton({
 
 function ConfettiBackdrop() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       {Array.from({ length: 24 }).map((_, i) => {
         const left = (i * 37) % 100;
         const delay = (i % 8) * 0.4;
@@ -310,11 +313,11 @@ function ConfettiBackdrop() {
               repeat: Infinity,
               ease: 'linear',
             }}
-            className="absolute w-2 h-2 rounded-sm"
+            className="absolute h-2 w-2 rounded-sm"
             style={{
               left: `${left}%`,
               top: '-10px',
-              backgroundColor: ['#FFE5DC', '#DBEEFF', '#D4F4E4', '#FFE9D6'][i % 4],
+              backgroundColor: ['#F97316', '#FB923C', '#FED7AA', '#FFFFFF'][i % 4],
             }}
           />
         );

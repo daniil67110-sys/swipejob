@@ -31,7 +31,7 @@ export function RequestExportButton() {
         type="button"
         onClick={onClick}
         disabled={pending}
-        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-gradient-to-r from-info-500 to-success-500 text-white text-body-sm font-semibold shadow-md hover:shadow-lg active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all min-h-[48px]"
+        className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-neutral-900 text-white text-body-sm font-semibold shadow-md hover:shadow-lg active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all min-h-[48px]"
       >
         {pending ? (
           <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
@@ -45,7 +45,7 @@ export function RequestExportButton() {
         <p
           role="status"
           aria-live="polite"
-          className="flex items-start gap-2 text-body-sm text-success-500"
+          className="flex items-start gap-2 text-body-sm text-neutral-800"
         >
           <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           <span>
@@ -56,7 +56,7 @@ export function RequestExportButton() {
         </p>
       ) : null}
       {error ? (
-        <p role="alert" className="flex items-start gap-2 text-body-sm text-error-500">
+        <p role="alert" className="flex items-start gap-2 text-body-sm text-red-600">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </p>
